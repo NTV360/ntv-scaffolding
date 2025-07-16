@@ -1,0 +1,114 @@
+/* Global Text Color Styles for Light and Dark Mode */
+
+/* Base text colors that apply to all elements */
+body {
+  @apply text-slate-900;
+}
+
+.dark body {
+  @apply text-slate-100;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-slate-900;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  @apply text-slate-100;
+}
+
+/* Paragraphs and general text */
+p, span, div, label {
+  @apply text-slate-700;
+}
+
+.dark p, .dark span, .dark div, .dark label {
+  @apply text-slate-300;
+}
+
+/* Links */
+a {
+  @apply text-blue-600 hover:text-blue-800;
+}
+
+.dark a {
+  @apply text-blue-400 hover:text-blue-300;
+}
+
+/* Form elements */
+input, textarea, select {
+  @apply text-slate-900 bg-white border-slate-300;
+}
+
+.dark input, .dark textarea, .dark select {
+  @apply text-slate-100 bg-slate-800 border-slate-600;
+}
+
+/* Buttons */
+button {
+  @apply text-white;
+}
+
+.dark button {
+  @apply text-slate-100;
+}
+
+/* Utility classes for specific text colors */
+.text-primary {
+  @apply text-slate-900;
+}
+
+.dark .text-primary {
+  @apply text-slate-100;
+}
+
+.text-secondary {
+  @apply text-slate-700;
+}
+
+.dark .text-secondary {
+  @apply text-slate-300;
+}
+
+.text-tertiary {
+  @apply text-slate-600;
+}
+
+.dark .text-tertiary {
+  @apply text-slate-400;
+}
+
+.text-muted {
+  @apply text-slate-500;
+}
+
+.dark .text-muted {
+  @apply text-slate-500;
+}
+
+.text-inverted {
+  @apply text-white;
+}
+
+.dark .text-inverted {
+  @apply text-slate-900;
+}
+
+.text-auto {
+  @apply text-slate-900;
+}
+
+.dark .text-auto {
+  @apply text-slate-100;
+}
+
+/* Ensure all text inherits proper colors */
+* {
+  color: inherit;
+}
+
+/* Override any conflicting styles */
+.dark * {
+  border-color: inherit;
+}

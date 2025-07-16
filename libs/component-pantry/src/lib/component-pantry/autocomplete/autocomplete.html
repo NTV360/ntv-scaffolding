@@ -1,0 +1,242 @@
+<div class="autocomplete-wrapper">
+  <!-- Multi-select Input with Chips -->
+  @if (mergedConfig().multiple) {
+    <div class="multi-input-wrapper" [class]="getMultiInputClasses()">
+      <!-- Label -->
+      @if (label()) {
+        <label [for]="id()" class="input-label">{{ label() }}</label>
+      }
+      
+      <!-- Input Container with Selected Chips -->
+      <div 
+        class="multi-input-container" 
+        (click)="focusInput()"
+        (keydown.enter)="focusInput()"
+        (keydown.space)="focusInput()"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="'Input container for ' + (label() || 'autocomplete')"
+      >
+        <!-- Chips Container with Horizontal Scroll -->
+        <div #chipsContainerRef class="chips-container">
+          <!-- Visible Selected Options as Chips -->
+          @for (option of getVisibleChips(); track option.value) {
+            <div 
+              [class]="getChipClasses()" 
+              [ngStyle]="getChipStyles()"
+            >
+              <span class="chip-label" [title]="option.label">{{ option.label }}</span>
+              <button 
+                  type="button"
+                  class="chip-remove"
+                  (click)="onRemoveOption(option, $event)"
+                  [attr.aria-label]="'Remove ' + option.label"
+                >
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6L14 14M6 14L14 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          }
+          
+          <!-- Overflow Indicator -->
+          @if (getOverflowCount() > 0) {
+            <div 
+              [class]="'overflow-chip chip-' + chipColor()" 
+              [ngStyle]="getChipStyles()"
+              (click)="toggleShowAllChips()"
+              [attr.aria-label]="'Show ' + getOverflowCount() + ' more selections'"
+              tabindex="0"
+              role="button"
+            >
+              <span class="overflow-text">+{{ getOverflowCount() }} more</span>
+            </div>
+          }
+        </div>
+        
+        <!-- Input Field -->
+        <input
+          #multiInputRef
+          [id]="id()"
+          type="text"
+          class="multi-input-field"
+          [placeholder]="getMultiInputPlaceholder()"
+          [disabled]="disabled() || disabledState()"
+          [value]="searchTerm()"
+          (input)="onInputChange($event)"
+          (focus)="onInputFocus()"
+          (blur)="onInputBlur()"
+          (keydown)="onMultiInputKeyDown($event)"
+        />
+        
+        <!-- Right Side Controls -->
+        <div class="input-controls">
+          <!-- Clear Button -->
+          @if (mergedConfig().clearable && hasSelection()) {
+            <button 
+              type="button"
+              class="clear-button"
+              (click)="onClear()"
+              (keydown.enter)="onClear()"
+              (keydown.space)="onClear()"
+              [attr.aria-label]="'Clear all selections'"
+              tabindex="0"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          }
+          
+          <!-- Dropdown Arrow -->
+          <svg 
+            class="dropdown-arrow"
+            [class.rotated]="showDropdown()"
+            width="16" 
+            height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2"
+          >
+            <polyline points="6,9 12,15 18,9"></polyline>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Error/Info Messages -->
+      @if (error()) {
+        <div class="input-message error">
+          <p>{{ error() }}</p>
+        </div>
+      } @else if (info()) {
+        <div class="input-message info">
+          <p>{{ info() }}</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Single Select Input -->
+    <ntv-input
+      #inputRef
+      [id]="id()"
+      [label]="label()"
+      [error]="error()"
+      [info]="info()"
+      [size]="size()"
+      [variant]="variant()"
+      [placeholder]="mergedConfig().placeholder || 'Search...'"
+      [disabledInput]="disabled() || disabledState()"
+      [clearable]="!!(mergedConfig().clearable && hasSelection())"
+      (input)="onInputChange($event)"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      (inputCleared)="onClear()"
+    >
+      <!-- Left Icon Slot -->
+      <ng-content select="[left-icon]"></ng-content>
+      
+      <!-- Right Icon - Dropdown Arrow -->
+      <svg 
+        right-icon
+        class="dropdown-arrow"
+        [class.rotated]="showDropdown()"
+        width="16" 
+        height="16" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2"
+      >
+        <polyline points="6,9 12,15 18,9"></polyline>
+      </svg>
+    </ntv-input>
+  }
+
+  <!-- Dropdown -->
+  @if (showDropdown()) {
+    <div 
+      #dropdownRef
+      class="dropdown"
+      [class.loading]="loading()"
+      role="listbox"
+      [attr.aria-label]="'Options for ' + (label() || 'autocomplete')"
+    >
+      <!-- Dropdown Header with Close Button (Multiple Mode Only) -->
+      @if (mergedConfig().multiple) {
+        <div class="dropdown-header">
+          <button 
+            type="button"
+            class="close-dropdown"
+            (click)="closeDropdown()"
+            (keydown.enter)="closeDropdown()"
+            (keydown.space)="closeDropdown()"
+            [attr.aria-label]="'Close dropdown'"
+            tabindex="0"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      }
+      
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="dropdown-item loading-item">
+          <div class="loading-spinner"></div>
+          <span>{{ mergedConfig().loadingText }}</span>
+        </div>
+      } @else {
+        <!-- Options List -->
+        @if (filteredOptions().length > 0) {
+          @for (option of filteredOptions(); track option.value; let i = $index) {
+            <div 
+              class="dropdown-item"
+              [class.highlighted]="isOptionHighlighted(i)"
+              [class.selected]="isOptionSelected(option)"
+              [class.disabled]="option.disabled"
+              [attr.role]="'option'"
+              [attr.aria-selected]="isOptionSelected(option)"
+              [attr.aria-disabled]="option.disabled"
+              [attr.tabindex]="option.disabled ? -1 : 0"
+              (click)="onOptionClick(option, $event)"
+              (mousedown)="onOptionMouseDown($event)"
+              (mouseup)="onOptionMouseUp($event)"
+              (mouseleave)="onOptionMouseLeave($event)"
+              (keydown.enter)="onOptionSelect(option)"
+              (keydown.space)="onOptionSelect(option)"
+              (mouseenter)="highlightedIndex.set(i)"
+            >
+              <!-- Selection Indicator (Multiple Mode) -->
+              @if (mergedConfig().multiple) {
+                <div class="selection-indicator">
+                  @if (isOptionSelected(option)) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20,6 9,17 4,12"></polyline>
+                    </svg>
+                  }
+                </div>
+              }
+              
+              <!-- Option Content -->
+              <div class="option-content">
+                <span class="option-label">{{ option.label }}</span>
+                @if (option.group) {
+                  <span class="option-group">{{ option.group }}</span>
+                }
+              </div>
+            </div>
+          }
+        } @else {
+          <!-- No Results -->
+          <div class="dropdown-item no-results">
+            <span>{{ mergedConfig().noResultsText }}</span>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

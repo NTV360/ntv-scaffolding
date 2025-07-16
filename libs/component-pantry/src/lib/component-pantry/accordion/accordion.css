@@ -1,0 +1,223 @@
+/* Accordion Base Styles */
+.accordion {
+  @apply w-full;
+}
+
+/* Accordion Variants */
+.accordion--default .accordion__item {
+  @apply bg-white border-b border-gray-200 dark:bg-neutral-800 dark:border-neutral-700;
+}
+
+.accordion--bordered .accordion__item {
+  @apply bg-white border border-gray-200 rounded-xl mb-2 dark:bg-neutral-800 dark:border-neutral-700;
+}
+
+.accordion--flush .accordion__item {
+  @apply bg-transparent border-b border-gray-200 dark:border-neutral-700;
+}
+
+/* Accordion Sizes */
+.accordion--sm .accordion__header {
+  @apply py-2 px-3 text-sm;
+}
+
+.accordion--md .accordion__header {
+  @apply py-4 px-5 text-base;
+}
+
+.accordion--lg .accordion__header {
+  @apply py-6 px-6 text-lg;
+}
+
+/* Accordion Item */
+.accordion__item {
+  @apply transition-all duration-200 overflow-hidden;
+}
+
+.accordion__item--open {
+  @apply shadow-sm;
+}
+
+.accordion__item--disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Accordion Header */
+.accordion__header {
+  @apply w-full flex justify-between items-center gap-x-3 font-semibold text-start text-gray-800 hover:text-gray-600 focus:outline-none transition-colors duration-200 dark:text-neutral-200 dark:hover:text-neutral-400;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.accordion__header--open {
+  @apply text-blue-600 dark:text-blue-500;
+}
+
+.accordion__header--disabled {
+  @apply cursor-not-allowed opacity-50 hover:text-gray-800 dark:hover:text-neutral-200;
+}
+
+/* Accordion Title */
+.accordion__title {
+  @apply flex-1 text-left;
+}
+
+/* Accordion Icon */
+.accordion__icon {
+  @apply flex-shrink-0 transition-transform duration-200;
+}
+
+.accordion__icon--open {
+  @apply transform rotate-180;
+}
+
+.accordion__icon-plus,
+.accordion__icon-minus {
+  @apply transition-opacity duration-200;
+}
+
+.accordion__icon--hidden {
+  @apply opacity-0 absolute;
+}
+
+/* Accordion Content */
+.accordion__content {
+  @apply overflow-hidden transition-all duration-300 ease-in-out;
+  max-height: 0;
+}
+
+.accordion__content--open {
+  max-height: 1000px; /* Large enough value for content */
+}
+
+/* Accordion Body */
+.accordion__body {
+  @apply py-4;
+}
+
+.accordion--sm .accordion__body {
+  @apply py-2 px-3;
+}
+
+.accordion--md .accordion__body {
+  @apply py-4 px-5;
+}
+
+.accordion--lg .accordion__body {
+  @apply py-6 px-6;
+}
+
+/* Accordion Text */
+.accordion__text {
+  @apply text-gray-800 dark:text-neutral-200 leading-relaxed;
+}
+
+.accordion--sm .accordion__text {
+  @apply text-sm;
+}
+
+.accordion--md .accordion__text {
+  @apply text-base;
+}
+
+.accordion--lg .accordion__text {
+  @apply text-lg;
+}
+
+/* Animation Enhancement */
+.accordion--animated .accordion__content {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.accordion--animated .accordion__icon {
+  @apply transition-transform duration-200 ease-in-out;
+}
+
+.accordion--animated .accordion__header {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+/* Hover Effects */
+.accordion__header:hover:not(.accordion__header--disabled) {
+  @apply bg-gray-50 dark:bg-neutral-700/50;
+}
+
+.accordion--bordered
+  .accordion__header:hover:not(.accordion__header--disabled) {
+  @apply bg-gray-50 dark:bg-neutral-700/50;
+}
+
+.accordion--flush .accordion__header:hover:not(.accordion__header--disabled) {
+  @apply bg-gray-50 dark:bg-neutral-800/50;
+}
+
+/* Focus States */
+.accordion__header:focus {
+  @apply outline-none bg-blue-50 dark:bg-blue-900/20;
+}
+
+.accordion--bordered .accordion__header:focus {
+  @apply bg-blue-50 dark:bg-blue-900/20;
+}
+
+/* Active States */
+.accordion__item--open.accordion--bordered {
+  @apply border-gray-300 dark:border-neutral-600;
+}
+
+.accordion__header--open .accordion__icon {
+  @apply text-blue-600 dark:text-blue-500;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .accordion--lg .accordion__header {
+    @apply py-4 px-4 text-base;
+  }
+
+  .accordion--lg .accordion__body {
+    @apply pb-4 px-4;
+  }
+
+  .accordion--lg .accordion__text {
+    @apply text-base;
+  }
+}
+
+/* Dark Mode Enhancements */
+.dark .accordion__item {
+  @apply border-neutral-700;
+}
+
+.dark .accordion__header {
+  @apply text-neutral-200 hover:text-neutral-400;
+}
+
+.dark .accordion__text {
+  @apply text-neutral-200;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .accordion__header {
+    @apply border-2 border-transparent;
+  }
+
+  .accordion__header:focus {
+    @apply bg-blue-100 dark:bg-blue-800/40;
+  }
+
+  .accordion__item {
+    @apply border-2;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .accordion__content,
+  .accordion__icon,
+  .accordion__header {
+    @apply transition-none;
+  }
+}

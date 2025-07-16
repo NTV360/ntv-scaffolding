@@ -1,0 +1,12 @@
+.layout {
+  @apply flex min-h-screen w-full;
+}
+
+.sidebar {
+  @apply w-[16.625rem] bg-primary-600;
+}
+
+.main-content {
+  @apply flex-1  p-8 min-h-screen overflow-x-auto;
+  @apply container mx-auto px-4 sm:px-6 lg:px-8;
+}

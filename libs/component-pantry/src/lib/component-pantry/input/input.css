@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base input styles using Tailwind theme colors */
+
+:host {
+  /* Global Defaults using Tailwind theme() function */
+  --input-variant-color: theme('colors.default.DEFAULT');
+  --input-focus-color: theme('colors.default.DEFAULT');
+  --input-error-color: theme('colors.red.600');
+  --input-background-color: theme('colors.white');
+  --input-disabled-bg: theme('colors.gray.100');
+
+  --input-text-color: var(--input-variant-color);
+  --input-placeholder-color: theme('colors.gray.400');
+  --input-icon-color-hover: var(--input-focus-color);
+}
+
+/* 🌙 Dark Mode Styles */
+:host-context(.dark) {
+  --input-background-color: theme('colors.gray.800');
+  --input-disabled-bg: theme('colors.gray.700');
+  --input-placeholder-color: theme('colors.gray.500');
+  --input-variant-color: theme('colors.gray.600');
+  --input-focus-color: theme('colors.blue.500');
+}
+
+:host-context(.dark).variant-primary {
+  --input-variant-color: theme('colors.blue.400');
+  --input-focus-color: theme('colors.blue.300');
+}
+
+:host-context(.dark).variant-success {
+  --input-variant-color: theme('colors.green.400');
+  --input-focus-color: theme('colors.green.300');
+}
+
+:host-context(.dark).variant-danger {
+  --input-variant-color: theme('colors.red.400');
+  --input-focus-color: theme('colors.red.300');
+}
+
+/* 🟢 Semantic Variant Host Classes (used via @HostBinding) */
+:host(.variant-default) {
+  --input-variant-color: theme('colors.default.DEFAULT');
+  --input-focus-color: theme('colors.default.DEFAULT');
+}
+
+:host(.variant-primary) {
+  --input-variant-color: theme('colors.default.primary');
+  --input-focus-color: theme('colors.default.primary-focused');
+}
+
+:host(.variant-success) {
+  --input-variant-color: theme('colors.default.success');
+  --input-focus-color: theme('colors.default.success');
+}
+
+:host(.variant-danger) {
+  --input-variant-color: theme('colors.default.danger');
+  --input-focus-color: theme('colors.default.danger');
+}
+
+/* Header Styling */
+.input__header {
+  @apply flex items-center justify-between mb-1;
+}
+
+/* ✅ Wrapper Styling */
+.input__wrapper {
+  @apply flex items-center relative border transition-all duration-75;
+  @apply bg-[var(--input-background-color)] border-[var(--input-variant-color)] text-[var(--input-text-color)];
+  @apply focus-within:outline-none;
+}
+
+.input__wrapper:focus-within {
+  @apply border-[var(--input-focus-color)] text-[var(--input-focus-color)];
+  box-shadow: 0 0 0 0px var(--input-background-color), 0 0 0 1px var(--input-focus-color);
+  animation: focus-settle 0.3s ease-out forwards;
+}
+
+@keyframes focus-settle {
+  0% {
+    box-shadow: 0 0 0 1px var(--input-background-color), 0 0 0 2px var(--input-focus-color);
+  }
+  100% {
+    box-shadow: 0 0 0 0px var(--input-background-color), 0 0 0 1px var(--input-focus-color);
+  }
+}
+
+.input__wrapper:has(input:disabled) {
+  @apply bg-[var(--input-disabled-bg)];
+}
+
+/* 🟥 Error State from @HostBinding */
+:host(.error) .input__wrapper {
+  @apply border-[var(--input-error-color)] text-[var(--input-error-color)];
+}
+
+:host(.error) .input__wrapper input {
+  color: inherit;
+}
+
+:host(.error) .input__wrapper svg[right-icon],
+:host(.error) .input__wrapper svg[left-icon] {
+  stroke: currentColor;
+}
+
+.input__wrapper input {
+  @apply w-full h-full outline-none bg-transparent cursor-text disabled:cursor-not-allowed font-normal;
+  color: inherit;
+}
+
+.input__wrapper input::placeholder {
+  @apply text-[var(--input-placeholder-color)];
+}
+
+.input__wrapper input:disabled {
+  @apply text-gray-400;
+}
+
+/* Dark mode text color for disabled inputs */
+:host-context(.dark) .input__wrapper input:disabled {
+  @apply text-gray-500;
+}
+
+.input__wrapper svg[right-icon],
+.input__wrapper svg[left-icon] {
+  @apply w-5 h-5 outline-none cursor-pointer transition-colors;
+  stroke: currentColor;
+}
+
+.input__wrapper svg[right-icon]:hover,
+.input__wrapper svg[right-icon]:focus,
+.input__wrapper svg[left-icon]:hover,
+.input__wrapper svg[left-icon]:focus {
+  @apply outline-none stroke-[var(--input-icon-color-hover)];
+}
+
+/* ℹ️ Info/Error Messages */
+.input-message {
+  @apply relative opacity-0 translate-y-1 pointer-events-none;
+  animation: fadeOutDown 0.25s ease forwards;
+}
+
+.input-message p {
+  @apply text-xs;
+}
+
+.input-message:has(p) {
+  @apply opacity-100 translate-y-0 pointer-events-auto;
+  animation: fadeInUp 0.25s ease forwards;
+}
+
+/* ✨ Animations */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}

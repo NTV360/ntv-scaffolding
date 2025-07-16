@@ -1,0 +1,38 @@
+@if (visible()) {
+  <div
+    class="offcanvas"
+    role="dialog"
+    aria-labelledby="offcanvas-title"
+    aria-hidden="false"
+    >
+    <!-- Overlay backdrop -->
+    <div
+      class="offcanvas__backdrop"
+      (click)="close()"
+      (keydown)="handleKeydown($event)"
+      tabindex="0"
+    ></div>
+    <!-- Panel content -->
+    <div class="offcanvas__panel" [ngClass]="getPositionClass()" role="document">
+      <!-- Header section -->
+      @if (header()) {
+        <div class="offcanvas__header">
+          <h3 id="offcanvas-title" class="offcanvas__title">{{ header() }}</h3>
+          <button
+            class="offcanvas__close"
+            (click)="close()"
+            (keydown)="handleKeydown($event)"
+            aria-label="Close drawer"
+            tabindex="0"
+            >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      }
+      <!-- Content section -->
+      <div class="offcanvas__content">
+        <ng-content select="[offcanvas]"></ng-content>
+      </div>
+    </div>
+  </div>
+}

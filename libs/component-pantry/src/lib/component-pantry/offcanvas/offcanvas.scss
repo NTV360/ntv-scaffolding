@@ -1,0 +1,95 @@
+.offcanvas {
+  @apply fixed inset-0 z-50 flex items-start justify-start;
+
+  &__backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-40 z-10 transition-opacity;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  &__panel {
+    @apply fixed bg-white shadow-lg z-20 transition-transform duration-300 ease-in-out flex flex-col;
+
+    /* Position variants */
+    &--left {
+      @apply top-0 left-0 h-full w-80 transform;
+      animation: slideInLeft 0.3s ease-in-out;
+    }
+
+    &--right {
+      @apply top-0 right-0 h-full w-80 transform;
+      animation: slideInRight 0.3s ease-in-out;
+    }
+
+    &--top {
+      @apply top-0 left-0 w-full h-auto max-h-96 transform;
+      animation: slideInTop 0.3s ease-in-out;
+    }
+
+    &--bottom {
+      @apply bottom-0 left-0 w-full h-auto max-h-96 transform;
+      animation: slideInBottom 0.3s ease-in-out;
+    }
+  }
+
+  &__header {
+    @apply flex items-center justify-between px-4 py-3 border-b border-gray-200;
+  }
+
+  &__title {
+    @apply text-lg font-medium text-gray-800;
+  }
+
+  &__close {
+    @apply bg-transparent border-none p-1 text-gray-600 hover:text-gray-900 text-2xl cursor-pointer focus:outline-none;
+  }
+
+  &__content {
+    @apply p-4 flex-1 overflow-y-auto;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInTop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

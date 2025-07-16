@@ -1,0 +1,40 @@
+<div [class]="accordionClasses()" role="tablist">
+  <!-- Accordion Item -->
+  <div class="accordion__item" [class.accordion__item--open]="isOpen()">
+    <!-- Header Section -->
+    <button 
+      class="accordion__header"
+      [class.accordion__header--open]="isOpen()"
+      [class.accordion__header--disabled]="mergedDisabled()"
+      (click)="toggle()"
+      [attr.id]="'accordion-header-' + accordionId()"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-controls]="'accordion-content-' + accordionId()"
+      [attr.disabled]="mergedDisabled() ? true : null"
+      [attr.aria-disabled]="mergedDisabled()"
+      type="button">
+      <ng-content select="[slot=header]"></ng-content>
+      
+      <!-- Default expand/collapse icon -->
+      @if (mergedShowIcons()) {
+        <span class="accordion__icon" [class.accordion__icon--open]="isOpen()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </span>
+      }
+    </button>
+    
+    <!-- Content Section -->
+    <div 
+      class="accordion__content"
+      [class.accordion__content--open]="isOpen()"
+      [attr.id]="'accordion-content-' + accordionId()"
+      [attr.aria-labelledby]="'accordion-header-' + accordionId()"
+      role="region">
+      <div class="accordion__body">
+        <ng-content select="[slot=body]"></ng-content>
+      </div>
+    </div>
+  </div>
+</div>

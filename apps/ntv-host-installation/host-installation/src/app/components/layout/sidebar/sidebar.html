@@ -1,0 +1,22 @@
+<div class="sidebar-container">
+  <div class="sidebar-logo">
+    <img src="ntv-logo.png" alt="NTV Logo" />
+  </div>
+
+  <!-- Vertical Reverse Stepper -->
+  <div class="stepper-container">
+    <ntv-stepper
+      [steps]="installationSteps"
+      [currentStep]="currentStep"
+      [config]="stepperConfig"
+      class="installation-stepper"
+    >
+    </ntv-stepper>
+  </div>
+
+  <div class="sidebar-button">
+    <ntv-button variant="secondary" rounded="full">
+      <span>Back to Old Host Installation</span>
+    </ntv-button>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+.sidebar-container {
+  @apply h-dvh sticky top-0 flex flex-col items-center justify-between gap-8 py-6;
+}
+
+.sidebar-logo {
+  @apply p-4;
+}
+
+.sidebar-logo img {
+  @apply w-auto h-8;
+}
+
+.stepper-container {
+  @apply flex-1 flex flex-col justify-start px-6;
+}
+
+.installation-stepper {
+  @apply w-full h-full;
+}
+
+/* Stepper text colors are now handled by the white color variant */
+
+.sidebar-button {
+  @apply p-4;
+}
+
+.sidebar-button span {
+  @apply text-sm text-gray-500;
+}
