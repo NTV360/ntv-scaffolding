@@ -48,6 +48,13 @@ export class InstallationFlowService {
   }
 
   /**
+   * Go to a specific step by index (alias for navigateToStep)
+   */
+  goToStep(stepIndex: number): boolean {
+    return this.navigateToStep(stepIndex);
+  }
+
+  /**
    * Move to the next step
    */
   nextStep(): boolean {
@@ -89,20 +96,19 @@ export class InstallationFlowService {
   /**
    * Mark the current step as having an error
    */
-  markCurrentStepError(errorMessage?: string): void {
-    this.markStepError(this._currentStepIndex(), errorMessage);
+  markCurrentStepError(): void {
+    this.markStepError(this._currentStepIndex());
   }
 
   /**
    * Mark a specific step as having an error
    */
-  markStepError(stepIndex: number, errorMessage?: string): void {
+  markStepError(stepIndex: number): void {
     const steps = [...this._steps()];
     if (steps[stepIndex]) {
       steps[stepIndex] = {
         ...steps[stepIndex],
         error: true,
-        // You could extend the interface to include errorMessage if needed
       };
       this._steps.set(steps);
     }

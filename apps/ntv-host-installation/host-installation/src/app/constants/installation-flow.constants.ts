@@ -32,6 +32,7 @@ export const DEFAULT_STEPPER_CONFIG: StepperConfig = {
   showLabels: true,
   showDescriptions: true,
   clickable: true,
+  allowSkipping: true,
 };
 
 // Additional stepper configurations for different use cases

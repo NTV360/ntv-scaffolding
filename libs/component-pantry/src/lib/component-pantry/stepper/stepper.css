@@ -310,6 +310,7 @@
 
 .step__connector--vertical {
   @apply after:content-[''] after:w-0.5 after:inline-block after:absolute after:left-4 lg:after:left-5 after:-z-10;
+  @apply before:content-[''] before:w-0.5 before:inline-block before:absolute before:left-4 lg:before:left-5 before:-z-20;
 }
 
 .step__connector--vertical::after {
@@ -319,16 +320,41 @@
   ); /* Full height minus top offset plus full margin spacing */
 }
 
+.step__connector--vertical::before {
+  top: 2.5rem; /* Start from below the step number */
+  height: calc(
+    100% - 2.5rem + 2.5rem
+  ); /* Full height minus top offset plus full margin spacing */
+  @apply bg-gray-200; /* Always show gray background */
+}
+
 .step__connector--vertical-completed::after {
   background-color: theme('colors.accent.500');
+  animation: progressLineDown 0.8s ease-in-out;
 }
 
 .step__connector--vertical-inactive::after {
-  @apply bg-gray-200;
+  display: none; /* Hide the colored line for inactive steps */
+}
+
+.step__connector--vertical-error::after {
+  background-color: theme('colors.danger.500');
+}
+
+/* Enhanced animation for regular vertical */
+.step__connector--vertical-completed.step__connector--animated::after {
+  background: linear-gradient(
+    to bottom,
+    theme('colors.accent.500'),
+    theme('colors.accent.400')
+  );
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+  animation: progressLineDownGradient 1s ease-in-out;
 }
 
 .step__connector--vertical-reverse {
   @apply after:content-[''] after:w-0.5 after:inline-block after:absolute after:right-4 lg:after:right-5 after:-z-10;
+  @apply before:content-[''] before:w-0.5 before:inline-block before:absolute before:right-4 lg:before:right-5 before:-z-20;
 }
 
 .step__connector--vertical-reverse::after {
@@ -338,12 +364,84 @@
   ); /* Full height minus top offset plus full margin spacing */
 }
 
+.step__connector--vertical-reverse::before {
+  top: 2.5rem; /* Start from below the step number */
+  height: calc(
+    100% - 2.5rem + 2.5rem
+  ); /* Full height minus top offset plus full margin spacing */
+  @apply bg-gray-200; /* Always show gray background */
+}
+
 .step__connector--vertical-reverse-completed::after {
   background-color: theme('colors.accent.500');
+  animation: progressLineDown 0.8s ease-in-out;
 }
 
 .step__connector--vertical-reverse-inactive::after {
-  @apply bg-gray-200;
+  display: none; /* Hide the colored line for inactive steps */
+}
+
+.step__connector--vertical-reverse-error::after {
+  background-color: theme('colors.danger.500');
+}
+
+/* Progressive line animation for vertical-reverse */
+@keyframes progressLineDown {
+  0% {
+    height: 0;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    height: calc(100% - 2.5rem + 2.5rem);
+    opacity: 1;
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .step__connector--vertical-completed::after,
+  .step__connector--vertical-reverse-completed::after,
+  .step__connector--vertical-completed.step__connector--animated::after,
+  .step__connector--vertical-reverse-completed.step__connector--animated::after {
+    animation: none;
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* Enhanced animation with gradient effect */
+.step__connector--vertical-reverse-completed.step__connector--animated::after {
+  background: linear-gradient(
+    to bottom,
+    theme('colors.accent.500'),
+    theme('colors.accent.400')
+  );
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+  animation: progressLineDownGradient 1s ease-in-out;
+}
+
+@keyframes progressLineDownGradient {
+  0% {
+    height: 0;
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  30% {
+    opacity: 0.5;
+    transform: scaleY(0.3);
+  }
+   70% {
+    opacity: 0.8;
+    transform: scaleY(0.7);
+  }
+  100% {
+    height: calc(100% - 2.5rem + 2.5rem);
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }
 
 /* Detailed variant styles */
