@@ -34,6 +34,7 @@ import {
   TableStyle,
 } from './table.types';
 
+//Components
 const components = [Button, ColumnFilter, Popover];
 
 @Component({
@@ -59,7 +60,7 @@ export class Table implements AfterViewInit {
   data = input<any[]>([]);
   tableStyle = input<TableStyle>({});
   columnDraggable = input<boolean>(false);
-  expandableColumn = input<boolean>(false);
+  // expandableColumn = input<boolean>(false);
   expandableRows = input<boolean>(false);
   defaultMinWidth = input<number>(100);
   defaultMaxWidth = input<number>(400);
@@ -69,7 +70,6 @@ export class Table implements AfterViewInit {
   hasIndex = input<boolean>(false);
   // Optional: Allow external control of column management
   externalColumnControl = input<boolean>(false);
-  // Optional: Enable filtering functionality
   filterEnabled = input<boolean>(false);
   // Optional: Enable checkbox selection
   hasCheckBox = input<boolean>(false);
@@ -115,6 +115,9 @@ export class Table implements AfterViewInit {
   // Column search state management
   private _columnSearchTerm = signal<string>('');
 
+  // Column expand/shrink state management
+  private _columnsShrunk = signal<boolean>(false);
+
   // Public getter for sort order
   get sortOrder() {
     return this._sortOrder();
@@ -156,6 +159,9 @@ export class Table implements AfterViewInit {
   /** SVG */
   public readonly settingsIcon: SafeHtml;
   public readonly filtersIcon: SafeHtml;
+  public readonly rightIcon: SafeHtml;
+  public readonly downIcon: SafeHtml;
+
 
   constructor() {
     this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
@@ -165,6 +171,16 @@ export class Table implements AfterViewInit {
     this.settingsIcon = this.sanitizer.bypassSecurityTrustHtml(
       FILE_ICONS['SETTINGS']
     );
+
+       this.rightIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['RIGHT_ARROW']
+    );
+
+       this.downIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['DOWN_ARROW']
+    );
+
+
 
     // Initialize internal columns from input - only run once during initialization
     effect(
@@ -306,6 +322,14 @@ export class Table implements AfterViewInit {
         );
       this._selectAll.set(allSelected);
     });
+
+    // Effect to automatically enable expandable columns when columns are shrunk
+    effect(() => {
+      const shrunkState = this._columnsShrunk();
+      // When columns are shrunk, expandable columns should be automatically enabled
+      // This effect just tracks the state - the template will use shouldAutoEnableExpandableColumns()
+      console.log('Columns shrunk state changed:', shrunkState);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -424,6 +448,9 @@ export class Table implements AfterViewInit {
   // Public getter for column search term
   columnSearchTerm = computed(() => this._columnSearchTerm());
 
+  // Public getter for columns shrunk state
+  columnsShrunk = computed(() => this._columnsShrunk());
+
   toggleColumnSelector(): void {
     this.showColumnSelector.update((value) => !value);
   }
@@ -462,6 +489,82 @@ export class Table implements AfterViewInit {
     this._columnSearchTerm.set(target.value);
   }
 
+  // Toggle expand/shrink columns
+  toggleExpandShrinkColumns(): void {
+    const currentShrunkState = this._columnsShrunk();
+    this._columnsShrunk.set(!currentShrunkState);
+
+    if (this.externalColumnControl()) {
+      // For external control, emit events for each column
+      this._columns().forEach((column) => {
+        const updatedColumn = {
+          ...column,
+          shrunk: !currentShrunkState,
+        };
+        this.columnVisibilityChange.emit({
+          column: updatedColumn,
+          visible: column.visible !== false,
+        });
+      });
+    } else {
+      // Handle internally
+      const currentColumns = this._columns();
+      const newColumns = currentColumns.map((col) => ({
+        ...col,
+        shrunk: !currentShrunkState,
+      }));
+      this._columns.set(newColumns);
+    }
+  }
+
+  // Get column width based on shrunk state
+  getColumnWidth(column: TableColumn): string {
+    if (this._columnsShrunk() || column.shrunk) {
+      // Calculate dynamic width based on table width and column count
+      const visibleCols = this.visibleColumns();
+      const dataColumns = visibleCols.filter(
+        (col) => !this.isSpecialColumn(col.field)
+      );
+
+      // Set a fixed table width and divide by number of data columns
+      const tableWidth = 800; // Fixed table width in pixels
+      const specialColumnsWidth = this.calculateSpecialColumnsWidth();
+      const availableWidth = tableWidth - specialColumnsWidth;
+      const columnWidth = Math.floor(availableWidth / dataColumns.length);
+
+      return `${Math.max(columnWidth, 60)}px`; // Minimum 60px per column
+    }
+    return column.width || '100px'; // Use better default width when expanded
+  }
+
+  private isSpecialColumn(field: string): boolean {
+    // Check if this is a special column (checkbox, index, expand, actions)
+    return (
+      field === 'checkbox' ||
+      field === 'index' ||
+      field === 'expand' ||
+      field === 'actions'
+    );
+  }
+
+  private calculateSpecialColumnsWidth(): number {
+    let width = 0;
+    if (this.hasCheckBox()) width += 60; // Checkbox column
+    if (this.hasIndex()) width += 60; // Index column
+    if (this.expandableRows()) width += 50; // Expand column
+    // Add action column width if present
+    const hasActionColumn = this.visibleColumns().some(
+      (col) => col.field === 'actions'
+    );
+    if (hasActionColumn) width += 100; // Action column
+    return width;
+  }
+
+  // Check if expandable columns should be automatically enabled
+  shouldAutoEnableExpandableColumns(): boolean {
+    return this._columnsShrunk();
+  }
+
   // Show all columns
   showAllColumns(): void {
     if (this.externalColumnControl()) {
@@ -498,8 +601,9 @@ export class Table implements AfterViewInit {
       const originalColumns = this.columns();
       this._columns.set([...originalColumns]);
     }
-    // Clear search term
+    // Clear search term and reset shrunk state
     this._columnSearchTerm.set('');
+    this._columnsShrunk.set(false);
   }
 
   onClickOutside(event: Event): void {
@@ -522,7 +626,9 @@ export class Table implements AfterViewInit {
 
   // Filtered data based on current filters
   filteredData = computed(() => {
-    if (!this.filterEnabled()) {
+    // Check if any column has filtering enabled
+    const hasFilterEnabledColumns = this.displayColumns().some(col => col.filter === true);
+    if (!hasFilterEnabledColumns && !this.filterEnabled()) {
       return this._data();
     }
 
@@ -537,7 +643,7 @@ export class Table implements AfterViewInit {
         const itemValue = item[field];
         const column = this.displayColumns().find((col) => col.field === field);
 
-        if (!column) return true;
+        if (!column || !column.filter) return true;
 
         switch (column.filterType) {
           case 'text':
@@ -978,8 +1084,8 @@ export class Table implements AfterViewInit {
     this.animateCollapseExpandedRows();
   }
 
-  getExpandIcon(rowData: any): string {
-    return this.isRowExpanded(rowData) ? '▼' : '▶';
+  getExpandIcon(rowData: any): SafeHtml {
+    return this.isRowExpanded(rowData) ? this.downIcon : this.rightIcon;
   }
 
   getExpandedContentColspan(): number {

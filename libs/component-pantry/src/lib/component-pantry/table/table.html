@@ -17,7 +17,7 @@
         [showArrow]="false"
       >
         <span slot="trigger" [innerHTML]="settingsIcon"></span>
-        <div slot="content" class="w-[230px]">
+        <div slot="content" class="w-[250px]">
           <h3 class="mb-4">Show/Hide Columns</h3>
 
           <input
@@ -31,16 +31,34 @@
           <div class="column-list">
             @for (column of filteredColumns(); track column.field) {
             <label class="column-option">
-              <input
-                type="checkbox"
-                class="checkbox-input"
-                [checked]="column.visible !== false"
-                (change)="toggleColumnVisibility(column)"
-              />
               <span>{{ column.header }}</span>
+
+              <div class="toggle-switch">
+                <input
+                  type="checkbox"
+                  class="toggle-input"
+                  [checked]="column.visible !== false"
+                  (change)="toggleColumnVisibility(column)"
+                  [id]="'toggle-' + column.field"
+                />
+                <span class="toggle-slider"></span>
+              </div>
             </label>
             }
           </div>
+
+          <label class="column-option" title="hi">
+            <span>Compact View</span>
+
+            <div class="toggle-switch">
+              <input
+                type="checkbox"
+                class="toggle-input"
+                (change)="toggleExpandShrinkColumns()"
+              />
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
 
           <div class="column-actions">
             <ntv-button
@@ -63,7 +81,11 @@
   }
 
   <div class="table-wrapper" (scroll)="onTableScroll($event)">
-    <table [ngStyle]="tableStyle()" class="table">
+    <table
+      [ngStyle]="tableStyle()"
+      class="table"
+      [class.columns-shrunk]="columnsShrunk()"
+    >
       <thead #tableHeader>
         <tr>
           <!-- Checkbox Column Header -->
@@ -95,9 +117,12 @@
           (column.field === 'action') {
           <th
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
           >
             <!-- Header content for custom header template with draggable columns (with commented filter code) -->
             <div class="header-content">
@@ -111,9 +136,12 @@
           <th
             ntvDraggableColumn
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
             [dragData]="column"
             [dragIndex]="i"
             [columnField]="column.field"
@@ -126,7 +154,7 @@
                 [ngTemplateOutlet]="headerTemplate"
                 [ngTemplateOutletContext]="{ $implicit: column }"
               ></ng-container>
-              @if (filterEnabled() && column.field !== 'action' && column.field
+              @if (column.filter && column.field !== 'action' && column.field
               !== 'actions') {
               <!-- <div class="filter-icon-container">
                 <button
@@ -250,18 +278,21 @@
           } } } @else { @for (column of visibleColumns(); track column.field) {
           <th
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
             [class.filtered-column]="hasActiveFilter(column.field)"
           >
             <!-- Header content for draggable columns with filter functionality (deeply nested case) -->
             <div class="header-content">
-              {{ column.header }} @if (filterEnabled() && column.field !==
+              {{ column.header }} @if (column.filter && column.field !==
               'action' && column.field !== 'actions') {
               <ntv-column-filter
                 [column]="column"
-                [data]="displayData()"
+                [data]="filteredData()"
                 [filterValue]="getFilterValue(column.field)"
                 [sortField]="sortField()"
                 [sortOrder]="_sortOrder()"
@@ -279,9 +310,12 @@
           (column.field === 'action') {
           <th
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
             [class.filtered-column]="hasActiveFilter(column.field)"
           >
             <!-- Header content for action columns (no filtering) -->
@@ -291,9 +325,12 @@
           <th
             ntvDraggableColumn
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
             [dragData]="column"
             [dragIndex]="i"
             [columnField]="column.field"
@@ -302,11 +339,11 @@
           >
             <!-- Header content for draggable columns with filter functionality (final case) -->
             <div class="header-content">
-              {{ column.header }} @if (filterEnabled() && column.field !==
+              {{ column.header }} @if (column.filter && column.field !==
               'action' && column.field !== 'actions') {
               <ntv-column-filter
                 [column]="column"
-                [data]="displayData()"
+                [data]="filteredData()"
                 [filterValue]="getFilterValue(column.field)"
                 [sortField]="sortField()"
                 [sortOrder]="_sortOrder()"
@@ -322,14 +359,17 @@
           } } } @else { @for (column of visibleColumns(); track column.field) {
           <th
             ntvExpandableColumn
-            [expandableColumn]="expandableColumn()"
+            [expandableColumn]="shouldAutoEnableExpandableColumns()"
             [minWidth]="defaultMinWidth()"
             [maxWidth]="defaultMaxWidth()"
+            [style.width]="getColumnWidth(column)"
+            [style.min-width]="columnsShrunk() ? null : (column.minWidth || defaultMinWidth() + 'px')"
+            [style.max-width]="columnsShrunk() ? null : (column.maxWidth || defaultMaxWidth() + 'px')"
             [class.filtered-column]="hasActiveFilter(column.field)"
           >
             <!-- Header content for non-draggable columns with date sorting -->
             <div class="header-content">
-              {{ column.header }} @if (filterEnabled() && column.filterType ===
+              {{ column.header }} @if (column.filter && column.filterType ===
               'date') {
               <button
                 class="sort-btn"
@@ -421,12 +461,16 @@
               class="expand-btn"
               (click)="toggleRowExpansion(rowData)"
               [title]="isRowExpanded(rowData) ? 'Collapse row' : 'Expand row'"
-            >
-              {{ getExpandIcon(rowData) }}
-            </button>
+              [innerHTML]="getExpandIcon(rowData)"
+            ></button>
           </td>
           } @for (col of visibleColumns(); track col.field) {
-          <td [class.filtered-column-cell]="hasActiveFilter(col.field)">
+          <td
+            [class.filtered-column-cell]="hasActiveFilter(col.field)"
+            [style.width]="getColumnWidth(col)"
+            [style.min-width]="col.minWidth || defaultMinWidth() + 'px'"
+            [style.max-width]="col.maxWidth || defaultMaxWidth() + 'px'"
+          >
             @if (col.field === 'status') {
             <span [class]="'status-' + rowData[col.field]?.toLowerCase()">
               {{ rowData[col.field] }}
