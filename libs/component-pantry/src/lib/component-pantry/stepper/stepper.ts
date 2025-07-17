@@ -1,9 +1,14 @@
-import { Component, input, output, linkedSignal, computed } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  linkedSignal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   StepData,
   StepperVariant,
-  StepperOrientation,
   StepperSize,
   ColorVariant,
   StepClickEvent,
@@ -37,7 +42,7 @@ import {
  *
  * @example
  * // DRY config pattern
- * <ntv-stepper 
+ * <ntv-stepper
  *   [steps]="stepData"
  *   [currentStep]="activeStep"
  *   [config]="stepperConfig">
@@ -101,59 +106,57 @@ export class Stepper {
   /** Whether to animate the progress lines in vertical steppers */
   animateProgress = input<boolean>(false);
 
-  /** 
+  /**
    * Configuration object for DRY usage - combines all stepper properties into a single object
    * @description Reduces template verbosity by 90% when using multiple properties
    */
   config = input<Partial<StepperConfig>>();
 
   // Computed properties that merge config with individual inputs
-  
+
   /** Resolved variant from config or individual property */
   readonly mergedVariant = computed(
     () => this.config()?.variant ?? this.variant()
   );
-  
+
   /** Resolved size from config or individual property */
-  readonly mergedSize = computed(
-    () => this.config()?.size ?? this.size()
-  );
-  
+  readonly mergedSize = computed(() => this.config()?.size ?? this.size());
+
   /** Resolved stepper color from config or individual property */
   readonly mergedStepperColor = computed(
     () => this.config()?.stepperColor ?? this.stepperColor()
   );
-  
+
   /** Resolved label color from config or individual property */
   readonly mergedLabelColor = computed(
     () => this.config()?.labelColor ?? this.labelColor()
   );
-  
+
   /** Resolved description color from config or individual property */
   readonly mergedDescriptionColor = computed(
     () => this.config()?.descriptionColor ?? this.descriptionColor()
   );
-  
+
   /** Resolved clickable state from config or individual property */
   readonly mergedClickable = computed(
     () => this.config()?.clickable ?? this.clickable()
   );
-  
+
   /** Resolved show labels state from config or individual property */
   readonly mergedShowLabels = computed(
     () => this.config()?.showLabels ?? this.showLabels()
   );
-  
+
   /** Resolved show descriptions state from config or individual property */
   readonly mergedShowDescriptions = computed(
     () => this.config()?.showDescriptions ?? this.showDescriptions()
   );
-  
+
   /** Resolved allow skipping state from config or individual property */
   readonly mergedAllowSkipping = computed(
     () => this.config()?.allowSkipping ?? this.allowSkipping()
   );
-  
+
   /** Resolved animate progress state from config or individual property */
   readonly mergedAnimateProgress = computed(
     () => this.config()?.animateProgress ?? this.animateProgress()
@@ -194,7 +197,8 @@ export class Stepper {
    */
   isStepCompleted(index: number): boolean {
     return (
-      index < this.internalCurrentStep() || this.steps()[index]?.completed === true
+      index < this.internalCurrentStep() ||
+      this.steps()[index]?.completed === true
     );
   }
 
@@ -558,7 +562,7 @@ export class Stepper {
       const isCompleted = this.isStepCompleted(index);
       const isError = this.isStepError(index);
       classes += ' step__connector--vertical';
-      
+
       if (isError) {
         // Add error color for connector
         classes += ' step__connector--danger';
@@ -566,7 +570,7 @@ export class Stepper {
       } else {
         // Add color classes for connector
         classes += ` step__connector--${this.mergedStepperColor()}`;
-        
+
         if (isCompleted) {
           classes += ' step__connector--vertical-completed';
           // Add animation class if enabled
@@ -737,7 +741,7 @@ export class Stepper {
       const isCompleted = this.isStepCompleted(index);
       const isError = this.isStepError(index);
       classes += ' step__connector--vertical-reverse';
-      
+
       if (isError) {
         // Add error color for connector
         classes += ' step__connector--danger';
@@ -745,7 +749,7 @@ export class Stepper {
       } else {
         // Add color classes for connector
         classes += ` step__connector--${this.mergedStepperColor()}`;
-        
+
         if (isCompleted) {
           classes += ' step__connector--vertical-reverse-completed';
           // Add animation class if enabled

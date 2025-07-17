@@ -10,20 +10,24 @@ import {
   forwardRef,
   HostBinding,
   output,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { InputSize, InputType, InputConfig, DEFAULT_INPUT_CONFIG } from './input.types';
-import { getPaddingClass } from '../../utils';
+import {
+  InputSize,
+  InputType,
+  InputConfig,
+  DEFAULT_INPUT_CONFIG,
+} from './input.types';
 
 /**
  * A comprehensive and flexible input component that provides extensive customization and form integration capabilities.
- * 
+ *
  * @description
  * This component supports multiple input types, flexible sizing, visual variants, enhanced UX features,
  * form integration, accessibility, validation display, customizable styling, icon support, and DRY configuration.
- * 
+ *
  * @features
  * - Multiple input types (text, password, email, number) with automatic validation
  * - Flexible sizing (sm, md, lg) with responsive design
@@ -36,20 +40,20 @@ import { getPaddingClass } from '../../utils';
  * - Icon support (left and right icon slots for enhanced UI)
  * - DRY configuration (config object pattern reduces template verbosity)
  * - Backward compatibility (individual properties still supported)
- * 
+ *
  * @example
  * ```html
  * <!-- Basic usage -->
- * <ntv-input 
- *   type="email" 
- *   placeholder="Enter your email" 
+ * <ntv-input
+ *   type="email"
+ *   placeholder="Enter your email"
  *   label="Email Address">
  * </ntv-input>
- * 
+ *
  * <!-- DRY config usage -->
  * <ntv-input [config]="emailConfig" label="Email Address"></ntv-input>
  * ```
- * 
+ *
  * @example
  * ```typescript
  * // Component setup with config
@@ -80,35 +84,36 @@ import { getPaddingClass } from '../../utils';
 })
 export class Input implements ControlValueAccessor {
   /** Reference to the input element */
-  @ViewChild('inputElement', { static: false }) inputElement!: ElementRef<HTMLInputElement>;
+  readonly inputElement =
+    viewChild.required<ElementRef<HTMLInputElement>>('inputElement');
 
   // === Inputs
   // Individual properties (for backward compatibility)
-  
+
   /** The input type (text, password, email, number) */
   readonly type = input<InputType>('text');
-  
+
   /** Unique identifier for the input element */
   readonly id = input<string>('');
-  
+
   /** Placeholder text displayed when input is empty */
   readonly placeholder = input<string>('Enter your text...');
-  
+
   /** Whether the input field is required */
   readonly required = input<boolean>(false);
-  
+
   /** Whether the input is disabled */
   readonly disabledInput = input<boolean>(false);
-  
+
   /** Size of the input (sm, md, lg) */
   readonly size = input<InputSize>('md');
-  
+
   /** Border radius style (none, sm, md, lg, xl) */
   readonly borderRadius = input<string>('md');
-  
+
   /** Whether to show a clear button when input has value */
   readonly clearable = input<boolean>(false);
-  
+
   /** Event emitted when the input is cleared */
   readonly inputCleared = output<boolean>();
 
@@ -117,36 +122,36 @@ export class Input implements ControlValueAccessor {
 
   /** Label text displayed above the input */
   readonly label = input<string | null>(null);
-  
+
   /** Informational text displayed below the input */
   readonly info = input<string | null>(null);
-  
+
   /** Error message text */
   readonly error = input<string | null>(null);
-  
+
   /** Whether to display error messages */
   readonly showError = input<boolean>(true);
 
-  /** 
+  /**
    * Configuration object for DRY usage - combines all input properties into a single object
    * @description Reduces template verbosity by 90% when using multiple properties
    */
   readonly config = input<Partial<InputConfig>>();
 
   // === Internal state
-  
+
   /** Current value of the input field */
   readonly inputValue = signal<string>('');
-  
+
   /** Whether password is currently visible (for password inputs) */
   readonly showPassword = signal(false);
-  
+
   /** Internal disabled state managed by form controls */
   readonly disabledState = signal(false);
 
   // === Computed
-  
-  /** 
+
+  /**
    * Merged configuration combining default config, provided config object, and individual inputs
    * @description Provides a single source of truth for all component configuration
    */
@@ -156,52 +161,68 @@ export class Input implements ControlValueAccessor {
   }));
 
   // Computed properties that merge config with individual inputs
-  
+
   /** Resolved input type from config or individual property */
   readonly mergedType = computed(() => this.config()?.type ?? this.type());
-  
+
   /** Resolved input ID from config or individual property */
   readonly mergedId = computed(() => this.config()?.id ?? this.id());
-  
+
   /** Resolved placeholder text from config or individual property */
-  readonly mergedPlaceholder = computed(() => this.config()?.placeholder ?? this.placeholder());
-  
+  readonly mergedPlaceholder = computed(
+    () => this.config()?.placeholder ?? this.placeholder()
+  );
+
   /** Resolved required state from config or individual property */
-  readonly mergedRequired = computed(() => this.config()?.required ?? this.required());
-  
+  readonly mergedRequired = computed(
+    () => this.config()?.required ?? this.required()
+  );
+
   /** Resolved disabled state from config or individual property */
-  readonly mergedDisabledInput = computed(() => this.config()?.disabled ?? this.disabledInput());
-  
+  readonly mergedDisabledInput = computed(
+    () => this.config()?.disabled ?? this.disabledInput()
+  );
+
   /** Resolved size from config or individual property */
   readonly mergedSize = computed(() => this.config()?.size ?? this.size());
-  
+
   /** Resolved border radius from config or individual property */
-  readonly mergedBorderRadius = computed(() => this.config()?.borderRadius ?? this.borderRadius());
-  
+  readonly mergedBorderRadius = computed(
+    () => this.config()?.borderRadius ?? this.borderRadius()
+  );
+
   /** Resolved clearable state from config or individual property */
-  readonly mergedClearable = computed(() => this.config()?.clearable ?? this.clearable());
-  
+  readonly mergedClearable = computed(
+    () => this.config()?.clearable ?? this.clearable()
+  );
+
   /** Resolved variant from config or individual property */
-  readonly mergedVariant = computed(() => this.config()?.variant ?? this.variant());
-  
+  readonly mergedVariant = computed(
+    () => this.config()?.variant ?? this.variant()
+  );
+
   /** Resolved label from config or individual property */
   readonly mergedLabel = computed(() => this.config()?.label ?? this.label());
-  
+
   /** Resolved info text from config or individual property */
   readonly mergedInfo = computed(() => this.config()?.info ?? this.info());
-  
+
   /** Resolved error message from config or individual property */
   readonly mergedError = computed(() => this.config()?.error ?? this.error());
-  
+
   /** Resolved show error state from config or individual property */
-  readonly mergedShowError = computed(() => this.config()?.showError ?? this.showError());
+  readonly mergedShowError = computed(
+    () => this.config()?.showError ?? this.showError()
+  );
 
   readonly disabled = computed(
     () => this.mergedDisabledInput() || this.disabledState()
   );
 
   readonly visibleType = computed(() =>
-    this.mergedType() === 'password' && this.showPassword() ? 'text' : this.mergedType()
+    this.mergedType() === 'password' && this.showPassword()
+      ? 'text'
+      : this.mergedType()
   );
 
   readonly baseId = computed(() => this.mergedId());
@@ -248,7 +269,8 @@ export class Input implements ControlValueAccessor {
   get hostClass(): string {
     const variant = this.mergedVariant();
     const baseClass = variant.startsWith('#') ? '' : `variant-${variant}`;
-    const errorClass = !!this.mergedError() && this.mergedShowError() ? 'error' : '';
+    const errorClass =
+      !!this.mergedError() && this.mergedShowError() ? 'error' : '';
     return `${baseClass} ${errorClass}`.trim();
   }
 
@@ -261,7 +283,11 @@ export class Input implements ControlValueAccessor {
 
       // Set icon size
       const iconSize =
-        this.mergedSize() === 'sm' ? '16px' : this.mergedSize() === 'lg' ? '24px' : '20px';
+        this.mergedSize() === 'sm'
+          ? '16px'
+          : this.mergedSize() === 'lg'
+          ? '24px'
+          : '20px';
       native.style.setProperty('--input-icon-size', iconSize);
 
       // Handle custom hex colors
@@ -285,7 +311,7 @@ export class Input implements ControlValueAccessor {
 
   /** Callback function for value changes */
   private onChange: ((val: string) => void) | null = null;
-  
+
   /** Callback function for touch events */
   private onTouched: (() => void) | null = null;
 
@@ -411,8 +437,9 @@ export class Input implements ControlValueAccessor {
    * Focuses the input element
    */
   focus(): void {
-    if (this.inputElement?.nativeElement) {
-      this.inputElement.nativeElement.focus();
+    const inputElement = this.inputElement();
+    if (inputElement?.nativeElement) {
+      inputElement.nativeElement.focus();
     }
   }
 }
