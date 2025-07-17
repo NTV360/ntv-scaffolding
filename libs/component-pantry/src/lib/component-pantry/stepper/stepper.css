@@ -1,0 +1,1692 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base stepper styles */
+.stepper {
+  @apply flex items-center w-full text-sm font-medium;
+}
+
+.stepper--vertical {
+  @apply h-full flex flex-col overflow-hidden;
+}
+
+.stepper--vertical > li {
+  @apply flex-1 mb-8; /* flex-1 for height distribution, mb-8 for spacing */
+}
+
+.stepper--vertical > li:last-child {
+  @apply mb-0; /* Remove margin from last item */
+}
+
+.stepper--vertical-reverse {
+  @apply h-full flex flex-col overflow-hidden;
+}
+
+.stepper--vertical-reverse > li {
+  @apply flex-1 mb-8; /* flex-1 for height distribution, mb-8 for spacing */
+}
+
+.stepper--vertical-reverse > li:last-child {
+  @apply mb-0; /* Remove margin from last item */
+}
+
+/* Step item base styles */
+.step {
+  @apply flex items-center;
+}
+
+.step--default {
+  @apply md:w-full;
+}
+
+.step--progress {
+  @apply w-full relative;
+}
+
+.step--detailed,
+.step--panel {
+  @apply flex-1;
+}
+
+.step--vertical {
+  @apply relative flex-1 flex items-start;
+}
+
+.step--breadcrumb {
+  @apply relative;
+}
+
+.step--form {
+  @apply md:w-full;
+}
+
+/* Step content wrapper */
+.step__content {
+  @apply flex items-center whitespace-nowrap;
+}
+
+.step__content--mobile-separator::after {
+  content: '/';
+  @apply mx-2;
+}
+
+@media (min-width: 640px) {
+  .step__content--mobile-separator::after {
+    display: none;
+  }
+}
+
+/* Step number/icon styles */
+.step__number {
+  @apply rounded-full flex justify-center items-center mr-3;
+}
+
+.step__number--sm {
+  @apply w-6 h-6 text-sm;
+}
+
+.step__number--md {
+  @apply w-8 h-8 text-sm lg:w-10 lg:h-10;
+}
+
+.step__number--lg {
+  @apply w-10 h-10 text-base lg:w-12 lg:h-12;
+}
+
+/* Vertical step number styles */
+.step__vertical-number {
+  @apply rounded-full flex justify-center items-center mr-3 w-8 h-8 text-sm lg:w-10 lg:h-10;
+}
+
+/* Vertical reverse step number styles */
+.step__vertical-reverse-number {
+  @apply rounded-full flex justify-center items-center ml-3 w-8 h-8 text-sm lg:w-10 lg:h-10;
+}
+
+.step__vertical-reverse-number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+  @apply border text-white;
+}
+
+.step__vertical-reverse-number--active {
+  @apply bg-white;
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+  @apply border-2;
+}
+
+.step__vertical-reverse-number--inactive {
+  @apply bg-gray-100 border border-gray-200 text-gray-500;
+}
+
+.step__vertical-number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+  @apply border text-white;
+}
+
+.step__vertical-number--active {
+  @apply bg-white;
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+  @apply border-2;
+}
+
+.step__vertical-number--inactive {
+  @apply bg-gray-100 border border-gray-200 text-gray-500;
+}
+
+/* Vertical step title styles */
+.step__vertical-title {
+  @apply text-base font-medium;
+}
+
+.step__vertical-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-title--inactive {
+  @apply text-gray-600;
+}
+
+/* Vertical reverse step title styles */
+.step__vertical-reverse-title {
+  @apply text-base font-medium;
+}
+
+.step__vertical-reverse-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-title--inactive {
+  color: theme('colors.neutral.50');
+}
+
+/* Dynamic vertical-reverse title colors */
+.step__vertical-reverse-title--primary.step__vertical-reverse-title--active {
+  color: theme('colors.primary.500');
+}
+
+
+
+.step__vertical-reverse-title--accent.step__vertical-reverse-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-title--success.step__vertical-reverse-title--active {
+  color: theme('colors.success.500');
+}
+
+.step__vertical-reverse-title--warning.step__vertical-reverse-title--active {
+  color: theme('colors.warning.500');
+}
+
+.step__vertical-reverse-title--danger.step__vertical-reverse-title--active {
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-reverse-title--info.step__vertical-reverse-title--active {
+  color: theme('colors.info.500');
+}
+
+.step__vertical-reverse-title--white.step__vertical-reverse-title--active {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-title--white.step__vertical-reverse-title--inactive {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-title--neutral.step__vertical-reverse-title--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__vertical-reverse-title--neutral.step__vertical-reverse-title--inactive {
+  color: theme('colors.neutral.50');
+}
+
+.step__vertical-reverse-title--neutral-dark.step__vertical-reverse-title--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+.step__vertical-reverse-title--neutral-dark.step__vertical-reverse-title--inactive {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Step number states */
+.step__number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+  @apply border text-white;
+}
+
+.step__number--active {
+  @apply bg-white;
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+  @apply border-2;
+}
+
+.step__number--inactive {
+  @apply bg-gray-100 border border-gray-200 text-gray-500;
+}
+
+/* Step text states */
+.step__text--completed,
+.step__text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__text--inactive {
+  @apply text-gray-600;
+}
+
+/* Dynamic text colors */
+.step__text--primary.step__text--completed,
+.step__text--primary.step__text--active {
+  color: theme('colors.info.500');
+}
+
+
+
+.step__text--accent.step__text--completed,
+.step__text--accent.step__text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__text--success.step__text--completed,
+.step__text--success.step__text--active {
+  color: theme('colors.success.500');
+}
+
+.step__text--warning.step__text--completed,
+.step__text--warning.step__text--active {
+  color: theme('colors.warning.500');
+}
+
+.step__text--danger.step__text--completed,
+.step__text--danger.step__text--active {
+  color: theme('colors.danger.500');
+}
+
+.step__text--info.step__text--completed,
+.step__text--info.step__text--active {
+  color: theme('colors.alert');
+}
+
+.step__text--neutral.step__text--completed,
+.step__text--neutral.step__text--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__text--white.step__text--completed,
+.step__text--white.step__text--active {
+  color: theme('colors.white');
+}
+
+.step__text--neutral-dark.step__text--completed,
+.step__text--neutral-dark.step__text--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Connector lines */
+.step__connector {
+  @apply after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8;
+}
+
+.step__connector--progress {
+  @apply after:content-[''] after:w-full after:h-0.5 after:inline-block after:absolute lg:after:top-5 after:top-3 after:left-4;
+}
+
+.step__connector--progress-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+.step__connector--progress-inactive::after {
+  @apply bg-gray-200;
+}
+
+.step__connector--vertical {
+  @apply after:content-[''] after:w-0.5 after:inline-block after:absolute after:left-4 lg:after:left-5 after:-z-10;
+}
+
+.step__connector--vertical::after {
+  top: 2.5rem; /* Start from below the step number */
+  height: calc(
+    100% - 2.5rem + 2.5rem
+  ); /* Full height minus top offset plus full margin spacing */
+}
+
+.step__connector--vertical-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+.step__connector--vertical-inactive::after {
+  @apply bg-gray-200;
+}
+
+.step__connector--vertical-reverse {
+  @apply after:content-[''] after:w-0.5 after:inline-block after:absolute after:right-4 lg:after:right-5 after:-z-10;
+}
+
+.step__connector--vertical-reverse::after {
+  top: 2.5rem; /* Start from below the step number */
+  height: calc(
+    100% - 2.5rem + 2.5rem
+  ); /* Full height minus top offset plus full margin spacing */
+}
+
+.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+.step__connector--vertical-reverse-inactive::after {
+  @apply bg-gray-200;
+}
+
+/* Detailed variant styles */
+.step__detailed {
+  @apply block w-full p-4 border border-gray-200 rounded-lg;
+}
+
+.step__detailed--completed {
+  background-color: color-mix(in srgb, theme('colors.success.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__detailed--inactive {
+  background-color: color-mix(
+    in srgb,
+    theme('colors.description.500') 10%,
+    white
+  );
+}
+
+.step__detailed-text {
+  @apply text-xs font-medium uppercase tracking-wide;
+}
+
+.step__detailed-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-text--inactive {
+  @apply text-gray-500;
+}
+
+/* Dynamic detailed variant backgrounds */
+.step__detailed--primary.step__detailed--completed,
+.step__detailed--primary.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.primary.500') 10%, white);
+  border-color: theme('colors.primary.500');
+}
+
+
+
+.step__detailed--accent.step__detailed--completed,
+.step__detailed--accent.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__detailed--success.step__detailed--completed,
+.step__detailed--success.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.success.500') 10%, white);
+  border-color: theme('colors.success.500');
+}
+
+.step__detailed--warning.step__detailed--completed,
+.step__detailed--warning.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.warning.500') 10%, white);
+  border-color: theme('colors.warning.500');
+}
+
+.step__detailed--danger.step__detailed--completed,
+.step__detailed--danger.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  border-color: theme('colors.danger.500');
+}
+
+.step__detailed--info.step__detailed--completed,
+.step__detailed--info.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.info.500') 10%, white);
+  border-color: theme('colors.info.500');
+}
+
+.step__detailed--white.step__detailed--completed,
+.step__detailed--white.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.white') 10%, white);
+  border-color: theme('colors.white');
+}
+
+.step__detailed--neutral.step__detailed--completed,
+.step__detailed--neutral.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.neutral.300') 10%, white);
+  border-color: theme('colors.neutral.300');
+}
+
+.step__detailed--neutral-dark.step__detailed--completed,
+.step__detailed--neutral-dark.step__detailed--active {
+  background-color: color-mix(in srgb, theme('colors.neutral-dark.600') 10%, white);
+  border-color: theme('colors.neutral-dark.600');
+}
+
+.step__detailed--error {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  border-color: theme('colors.danger.500');
+}
+
+/* Dynamic detailed text colors */
+.step__detailed-text--primary.step__detailed-text--active {
+  color: theme('colors.primary.500');
+}
+
+
+
+.step__detailed-text--accent.step__detailed-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-text--success.step__detailed-text--active {
+  color: theme('colors.success.500');
+}
+
+.step__detailed-text--warning.step__detailed-text--active {
+  color: theme('colors.warning.500');
+}
+
+.step__detailed-text--danger.step__detailed-text--active {
+  color: theme('colors.danger.500');
+}
+
+.step__detailed-text--info.step__detailed-text--active {
+  color: theme('colors.info.500');
+}
+
+.step__detailed-text--white.step__detailed-text--active {
+  color: theme('colors.white');
+}
+
+.step__detailed-text--neutral.step__detailed-text--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__detailed-text--neutral-dark.step__detailed-text--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Error text color for detailed variant */
+.step__detailed-text--error {
+  color: theme('colors.danger.500');
+}
+
+/* Detailed title styles */
+.step__detailed-title {
+  @apply text-base lg:text-lg font-medium;
+}
+
+.step__detailed-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-title--inactive {
+  @apply text-gray-900;
+}
+
+/* Dynamic detailed title colors */
+.step__detailed-title--primary.step__detailed-title--active {
+  color: theme('colors.primary.500');
+}
+
+
+
+.step__detailed-title--accent.step__detailed-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-title--success.step__detailed-title--active {
+  color: theme('colors.success.500');
+}
+
+.step__detailed-title--warning.step__detailed-title--active {
+  color: theme('colors.warning.500');
+}
+
+.step__detailed-title--danger.step__detailed-title--active {
+  color: theme('colors.danger.500');
+}
+
+.step__detailed-title--info.step__detailed-title--active {
+  color: theme('colors.info.500');
+}
+
+.step__detailed-title--white.step__detailed-title--active {
+  color: theme('colors.white');
+}
+
+.step__detailed-title--neutral.step__detailed-title--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__detailed-title--neutral-dark.step__detailed-title--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+.step__detailed-title--error {
+  color: theme('colors.danger.500');
+}
+
+/* Detailed description styles */
+.step__detailed-description {
+  @apply text-sm mt-1;
+}
+
+.step__detailed-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-description--inactive {
+  @apply text-gray-600;
+}
+
+/* Dynamic detailed description colors */
+.step__detailed-description--primary.step__detailed-description--active {
+  color: theme('colors.primary.500');
+}
+
+.step__detailed-description--accent.step__detailed-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__detailed-description--success.step__detailed-description--active {
+  color: theme('colors.success.500');
+}
+
+.step__detailed-description--warning.step__detailed-description--active {
+  color: theme('colors.warning.500');
+}
+
+.step__detailed-description--danger.step__detailed-description--active {
+  color: theme('colors.danger.500');
+}
+
+.step__detailed-description--info.step__detailed-description--active {
+  color: theme('colors.info.500');
+}
+
+.step__detailed-description--neutral.step__detailed-description--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__detailed-description--neutral-dark.step__detailed-description--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+.step__detailed-description--info.step__detailed-description--active {
+  color: theme('colors.alert');
+}
+
+.step__detailed-description--white.step__detailed-description--active {
+  color: theme('colors.white');
+}
+
+.step__detailed-description--white.step__detailed-description--inactive {
+  color: theme('colors.white');
+}
+
+.step__detailed-description--error {
+  color: theme('colors.danger.500');
+}
+
+/* Panel variant styles */
+.step__panel {
+  @apply flex items-center p-4 border border-gray-200 rounded-lg;
+}
+
+.step__panel--completed {
+  background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__panel--error {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  border-color: theme('colors.danger.500');
+}
+
+.step__panel--inactive {
+  @apply bg-white;
+}
+
+.step__panel-text {
+  @apply text-base font-medium ml-4;
+}
+
+.step__panel-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__panel-text--inactive {
+  @apply text-gray-900;
+}
+
+/* Dynamic panel variant backgrounds */
+.step__panel--primary.step__panel--completed,
+.step__panel--primary.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.primary.500') 10%, white);
+  border-color: theme('colors.primary.500');
+}
+
+
+
+.step__panel--accent.step__panel--completed,
+.step__panel--accent.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
+  border-color: theme('colors.accent.500');
+}
+
+.step__panel--success.step__panel--completed,
+.step__panel--success.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.success.500') 10%, white);
+  border-color: theme('colors.success.500');
+}
+
+.step__panel--warning.step__panel--completed,
+.step__panel--warning.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.warning.500') 10%, white);
+  border-color: theme('colors.warning.500');
+}
+
+.step__panel--danger.step__panel--completed,
+.step__panel--danger.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  border-color: theme('colors.danger.500');
+}
+
+.step__panel--info.step__panel--completed,
+.step__panel--info.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.info.500') 10%, white);
+  border-color: theme('colors.info.500');
+}
+
+.step__panel--white.step__panel--completed,
+.step__panel--white.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.white') 10%, white);
+  border-color: theme('colors.white');
+}
+
+.step__panel--neutral.step__panel--completed,
+.step__panel--neutral.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.neutral.300') 10%, white);
+  border-color: theme('colors.neutral.300');
+}
+
+.step__panel--neutral-dark.step__panel--completed,
+.step__panel--neutral-dark.step__panel--active {
+  background-color: color-mix(in srgb, theme('colors.neutral-dark.600') 10%, white);
+  border-color: theme('colors.neutral-dark.600');
+}
+
+/* Dynamic panel text colors */
+.step__panel-text--primary.step__panel-text--active {
+  color: theme('colors.primary.500');
+}
+
+
+
+.step__panel-text--accent.step__panel-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__panel-text--success.step__panel-text--active {
+  color: theme('colors.success.500');
+}
+
+.step__panel-text--warning.step__panel-text--active {
+  color: theme('colors.warning.500');
+}
+
+.step__panel-text--danger.step__panel-text--active {
+  color: theme('colors.danger.500');
+}
+
+.step__panel-text--info.step__panel-text--active {
+  color: theme('colors.info.500');
+}
+
+.step__panel-text--white.step__panel-text--active {
+  color: theme('colors.white');
+}
+
+.step__panel-text--neutral.step__panel-text--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__panel-text--neutral-dark.step__panel-text--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Error text color for panel variant */
+.step__panel-text--error {
+  color: theme('colors.danger.500');
+}
+
+/* Vertical variant styles */
+.step__vertical-number {
+  @apply w-8 h-8 rounded-full flex justify-center items-center mr-3 text-sm lg:w-10 lg:h-10;
+}
+
+.step__vertical-number--completed {
+  background-color: theme('colors.accent.500');
+  @apply border-2 border-transparent text-white;
+}
+
+.step__vertical-number--active {
+  @apply bg-white;
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+  @apply border-2;
+}
+
+.step__vertical-number--inactive {
+  background-color: color-mix(
+    in srgb,
+    theme('colors.description.500') 10%,
+    white
+  );
+  @apply border-2 border-gray-200 text-gray-500;
+}
+
+.step__vertical-number--error {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  @apply border-2;
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-title {
+  @apply text-base font-medium;
+}
+
+.step__vertical-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-title--inactive {
+  @apply text-gray-900;
+}
+
+/* Dynamic vertical title colors */
+.step__vertical-title--primary.step__vertical-title--active {
+  color: theme('colors.primary.500');
+}
+
+.step__vertical-title--accent.step__vertical-title--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-title--success.step__vertical-title--active {
+  color: theme('colors.success.500');
+}
+
+.step__vertical-title--warning.step__vertical-title--active {
+  color: theme('colors.warning.500');
+}
+
+.step__vertical-title--danger.step__vertical-title--active {
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-title--info.step__vertical-title--active {
+  color: theme('colors.info.500');
+}
+
+.step__vertical-title--white.step__vertical-title--active {
+  color: theme('colors.white');
+}
+
+.step__vertical-title--neutral.step__vertical-title--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__vertical-title--neutral-dark.step__vertical-title--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Error text color for vertical variant */
+.step__vertical-title--error {
+  color: theme('colors.danger.500');
+}
+
+/* Vertical description styles */
+.step__vertical-description {
+  @apply text-sm mt-1;
+}
+
+.step__vertical-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-description--inactive {
+  @apply text-gray-600;
+}
+
+/* Dynamic vertical description colors */
+.step__vertical-description--primary.step__vertical-description--active {
+  color: theme('colors.primary.500');
+}
+
+.step__vertical-description--accent.step__vertical-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-description--success.step__vertical-description--active {
+  color: theme('colors.success.500');
+}
+
+.step__vertical-description--warning.step__vertical-description--active {
+  color: theme('colors.warning.500');
+}
+
+.step__vertical-description--danger.step__vertical-description--active {
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-description--info.step__vertical-description--active {
+  color: theme('colors.info.500');
+}
+
+.step__vertical-description--white.step__vertical-description--active {
+  color: theme('colors.white');
+}
+
+.step__vertical-description--white.step__vertical-description--inactive {
+  color: theme('colors.white');
+}
+
+.step__vertical-description--error {
+  color: theme('colors.danger.500');
+}
+
+/* Vertical-reverse error styles */
+.step__vertical-reverse-number--error {
+  background-color: color-mix(in srgb, theme('colors.danger.500') 10%, white);
+  @apply border-2;
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-reverse-title--error {
+  color: theme('colors.danger.500');
+}
+
+/* Vertical-reverse description styles */
+.step__vertical-reverse-description {
+  @apply text-sm mt-1;
+}
+
+.step__vertical-reverse-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-description--inactive {
+  color: theme('colors.neutral.300');
+}
+
+/* Dynamic vertical-reverse description colors */
+.step__vertical-reverse-description--primary.step__vertical-reverse-description--active {
+  color: theme('colors.primary.500');
+}
+
+
+
+.step__vertical-reverse-description--accent.step__vertical-reverse-description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-description--success.step__vertical-reverse-description--active {
+  color: theme('colors.success.500');
+}
+
+.step__vertical-reverse-description--warning.step__vertical-reverse-description--active {
+  color: theme('colors.warning.500');
+}
+
+.step__vertical-reverse-description--danger.step__vertical-reverse-description--active {
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-reverse-description--info.step__vertical-reverse-description--active {
+  color: theme('colors.info.500');
+}
+
+.step__vertical-reverse-description--white.step__vertical-reverse-description--active {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-description--white.step__vertical-reverse-description--inactive {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-description--neutral.step__vertical-reverse-description--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__vertical-reverse-description--neutral.step__vertical-reverse-description--inactive {
+  color: theme('colors.neutral.300');
+}
+
+.step__vertical-reverse-description--neutral-dark.step__vertical-reverse-description--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+.step__vertical-reverse-description--neutral-dark.step__vertical-reverse-description--inactive {
+  color: theme('colors.neutral.300');
+}
+
+.step__vertical-reverse-description--error {
+  color: theme('colors.danger.500');
+}
+
+/* Vertical-reverse text styles */
+.step__vertical-reverse-text {
+  @apply text-sm font-medium;
+}
+
+.step__vertical-reverse-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-text--inactive {
+  @apply text-gray-600;
+}
+
+/* Dynamic vertical-reverse text colors */
+.step__vertical-reverse-text--primary.step__vertical-reverse-text--active {
+  color: theme('colors.primary.500');
+}
+
+.step__vertical-reverse-text--accent.step__vertical-reverse-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-text--success.step__vertical-reverse-text--active {
+  color: theme('colors.success.500');
+}
+
+.step__vertical-reverse-text--warning.step__vertical-reverse-text--active {
+  color: theme('colors.warning.500');
+}
+
+.step__vertical-reverse-text--danger.step__vertical-reverse-text--active {
+  color: theme('colors.danger.500');
+}
+
+.step__vertical-reverse-text--info.step__vertical-reverse-text--active {
+  color: theme('colors.info.500');
+}
+
+.step__vertical-reverse-text--white.step__vertical-reverse-text--active {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-text--white.step__vertical-reverse-text--inactive {
+  color: theme('colors.white');
+}
+
+.step__vertical-reverse-text--error {
+  color: theme('colors.danger.500');
+}
+
+/* Breadcrumb variant styles */
+.step__breadcrumb-text {
+  @apply text-sm font-medium;
+}
+
+.step__breadcrumb-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__breadcrumb-text--inactive {
+  @apply text-gray-900;
+}
+
+.step__breadcrumb-icon {
+  @apply w-5 h-5 ml-2 lg:ml-4;
+}
+
+.step__breadcrumb-icon--active {
+  color: theme('colors.accent.500');
+}
+
+.step__breadcrumb-icon--inactive {
+  @apply text-gray-400;
+}
+
+/* Dynamic breadcrumb text colors */
+.step__breadcrumb-text--primary.step__breadcrumb-text--active {
+  color: theme('colors.primary.500');
+}
+
+.step__breadcrumb-text--accent.step__breadcrumb-text--active {
+  color: theme('colors.accent.500');
+}
+
+.step__breadcrumb-text--success.step__breadcrumb-text--active {
+  color: theme('colors.success.500');
+}
+
+.step__breadcrumb-text--warning.step__breadcrumb-text--active {
+  color: theme('colors.warning.500');
+}
+
+.step__breadcrumb-text--danger.step__breadcrumb-text--active {
+  color: theme('colors.danger.500');
+}
+
+.step__breadcrumb-text--info.step__breadcrumb-text--active {
+  color: theme('colors.info.500');
+}
+
+.step__breadcrumb-text--neutral.step__breadcrumb-text--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__breadcrumb-text--white.step__breadcrumb-text--active {
+  color: theme('colors.white');
+}
+
+.step__breadcrumb-text--neutral-dark.step__breadcrumb-text--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Dynamic breadcrumb icon colors */
+.step__breadcrumb-icon--primary.step__breadcrumb-icon--active {
+  color: theme('colors.primary.500');
+}
+
+.step__breadcrumb-icon--accent.step__breadcrumb-icon--active {
+  color: theme('colors.accent.500');
+}
+
+.step__breadcrumb-icon--success.step__breadcrumb-icon--active {
+  color: theme('colors.success.500');
+}
+
+.step__breadcrumb-icon--warning.step__breadcrumb-icon--active {
+  color: theme('colors.warning.500');
+}
+
+.step__breadcrumb-icon--danger.step__breadcrumb-icon--active {
+  color: theme('colors.danger.500');
+}
+
+.step__breadcrumb-icon--info.step__breadcrumb-icon--active {
+  color: theme('colors.info.500');
+}
+
+.step__breadcrumb-icon--neutral.step__breadcrumb-icon--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__breadcrumb-icon--white.step__breadcrumb-icon--active {
+  color: theme('colors.white');
+}
+
+.step__breadcrumb-icon--neutral-dark.step__breadcrumb-icon--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Interactive states */
+.step--clickable {
+  @apply cursor-pointer;
+}
+
+.step--disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.step--error {
+  @apply border-red-500;
+}
+
+/* Dynamic color variants */
+/* Primary color */
+.step__number--primary.step__number--completed {
+  background-color: theme('colors.primary.500');
+  border-color: theme('colors.primary.500');
+}
+
+.step__number--primary.step__number--active {
+  border-color: theme('colors.primary.500');
+  color: theme('colors.primary.500');
+}
+
+.step__connector--primary.step__connector--progress-completed::after {
+  background-color: theme('colors.primary.500');
+}
+
+.step__connector--primary.step__connector--vertical-completed::after {
+  background-color: theme('colors.primary.500');
+}
+
+.step__connector--primary.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.primary.500');
+}
+
+/* Accent color (default) */
+.step__number--accent.step__number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+}
+
+.step__number--accent.step__number--active {
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+}
+
+.step__connector--accent.step__connector--progress-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+.step__connector--accent.step__connector--vertical-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+.step__connector--accent.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.accent.500');
+}
+
+/* Success color */
+.step__number--success.step__number--completed {
+  background-color: theme('colors.success.500');
+  border-color: theme('colors.success.500');
+}
+
+.step__number--success.step__number--active {
+  border-color: theme('colors.success.500');
+  color: theme('colors.success.500');
+}
+
+.step__connector--success.step__connector--progress-completed::after {
+  background-color: theme('colors.success.500');
+}
+
+.step__connector--success.step__connector--vertical-completed::after {
+  background-color: theme('colors.success.500');
+}
+
+.step__connector--success.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.success.500');
+}
+
+/* Warning color */
+.step__number--warning.step__number--completed {
+  background-color: theme('colors.warning.500');
+  border-color: theme('colors.warning.500');
+}
+
+.step__number--warning.step__number--active {
+  border-color: theme('colors.warning.500');
+  color: theme('colors.warning.500');
+}
+
+.step__connector--warning.step__connector--progress-completed::after {
+  background-color: theme('colors.warning.500');
+}
+
+.step__connector--warning.step__connector--vertical-completed::after {
+  background-color: theme('colors.warning.500');
+}
+
+.step__connector--warning.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.warning.500');
+}
+
+/* Danger color */
+.step__number--danger.step__number--completed {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+}
+
+.step__number--danger.step__number--active {
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+.step__connector--danger.step__connector--progress-completed::after {
+  background-color: theme('colors.danger.500');
+}
+
+.step__connector--danger.step__connector--vertical-completed::after {
+  background-color: theme('colors.danger.500');
+}
+
+.step__connector--danger.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.danger.500');
+}
+
+/* Info color */
+.step__number--info.step__number--completed {
+  background-color: theme('colors.info.500');
+  border-color: theme('colors.info.500');
+}
+
+.step__number--info.step__number--active {
+  border-color: theme('colors.info.500');
+  color: theme('colors.info.500');
+}
+
+.step__connector--info.step__connector--progress-completed::after {
+  background-color: theme('colors.info.500');
+}
+
+.step__connector--info.step__connector--vertical-completed::after {
+  background-color: theme('colors.info.500');
+}
+
+.step__connector--info.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.info.500');
+}
+
+/* White color */
+.step__number--white.step__number--completed {
+  background-color: theme('colors.white');
+  border-color: theme('colors.white');
+  color: theme('colors.black');
+}
+
+.step__number--white.step__number--active {
+  border-color: theme('colors.white');
+  color: theme('colors.white');
+}
+
+.step__connector--white.step__connector--progress-completed::after {
+  background-color: theme('colors.white');
+}
+
+.step__connector--white.step__connector--vertical-completed::after {
+  background-color: theme('colors.white');
+}
+
+.step__connector--white.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.white');
+}
+
+/* Neutral color */
+.step__number--neutral.step__number--completed {
+  background-color: theme('colors.neutral.300');
+  border-color: theme('colors.neutral.300');
+}
+
+.step__number--neutral.step__number--active {
+  border-color: theme('colors.neutral.300');
+  color: theme('colors.neutral.300');
+}
+
+.step__connector--neutral.step__connector--progress-completed::after {
+  background-color: theme('colors.neutral.300');
+}
+
+.step__connector--neutral.step__connector--vertical-completed::after {
+  background-color: theme('colors.neutral.300');
+}
+
+.step__connector--neutral.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.neutral.300');
+}
+
+/* Neutral Dark color */
+.step__number--neutral-dark.step__number--completed {
+  background-color: theme('colors.neutral-dark.600');
+  border-color: theme('colors.neutral-dark.600');
+}
+
+.step__number--neutral-dark.step__number--active {
+  border-color: theme('colors.neutral-dark.600');
+  color: theme('colors.neutral-dark.600');
+}
+
+.step__connector--neutral-dark.step__connector--progress-completed::after {
+  background-color: theme('colors.neutral-dark.600');
+}
+
+.step__connector--neutral-dark.step__connector--vertical-completed::after {
+  background-color: theme('colors.neutral-dark.600');
+}
+
+.step__connector--neutral-dark.step__connector--vertical-reverse-completed::after {
+  background-color: theme('colors.neutral-dark.600');
+}
+
+/* Vertical number dynamic color variants */
+/* Primary color */
+.step__vertical-number--primary.step__vertical-number--completed {
+  background-color: theme('colors.primary.500');
+  border-color: theme('colors.primary.500');
+}
+
+.step__vertical-number--primary.step__vertical-number--active {
+  border-color: theme('colors.primary.500');
+  color: theme('colors.primary.500');
+}
+
+/* Accent color (default) */
+.step__vertical-number--accent.step__vertical-number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+}
+
+.step__vertical-number--accent.step__vertical-number--active {
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+}
+
+/* Success color */
+.step__vertical-number--success.step__vertical-number--completed {
+  background-color: theme('colors.success.500');
+  border-color: theme('colors.success.500');
+}
+
+.step__vertical-number--success.step__vertical-number--active {
+  border-color: theme('colors.success.500');
+  color: theme('colors.success.500');
+}
+
+/* Warning color */
+.step__vertical-number--warning.step__vertical-number--completed {
+  background-color: theme('colors.warning.500');
+  border-color: theme('colors.warning.500');
+}
+
+.step__vertical-number--warning.step__vertical-number--active {
+  border-color: theme('colors.warning.500');
+  color: theme('colors.warning.500');
+}
+
+/* Danger color */
+.step__vertical-number--danger.step__vertical-number--completed {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+}
+
+.step__vertical-number--danger.step__vertical-number--active {
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+/* Info color */
+.step__vertical-number--info.step__vertical-number--completed {
+  background-color: theme('colors.info.500');
+  border-color: theme('colors.info.500');
+}
+
+.step__vertical-number--info.step__vertical-number--active {
+  border-color: theme('colors.info.500');
+  color: theme('colors.info.500');
+}
+
+/* White color */
+.step__vertical-number--white.step__vertical-number--completed {
+  background-color: theme('colors.white');
+  border-color: theme('colors.white');
+  color: theme('colors.black');
+}
+
+.step__vertical-number--white.step__vertical-number--active {
+  border-color: theme('colors.white');
+  color: theme('colors.white');
+}
+
+/* Neutral color */
+.step__vertical-number--neutral.step__vertical-number--completed {
+  background-color: theme('colors.neutral.300');
+  border-color: theme('colors.neutral.300');
+}
+
+.step__vertical-number--neutral.step__vertical-number--active {
+  border-color: theme('colors.neutral.300');
+  color: theme('colors.neutral.300');
+}
+
+/* Neutral Dark color */
+.step__vertical-number--neutral-dark.step__vertical-number--completed {
+  background-color: theme('colors.neutral-dark.600');
+  border-color: theme('colors.neutral-dark.600');
+}
+
+.step__vertical-number--neutral-dark.step__vertical-number--active {
+  border-color: theme('colors.neutral-dark.600');
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Vertical-reverse number dynamic color variants */
+/* Primary color */
+.step__vertical-reverse-number--primary.step__vertical-reverse-number--completed {
+  background-color: theme('colors.primary.500');
+  border-color: theme('colors.primary.500');
+}
+
+.step__vertical-reverse-number--primary.step__vertical-reverse-number--active {
+  border-color: theme('colors.primary.500');
+  color: theme('colors.primary.500');
+}
+
+/* Accent color (default) */
+.step__vertical-reverse-number--accent.step__vertical-reverse-number--completed {
+  background-color: theme('colors.accent.500');
+  border-color: theme('colors.accent.500');
+}
+
+.step__vertical-reverse-number--accent.step__vertical-reverse-number--active {
+  border-color: theme('colors.accent.500');
+  color: theme('colors.accent.500');
+}
+
+/* Success color */
+.step__vertical-reverse-number--success.step__vertical-reverse-number--completed {
+  background-color: theme('colors.success.500');
+  border-color: theme('colors.success.500');
+}
+
+.step__vertical-reverse-number--success.step__vertical-reverse-number--active {
+  border-color: theme('colors.success.500');
+  color: theme('colors.success.500');
+}
+
+/* Warning color */
+.step__vertical-reverse-number--warning.step__vertical-reverse-number--completed {
+  background-color: theme('colors.warning.500');
+  border-color: theme('colors.warning.500');
+}
+
+.step__vertical-reverse-number--warning.step__vertical-reverse-number--active {
+  border-color: theme('colors.warning.500');
+  color: theme('colors.warning.500');
+}
+
+/* Danger color */
+.step__vertical-reverse-number--danger.step__vertical-reverse-number--completed {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+}
+
+.step__vertical-reverse-number--danger.step__vertical-reverse-number--active {
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+/* Info color */
+.step__vertical-reverse-number--info.step__vertical-reverse-number--completed {
+  background-color: theme('colors.info.500');
+  border-color: theme('colors.info.500');
+}
+
+.step__vertical-reverse-number--info.step__vertical-reverse-number--active {
+  border-color: theme('colors.info.500');
+  color: theme('colors.info.500');
+}
+
+/* White color */
+.step__vertical-reverse-number--white.step__vertical-reverse-number--completed {
+  background-color: theme('colors.white');
+  border-color: theme('colors.white');
+  color: theme('colors.black');
+}
+
+.step__vertical-reverse-number--white.step__vertical-reverse-number--active {
+  border-color: theme('colors.white');
+  color: theme('colors.white');
+}
+
+/* Neutral color */
+.step__vertical-reverse-number--neutral.step__vertical-reverse-number--completed {
+  background-color: theme('colors.neutral.300');
+  border-color: theme('colors.neutral.300');
+}
+
+.step__vertical-reverse-number--neutral.step__vertical-reverse-number--active {
+  border-color: theme('colors.neutral.300');
+  color: theme('colors.neutral.300');
+}
+
+/* Neutral Dark color */
+.step__vertical-reverse-number--neutral-dark.step__vertical-reverse-number--completed {
+  background-color: theme('colors.neutral-dark.600');
+  border-color: theme('colors.neutral-dark.600');
+}
+
+.step__vertical-reverse-number--neutral-dark.step__vertical-reverse-number--active {
+  border-color: theme('colors.neutral-dark.600');
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Label styles */
+.step__label {
+  @apply text-base font-medium;
+}
+
+.step__label--active {
+  @apply font-semibold;
+}
+
+.step__label--inactive {
+  color: theme('colors.neutral.300');
+}
+
+.step__label--error {
+  color: theme('colors.danger.500');
+}
+
+/* Label color variants */
+.step__label--primary.step__label--active {
+  color: theme('colors.primary.500');
+}
+
+.step__label--accent.step__label--active {
+  color: theme('colors.accent.500');
+}
+
+.step__label--success.step__label--active {
+  color: theme('colors.success.500');
+}
+
+.step__label--warning.step__label--active {
+  color: theme('colors.warning.500');
+}
+
+.step__label--danger.step__label--active {
+  color: theme('colors.danger.500');
+}
+
+.step__label--info.step__label--active {
+  color: theme('colors.info.500');
+}
+
+.step__label--white.step__label--active {
+  color: theme('colors.white');
+}
+
+.step__label--neutral.step__label--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__label--neutral-dark.step__label--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Description styles */
+.step__description {
+  @apply text-sm;
+}
+
+.step__description--active {
+  @apply opacity-100;
+}
+
+.step__description--inactive {
+  @apply text-gray-600 opacity-70;
+}
+
+.step__description--error {
+  color: theme('colors.danger.500');
+}
+
+/* Description color variants */
+.step__description--primary.step__description--active {
+  color: theme('colors.primary.500');
+}
+
+.step__description--accent.step__description--active {
+  color: theme('colors.accent.500');
+}
+
+.step__description--success.step__description--active {
+  color: theme('colors.success.500');
+}
+
+.step__description--warning.step__description--active {
+  color: theme('colors.warning.500');
+}
+
+.step__description--danger.step__description--active {
+  color: theme('colors.danger.500');
+}
+
+.step__description--info.step__description--active {
+  color: theme('colors.info.500');
+}
+
+.step__description--white.step__description--active {
+  color: theme('colors.white');
+}
+
+.step__description--neutral.step__description--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__description--neutral-dark.step__description--active {
+  color: theme('colors.neutral-dark.600');
+}
+
+/* Dark mode support */
+:host-context(.dark) {
+  .step__number--inactive {
+    @apply bg-gray-700 border-gray-600 text-gray-400;
+  }
+
+  .step__text--inactive {
+    @apply text-gray-400;
+  }
+
+  .step__detailed--inactive {
+    @apply bg-gray-800;
+  }
+
+  .step__panel--inactive {
+    @apply bg-gray-800;
+  }
+
+  .step__panel-text--inactive {
+    @apply text-gray-200;
+  }
+
+  .step__vertical-number--inactive {
+    @apply bg-gray-700 border-gray-600 text-gray-400;
+  }
+
+  .step__vertical-title--inactive {
+    @apply text-gray-200;
+  }
+
+  .step__vertical-reverse-number--inactive {
+    @apply bg-gray-700 border-gray-600 text-gray-400;
+  }
+
+  .step__vertical-reverse-title--inactive {
+    @apply text-gray-200;
+  }
+
+  .step__breadcrumb-text--inactive {
+    @apply text-gray-200;
+  }
+
+  .step__label--inactive {
+    @apply text-gray-400;
+  }
+
+  .step__description--inactive {
+    @apply text-gray-400;
+  }
+}

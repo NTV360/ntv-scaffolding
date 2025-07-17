@@ -1,0 +1,558 @@
+Default
+ <ol class="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base">
+      <li class="flex md:w-full items-center text-indigo-600  sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 ">
+          <div class="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2 ">
+              <span class="w-6 h-6 bg-indigo-600 border border-indigo-200 rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10">1</span> Step 1
+          </div>
+      </li>
+      <li class="flex md:w-full items-center text-gray-600 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 ">
+          <div class="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2 ">
+              <span class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex justify-center items-center mr-3 lg:w-10 lg:h-10">2</span> Step 2
+          </div>
+      </li>
+      <li class="flex md:w-full items-center text-gray-600 ">
+          <div class="flex items-center  ">
+              <span class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex justify-center items-center mr-3 lg:w-10 lg:h-10">3</span> Step 3
+          </div>
+      </li>
+      </ol>
+
+
+Progress Stepper
+ <ol class="flex items-center w-full text-xs text-gray-900 font-medium sm:text-base">
+      <li class="flex w-full relative text-indigo-600  after:content-['']  after:w-full after:h-0.5  after:bg-indigo-600 after:inline-block after:absolute lg:after:top-5 after:top-3 after:left-4">
+         <div class="block whitespace-nowrap z-10">
+             <span class="w-6 h-6 bg-indigo-600 border-2 border-transparent rounded-full flex justify-center items-center mx-auto mb-3 text-sm text-white lg:w-10 lg:h-10">1</span> Step 1
+         </div>
+      </li>
+      <li class="flex w-full relative text-gray-900  after:content-['']  after:w-full after:h-0.5  after:bg-gray-200 after:inline-block after:absolute lg:after:top-5 after:top-3 after:left-4">
+         <div class="block whitespace-nowrap z-10">
+             <span class="w-6 h-6 bg-indigo-50 border-2 border-indigo-600 rounded-full flex justify-center items-center mx-auto mb-3 text-sm text-indigo-600 lg:w-10 lg:h-10">2</span> Step 2
+         </div>
+      </li>
+      <li class="flex w-full relative text-gray-900  after:content-['']  after:w-full after:h-0.5  after:bg-gray-200 after:inline-block after:absolute lg:after:top-5  after:top-3 after:left-4">
+         <div class="block whitespace-nowrap z-10">
+             <span class="w-6 h-6 bg-gray-50 border-2 border-gray-200 rounded-full flex justify-center items-center mx-auto mb-3 text-sm  lg:w-10 lg:h-10">3</span> Step 3
+         </div>
+      </li>
+      <li class="flex w-full relative text-gray-900  after:content-['']  after:w-full after:h-0.5  after:bg-gray-200 after:inline-block after:absolute lg:after:top-5 after:top-3 after:left-4">
+         <div class="block whitespace-nowrap z-10">
+             <span class="w-6 h-6 bg-gray-50 border-2 border-gray-200 rounded-full flex justify-center items-center mx-auto mb-3 text-sm  lg:w-10 lg:h-10">4</span> Step 4
+         </div>
+      </li>
+      <li class="flex w-full relative text-gray-900  ">
+         <div class="block whitespace-nowrap z-10">
+             <span class="w-6 h-6 bg-gray-50 border-2 border-gray-200 rounded-full flex justify-center items-center mx-auto mb-3 text-sm  lg:w-10 lg:h-10">5</span> Step 5
+         </div>
+      </li>
+      </ol>
+
+Detailed Stepper
+ <ol class="lg:flex items-center w-full space-y-4 lg:space-x-8 lg:space-y-0">
+      <li class=" flex-1">
+         <a  href="https://pagedone.io/" class="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid border-indigo-600 font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0">
+             <span class="text-sm lg:text-base text-indigo-600">Step 1</span>
+             <h4 class="text-base lg:text-lg text-gray-900">Create Pagedone Account</h4>
+         </a>
+      </li>
+      <li class=" flex-1">
+         <a class="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid border-indigo-300 font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0">
+             <span class="text-sm lg:text-base text-indigo-600">Step 2</span>
+             <h4 class="text-base lg:text-lg text-gray-900">Billing Information</h4>
+         </a>
+      </li>
+      <li class=" flex-1">
+         <a class="border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid border-gray-200 font-medium lg:pt-4 lg:border-t-2 lg:border-l-0 lg:pl-0">
+             <span class="text-sm lg:text-base text-gray-400">Step 3</span>
+             <h4 class="text-base lg:text-lg text-gray-900">Summary</h4>
+         </a>
+      </li>
+      </ol>
+
+
+Panel Stepper
+ <ol class="lg:flex items-center w-full space-y-4 lg:space-y-0  ">
+      <li class="  flex-1 ">
+         <a  href="https://pagedone.io/" class="flex items-center font-medium px-4 py-5 w-full rounded-lg bg-indigo-50">
+             <span class="w-8 h-8 bg-indigo-600  rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10">01</span>
+             <h4 class="text-base  text-indigo-600">Create Pagedone Account</h4>
+         </a>
+      </li>
+      <li class="  flex-1 ">
+         <a class="flex items-center font-medium px-4 py-5 w-full">
+             <span class="w-8 h-8 bg-indigo-50 border border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm text-indigo-600 lg:w-10 lg:h-10">02</span>
+             <h4 class="text-base  text-gray-900">Billing Information</h4>
+         </a>
+      </li>
+      <li class=" flex-1">
+         <a class="flex items-center font-medium px-4 py-5 w-full">
+             <span class="w-8 h-8 bg-gray-50 border border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm  lg:w-10 lg:h-10">03</span>
+             <h4 class="text-base  text-gray-900">Summary</h4>
+         </a>
+      </li>
+      </ol>
+
+
+Vertical Stepper
+ <ol class=" overflow-hidden space-y-8">
+      <li class="relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:bg-indigo-600 after:inline-block after:absolute after:-bottom-11 after:left-4 lg:after:left-5">
+          <a  href="https://pagedone.io/" class="flex items-center font-medium w-full  ">
+              <span class="w-8 h-8 bg-indigo-600 border-2 border-transparent rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10">
+                  <svg class="w-5 h-5 stroke-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 12L9.28722 16.2923C9.62045 16.6259 9.78706 16.7927 9.99421 16.7928C10.2014 16.7929 10.3681 16.6262 10.7016 16.2929L20 7" stroke="stroke-current" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="my-path"></path>
+                  </svg>
+              </span>
+              <div class="block">
+                  <h4 class="text-lg  text-indigo-600">Step 1</h4>
+                  <span class="text-sm">Create Pagedone Account</span>
+              </div>
+          </a>
+      </li>
+      <li class="relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:bg-gray-200 after:inline-block after:absolute after:-bottom-12 after:left-4 lg:after:left-5">
+          <a class="flex items-center font-medium w-full  ">
+              <span class="w-8 h-8 bg-indigo-50  border-2 border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm text-indigo-600 lg:w-10 lg:h-10">2</span>
+              <div class="block">
+                  <h4 class="text-lg  text-indigo-600">Step 2</h4>
+                  <span class="text-sm">Billing Information</span>
+              </div>
+          </a>
+      </li>
+      <li class="relative flex-1 ">
+          <a class="flex items-center font-medium w-full  ">
+              <span class="w-8 h-8 bg-gray-50 border-2 border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm  lg:w-10 lg:h-10">3</span>
+              <div class="block">
+                  <h4 class="text-lg  text-gray-900">Step 3</h4>
+                  <span class="text-sm">Summary</span>
+              </div>
+          </a>
+      </li>
+      </ol>
+
+
+BreadCrumb stepper
+ <ol class="lg:flex  items-center w-full space-y-4 lg:space-y-0 lg:space-x-4">
+      <li class="relative ">
+          <a  href="https://pagedone.io/" class="flex items-center font-medium w-full  ">
+              <span class="w-6 h-6 bg-indigo-600 border border-transparent rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-8 lg:h-8"> 1 </span>
+              <div class="block">
+                  <h4 class="text-base  text-indigo-600">Create Pagedone Account</h4>
+              </div>
+              <svg class="w-5 h-5 ml-2 stroke-indigo-600 sm:ml-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 18L9.67462 13.0607C10.1478 12.5607 10.3844 12.3107 10.3844 12C10.3844 11.6893 10.1478 11.4393 9.67462 10.9393L5 6M12.6608 18L17.3354 13.0607C17.8086 12.5607 18.0452 12.3107 18.0452 12C18.0452 11.6893 17.8086 11.4393 17.3354 10.9393L12.6608 6" stroke="stroke-current" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+          </a>
+      </li>
+      <li class="relative  ">
+          <a class="flex items-center font-medium w-full  ">
+              <span class="w-6 h-6 bg-gray-50 border border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm  lg:w-8 lg:h-8">2</span>
+              <div class="block">
+                  <h4 class="text-base  text-gray-900">Billing Information</h4>
+              </div>
+              <svg class="w-5 h-5 ml-2 stroke-gray-900 sm:ml-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 18L9.67462 13.0607C10.1478 12.5607 10.3844 12.3107 10.3844 12C10.3844 11.6893 10.1478 11.4393 9.67462 10.9393L5 6M12.6608 18L17.3354 13.0607C17.8086 12.5607 18.0452 12.3107 18.0452 12C18.0452 11.6893 17.8086 11.4393 17.3354 10.9393L12.6608 6" stroke="stroke-current" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+          </a>
+      </li>
+      <li class="relative  ">
+          <a class="flex items-center font-medium w-full  ">
+              <span class="w-6 h-6 bg-gray-50 border border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm  lg:w-8 lg:h-8">3</span>
+              <div class="block">
+                  <h4 class="text-base  text-gray-900">Summary</h4>
+              </div>
+          </a>
+      </li>
+      </ol>
+
+
+
+Vertical stepper With Detail and buttons
+The vertical stepper in Tailwind CSS is designed to show all steps or workflow in a vertical direction. It is used when there is a need to display multiple steps of a process in a vertical manner. It includes a navigation button to move between pages.
+<ol class=" overflow-hidden space-y-8">
+      <li
+      class="relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:bg-indigo-600 after:inline-block after:absolute after:-bottom-11 after:left-4 lg:after:left-5">
+      <a  href="https://pagedone.io/" class="flex items-start font-medium w-full  ">
+      <span
+      class="w-8 h-8 aspect-square bg-indigo-600 border-2 border-transparent rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10">
+      1
+      </span>
+      <div class="block">
+      <h4 class="text-base  text-indigo-600 mb-2">How to create a Pagedone
+          account?</h4>
+      <p class="text-sm text-gray-600 max-w-xs mb-4">To
+          Create an account with several steps to collect user
+          information, verify identity, and set up account
+          preferences.
+          <br></p>
+      <ul class="flex flex-wrap gap-x-5 gap-y-1 w-full max-w-xl mb-4">
+          <li class="text-sm font-medium text-gray-900">
+              Register yourself ></li>
+          <li class="text-sm font-medium text-gray-900">
+              Validation ></li>
+          <li class="text-sm font-medium text-gray-900">
+              Validation ></li>
+          <li class="text-sm font-medium text-gray-900">Email
+              Verification ></li>
+          <li class="text-sm font-medium text-gray-900">
+              Account Activation ></li>
+          <li class="text-sm font-medium text-gray-900">
+              Profile Setup ></li>
+          <li class="text-sm font-medium text-gray-900">
+              Confirmation Message.</li>
+      </ul>
+      <p class="text-sm text-gray-600 max-w-xs">
+      By following these steps, you can create an easy and
+      user-friendly account creation process.</p>
+      <div class="flex items-center gap-4 my-6">
+          <button type="button"
+              class="py-2.5 px-6 text-sm bg-indigo-500 text-white rounded-lg cursor-pointer font-semibold text-center shadow-xs uppercase transition-all duration-500 hover:bg-indigo-700">Continue</button>
+          <p
+              class="py-2.5 px-6 text-sm bg-indigo-50 text-indigo-500 rounded-lg cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 ">
+              BACK</p>
+      </div>
+      </div>
+      </a>
+      </li>
+      <li
+      class="relative flex-1 after:content-[''] z-10  after:w-0.5 after:h-full after:z-0 after:bg-gray-200 after:inline-block after:absolute after:-bottom-12 after:left-4 lg:after:left-5">
+      <a class="flex items-center font-medium w-full  ">
+      <span
+      class="w-8 h-8 bg-indigo-50 relative z-20 border-2 border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm text-indigo-600 lg:w-10 lg:h-10">2</span>
+      <div class="block">
+      <h4 class="text-base  text-indigo-600 mb-2">Have any trust
+          issue?</h4>
+      <p class="text-sm text-gray-600 max-w-xs">
+          of courser we are here to guide you
+      </p>
+      </div>
+      </a>
+      </li>
+      <li class="relative flex-1 ">
+      <a class="flex items-start font-medium w-full  ">
+      <span
+      class="w-8 h-8 bg-gray-50 border-2 relative z-10 border-gray-200 rounded-full flex justify-center items-center mr-3 text-sm  lg:w-10 lg:h-10">3</span>
+      <div class="block">
+      <h4 class="text-base  text-gray-900 mb-2">How can I reset my
+          password?</h4>
+      <p class="text-sm text-gray-600 max-w-xs">
+          Go to your profile > Click Change Password > Enter
+          previous password> confirm Previous password and add
+          your new password
+      </p>
+      </div>
+      </a>
+      </li>
+      </ol>
+
+
+Tailwind Form Stepper
+Use this example to display the form submission process in easy steps inside the form component. The form stepper uses HTML form elements. The progress step header shows which step is in the current position and the steps they've completed.
+<ol class="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base mb-12">
+      <li class="flex md:w-full items-center text-indigo-600  sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 ">
+      <div class="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2 ">
+      <span class="w-6 h-6 bg-indigo-600 border border-indigo-200 rounded-full flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10">1</span>Personal Info
+      </div>
+      </li>
+      <li class="flex md:w-full items-center text-gray-600 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8 ">
+      <div class="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2 ">
+      <span class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex justify-center items-center mr-3 lg:w-10 lg:h-10">2</span>Account Info
+      </div>
+      </li>
+      <li class="flex md:w-full items-center text-gray-600 ">
+      <div class="flex items-center  ">
+      <span class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex justify-center items-center mr-3 lg:w-10 lg:h-10">3</span> Confirmation
+      </div>
+      </li>
+      </ol>
+      
+      <div class="flex flex-col">
+      <form action="" class="">
+      <div class="flex gap-x-6 mb-6">
+      <div class="w-full relative">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">First Name <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      <div class="w-full relative">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">Last Name <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      </div>
+      <div class="relative mb-6">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">Email Address <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      <div class="flex gap-x-6 mb-6">
+      <div class="w-full relative">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">DOB <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      <div class="w-full relative">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">Country <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      </div>
+      <div class="relative mb-6">
+      <label class="flex  items-center mb-2 text-gray-600 text-sm font-medium">Phone Number <svg width="7" height="7" class="ml-1" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3.11222 6.04545L3.20668 3.94744L1.43679 5.08594L0.894886 4.14134L2.77415 3.18182L0.894886 2.2223L1.43679 1.2777L3.20668 2.41619L3.11222 0.318182H4.19105L4.09659 2.41619L5.86648 1.2777L6.40838 2.2223L4.52912 3.18182L6.40838 4.14134L5.86648 5.08594L4.09659 3.94744L4.19105 6.04545H3.11222Z" fill="#EF4444" />
+      </svg>
+      </label>
+      <input type="text" id="default-search" class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none " placeholder="" required="">
+      </div>
+      <button class="w-52 h-12 shadow-sm rounded-full bg-indigo-600 hover:bg-indigo-800 transition-all duration-700 text-white text-base font-semibold leading-7">Next</button>
+      </form>
+      </div>
+      
+                                          
+
+
+Mobile stepper
+A mobile stepper is a UI component designed specifically for mobile devices to guide users through a sequential process using a series of steps or screens. This Progress Steps Form shows every step of the process with navigation buttons to move between pages and also shows fraction counts of progress steps.
+<div class="w-full max-w-md mx-auto bg-indigo-100 p-2 rounded-md">
+      <h3 class="p-3 rounded bg-white text-gray-900 font-semibold text-xl">
+      How to create an account?</h3>
+      <div class=" py-5 min-h-96 max-w-sm mx-auto">
+      <p class="text-base text-gray-600 font-normal">
+      Create an account with several steps to collect user
+      information, verify identity, and set up account
+      preferences.  <br>
+      <br> <b> Register yourself > Validation > Email
+      Verification > Account Activation > Profile Setup >
+      Confirmation Message.</b> <br><br>
+      By following these steps, you can create an easy and
+      user-friendly account creation process.
+      </p>
+      </div>
+      <div class="flex items-center justify-between gap-3 p-3 bg-white rounded">
+      <button class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      <svg class="rotate-180" xmlns="http://www.w3.org/2000/svg"
+      width="22" height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+          stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Back
+      </button>
+      <ul class="flex gap-1 items-center">
+      <li class="text-lg font-medium text-gray-900">1</li>
+      <li class="text-base font-normal text-gray-900">/</li>
+      <li class="text-base font-normal text-gray-600">3</li>
+      </ul>
+      <button
+      class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      Next<svg xmlns="http://www.w3.org/2000/svg" width="22"
+      height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+          stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      </button>
+      </div>
+      </div>
+
+
+card stepper
+This Tailwind UI Stepper example is designed to guide users through a multi-step process using a list of cards. Each card represents a specific step in the process. The card layout provides a clear and organized way to present information to users.
+<ol class=" overflow-hidden space-y-8">
+      <li class="relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:bg-indigo-600 after:inline-block after:absolute after:-bottom-11 after:left-1/2">
+      <div class="flex items-center justify-center gap-8 w-full max-w-sm">
+      <div class="flex items-center gap-3.5 bg-indigo-50 p-3.5 rounded-xl relative z-10 border border-indigo-600 w-full">
+      <div class="rounded-lg bg-indigo-600 flex items-center justify-center">
+          <span class="text-white p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                  height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                      d="M15.9998 7C15.9998 9.20914 14.2089 11 11.9998 11C9.79067 11 7.99981 9.20914 7.99981 7C7.99981 4.79086 9.79067 3 11.9998 3C14.2089 3 15.9998 4.79086 15.9998 7Z"
+                      stroke="currentColor" stroke-width="1.6" />
+                  <path
+                      d="M11.9998 14C9.15153 14 6.65091 15.3024 5.23341 17.2638C4.48341 18.3016 4.10841 18.8204 4.6654 19.9102C5.2224 21 6.1482 21 7.99981 21H15.9998C17.8514 21 18.7772 21 19.3342 19.9102C19.8912 18.8204 19.5162 18.3016 18.7662 17.2638C17.3487 15.3024 14.8481 14 11.9998 14Z"
+                      stroke="currentColor" stroke-width="1.6" />
+              </svg>
+          </span>
+      </div>
+      <div
+          class=" flex items-start rounded-md justify-center flex-col ">
+          <h6 class="text-base font-semibold text-black mb-0.5">
+              Personal
+              Info</h6>
+          <p class="text-xs font-normal text-gray-500">Just your
+              personal
+              information</p>
+      </div>
+      </div>
+      <div>
+      </li>
+      <li class="relative flex-1 after:content-['']  after:w-0.5 after:h-full  after:bg-gray-200 after:inline-block after:absolute after:-bottom-12 after:left-1/2">
+      <div class="flex items-center justify-center gap-8 w-full max-w-sm">
+      <div class="flex items-center gap-3.5 bg-gray-50 p-3.5 rounded-xl relative z-10 border border-gray-50 w-full">
+      <div class="rounded-lg bg-gray-200 flex items-center justify-center">
+          <span class="text-gray-600 p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                  height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                      d="M8 5.99985H7C5.11438 5.99985 4.17157 5.99985 3.58579 6.58564C3 7.17142 3 8.11423 3 9.99985V16.9998C3 18.8855 3 19.8283 3.58579 20.4141C4.17157 20.9998 5.11438 20.9998 7 20.9998H17C18.8856 20.9998 19.8284 20.9998 20.4142 20.4141C21 19.8283 21 18.8855 21 16.9998V9.99985C21 8.11423 21 7.17142 20.4142 6.58564C19.8284 5.99985 18.8856 5.99985 17 5.99985H16M12 17.9998V17.9284C12 17.53 12 17.3308 11.9624 17.1661C11.8342 16.6043 11.3955 16.1657 10.8338 16.0375C10.669 15.9998 10.4698 15.9998 10.0714 15.9998H8C7.53501 15.9998 7.30252 15.9998 7.11177 16.051C6.59413 16.1897 6.18981 16.594 6.05111 17.1116C6 17.3024 6 17.5349 6 17.9998M15 12.9998H18M15 15.9998H18M10.5 12.4998C10.5 13.3283 9.82843 13.9998 9 13.9998C8.17157 13.9998 7.5 13.3283 7.5 12.4998C7.5 11.6714 8.17157 10.9998 9 10.9998C9.82843 10.9998 10.5 11.6714 10.5 12.4998ZM10.25 5.47472V6.24985C10.25 6.95208 10.25 7.3032 10.4185 7.55542C10.4915 7.66461 10.5852 7.75836 10.6944 7.83132C10.9467 7.99985 11.2978 7.99985 12 7.99985C12.7022 7.99985 13.0533 7.99985 13.3056 7.83132C13.4148 7.75836 13.5085 7.66461 13.5815 7.55542C13.75 7.3032 13.75 6.95208 13.75 6.24985V5.47472C13.75 5.16873 13.75 5.01573 13.7069 4.87378C13.6879 4.8111 13.6628 4.75043 13.6319 4.69267C13.562 4.56185 13.4538 4.45366 13.2374 4.23729C12.7409 3.74073 12.4926 3.49246 12.1951 3.43328C12.0663 3.40766 11.9337 3.40766 11.8049 3.43328C11.5074 3.49246 11.2591 3.74073 10.7626 4.23729C10.5462 4.45366 10.438 4.56185 10.3681 4.69267C10.3372 4.75043 10.3121 4.8111 10.2931 4.87378C10.25 5.01573 10.25 5.16873 10.25 5.47472Z"
+                      stroke="currentColor" stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round" />
+              </svg>
+          </span>
+      </div>
+      <div class=" flex items-start rounded-md justify-center flex-col">
+          <h6 class="text-base font-semibold text-black mb-0.5">
+              Account
+              Info</h6>
+          <p class="text-xs font-normal text-gray-500">Anything
+              you want for your credentials
+          </p>
+      </div>
+      </div>
+      </div>
+      </li>
+      <li class="relative flex-1 ">
+      <div class="flex items-center justify-center gap-8 w-full max-w-sm">
+      <div class="flex items-center gap-3.5 bg-gray-50 p-3.5 rounded-xl relative z-10 border border-gray-50 w-full">
+      <div class="rounded-lg bg-gray-200 flex items-center justify-center">
+          <span class="text-gray-600 p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                  height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                      d="M15.9998 7C15.9998 9.20914 14.2089 11 11.9998 11C9.79067 11 7.99981 9.20914 7.99981 7C7.99981 4.79086 9.79067 3 11.9998 3C14.2089 3 15.9998 4.79086 15.9998 7Z"
+                      stroke="currentColor" stroke-width="1.6" />
+                  <path
+                      d="M11.9998 14C9.15153 14 6.65091 15.3024 5.23341 17.2638C4.48341 18.3016 4.10841 18.8204 4.6654 19.9102C5.2224 21 6.1482 21 7.99981 21H15.9998C17.8514 21 18.7772 21 19.3342 19.9102C19.8912 18.8204 19.5162 18.3016 18.7662 17.2638C17.3487 15.3024 14.8481 14 11.9998 14Z"
+                      stroke="currentColor" stroke-width="1.6" />
+              </svg>
+          </span>
+      </div>
+      <div class=" flex items-start rounded-md justify-center flex-col ">
+          <h6 class="text-base font-semibold text-black mb-0.5">
+              Confirmation</h6>
+          <p class="text-xs font-normal text-gray-500">Finish It !
+          </p>
+      </div>
+      </div>
+      </div>
+      </li>
+      </ol>
+
+
+Stepper With Bullet Indicators
+The stepper with bullet indicators is used to guide users through a sequential process by visually indicating their progress using bullet points. This component is commonly used in forms or multiple sequential steps. This indicating their current position within the form submission process, These bullet points typically appear horizontally or vertically, depending on the layout and design preferences.
+<div class="w-full max-w-md mx-auto bg-indigo-100 border-2 border-indigo-600 rounded-md">
+      <div class="flex items-center justify-between gap-3 p-3 bg-white rounded">
+      <button class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      <svg class="rotate-180" xmlns="http://www.w3.org/2000/svg"
+      width="22" height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+          stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Back
+      </button>
+      <ul class="flex gap-1 items-center">
+      <li
+      class="text-base font-normal text-gray-900 w-2 h-2 rounded-full bg-indigo-600">
+      </li>
+      <li
+      class="text-base font-normal text-gray-900 w-2 h-2 rounded-full bg-indigo-100">
+      </li>
+      <li
+      class="text-base font-normal text-gray-600 w-2 h-2 rounded-full bg-indigo-100">
+      </li>
+      <li
+      class="text-base font-normal text-gray-600 w-2 h-2 rounded-full bg-indigo-100">
+      </li>
+      <li
+      class="text-base font-normal text-gray-600 w-2 h-2 rounded-full bg-indigo-100">
+      </li>
+      </ul>
+      <button
+      class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      Next<svg xmlns="http://www.w3.org/2000/svg" width="22"
+      height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+      stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      </button>
+      </div>
+      </div>
+
+
+
+Progress Bar stepper
+The Progress Stepper Component includes step-by-step progress indicators. It allows users to track their progress through a series of steps that provide clear guidance and enhance the user experience. This design is also suitable for mobile devices, which provides an immense look.
+<div class="w-full max-w-md mx-auto bg-indigo-100 border-2 border-indigo-600 rounded-md">
+      <div class="flex items-center justify-between gap-3 p-3 bg-white rounded">
+      <button class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      <svg class="rotate-180" xmlns="http://www.w3.org/2000/svg"
+      width="22" height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+          stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Back
+      </button>
+      <div class="w-full max-w-xs bg-gray-100 rounded-3xl h-2 ">
+      <div class="bg-indigo-600 h-2 rounded-3xl"
+      style="width: 50%"></div>
+      </div>
+      <button
+      class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      Next<svg xmlns="http://www.w3.org/2000/svg" width="22"
+      height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+      stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      </button>
+      </div>
+      </div>
+      
+                                          
+
+Stepper with Pagination
+This Tailwind CSS component is more suitable for mobile devices, which includes fraction counts and navigation buttons to move between pages.
+<div class="w-full max-w-md mx-auto bg-indigo-100 border-2 border-indigo-600 rounded-md">
+      <div class="flex items-center justify-between gap-3 p-3 bg-white rounded">
+      <button
+      class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      <svg class="rotate-180" xmlns="http://www.w3.org/2000/svg"
+      width="22" height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+      stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Back
+      </button>
+      <ul class="flex gap-1 items-center">
+      <li class="text-lg font-medium text-gray-900">1</li>
+      <li class="text-base font-normal text-gray-900">/</li>
+      <li class="text-base font-normal text-gray-600">3</li>
+      
+      <button
+      class="flex items-center gap-1.5 border-none text-base font-medium py-2.5 text-gray-700 transition-all duration-300 hover:text-indigo-600">
+      Next<svg xmlns="http://www.w3.org/2000/svg" width="22"
+      height="23" viewBox="0 0 22 23" fill="none">
+      <path d="M8.25324 6.37646L13.7535 11.8767L8.25 17.3802"
+      stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      
+      </button>
+      </div>
+      </div>
+                                          

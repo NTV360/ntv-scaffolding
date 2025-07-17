@@ -1,0 +1,10 @@
+<div 
+  [class]="cardClasses()"
+  [style]="customStyles()"
+  (click)="onClick($event)"
+  (keydown)="onKeyDown($event)"
+  [attr.role]="mergedClickable() ? 'button' : null"
+  [attr.tabindex]="mergedClickable() ? '0' : null"
+  [attr.aria-label]="mergedClickable() ? 'Clickable card' : null">
+  <ng-content></ng-content>
+</div>

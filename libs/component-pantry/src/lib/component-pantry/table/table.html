@@ -1,0 +1,505 @@
+<div
+  class="table-container"
+  [ngStyle]="tableStyle()"
+  (click)="onClickOutside($event)"
+  tabindex="0"
+  role="button"
+  (keyup.enter)="onClickOutside($event)"
+  (keyup.space)="onClickOutside($event)"
+>
+  <!-- Column Settings -->
+  @if (showColumnSettings()) {
+  <div class="table-header-controls">
+    <div class="column-settings">
+      <ntv-popover
+        [placement]="'bottom-end'"
+        [trigger]="'click'"
+        [showArrow]="false"
+      >
+        <span slot="trigger" [innerHTML]="settingsIcon"></span>
+        <div slot="content" class="w-[230px]">
+          <h3 class="mb-4">Show/Hide Columns</h3>
+
+          <input
+            type="text"
+            class="column-search-input"
+            placeholder="Search columns..."
+            [value]="columnSearchTerm()"
+            (input)="onColumnSearch($event)"
+          />
+
+          <div class="column-list">
+            @for (column of filteredColumns(); track column.field) {
+            <label class="column-option">
+              <input
+                type="checkbox"
+                class="checkbox-input"
+                [checked]="column.visible !== false"
+                (change)="toggleColumnVisibility(column)"
+              />
+              <span>{{ column.header }}</span>
+            </label>
+            }
+          </div>
+
+          <div class="column-actions">
+            <ntv-button
+              variant="danger"
+              size="md"
+              [fullWidth]="true"
+              (click)="resetColumns()"
+            >
+              Reset
+            </ntv-button>
+          </div>
+
+          <p class="column-count-info">
+            Showing {{ visibleColumnCount() }}/{{ totalColumnCount() }} columns
+          </p>
+        </div>
+      </ntv-popover>
+    </div>
+  </div>
+  }
+
+  <div class="table-wrapper" (scroll)="onTableScroll($event)">
+    <table [ngStyle]="tableStyle()" class="table">
+      <thead #tableHeader>
+        <tr>
+          <!-- Checkbox Column Header -->
+          @if (hasCheckBox()) {
+          <th class="checkbox-column">
+            <input
+              type="checkbox"
+              class="checkbox-input header-checkbox"
+              [checked]="selectAll()"
+              [indeterminate]="isIndeterminate()"
+              (change)="toggleSelectAll()"
+              title="Select all rows"
+            />
+          </th>
+          }
+          <!-- Index Column Header -->
+          @if (hasIndex()) {
+          <th class="index-column">#</th>
+          }
+
+          <!-- Expandable Column Header -->
+          @if (expandableRows()) {
+          <th class="expand-column"></th>
+          }
+
+          <!-- Expandable Column Draggable -->
+          @if (headerTemplate) { @if (columnDraggable()) { @for (column of
+          visibleColumns(); track column.field; let i = $index) { @if
+          (column.field === 'action') {
+          <th
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+          >
+            <!-- Header content for custom header template with draggable columns (with commented filter code) -->
+            <div class="header-content">
+              <ng-container
+                [ngTemplateOutlet]="headerTemplate"
+                [ngTemplateOutletContext]="{ $implicit: column }"
+              ></ng-container>
+            </div>
+          </th>
+          } @else {
+          <th
+            ntvDraggableColumn
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+            [dragData]="column"
+            [dragIndex]="i"
+            [columnField]="column.field"
+            [class.filtered-column]="hasActiveFilter(column.field)"
+            (columnReorder)="onColumnReorder($event)"
+          >
+            <!-- Header content for custom header template with draggable columns (with commented filter code) -->
+            <div class="header-content">
+              <ng-container
+                [ngTemplateOutlet]="headerTemplate"
+                [ngTemplateOutletContext]="{ $implicit: column }"
+              ></ng-container>
+              @if (filterEnabled() && column.field !== 'action' && column.field
+              !== 'actions') {
+              <!-- <div class="filter-icon-container">
+                <button
+                  class="filter-icon-btn"
+                  (click)="toggleFilterPopup(column.field, $event)"
+                  [class.active]="isFilterPopupOpen(column.field)"
+                  title="Filter {{ column.header }}"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <path
+                        d="M21 6H19M21 12H16M21 18H16M7 20V13.5612C7 13.3532 7 13.2492 6.97958 13.1497C6.96147 13.0615 6.93151 12.9761 6.89052 12.8958C6.84431 12.8054 6.77934 12.7242 6.64939 12.5617L3.35061 8.43826C3.22066 8.27583 3.15569 8.19461 3.10948 8.10417C3.06849 8.02393 3.03853 7.93852 3.02042 7.85026C3 7.75078 3 7.64677 3 7.43875V5.6C3 5.03995 3 4.75992 3.10899 4.54601C3.20487 4.35785 3.35785 4.20487 3.54601 4.10899C3.75992 4 4.03995 4 4.6 4H13.4C13.9601 4 14.2401 4 14.454 4.10899C14.6422 4.20487 14.7951 4.35785 14.891 4.54601C15 4.75992 15 5.03995 15 5.6V7.43875C15 7.64677 15 7.75078 14.9796 7.85026C14.9615 7.93852 14.9315 8.02393 14.8905 8.10417C14.8443 8.19461 14.7793 8.27583 14.6494 8.43826L11.3506 12.5617C11.2207 12.7242 11.1557 12.8054 11.1095 12.8958C11.0685 12.9761 11.0385 13.0615 11.0204 13.1497C11 13.2492 11 13.3532 11 13.5612V17L7 20Z"
+                        stroke="#091635"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </g>
+                  </svg>
+                </button>
+                @if (isFilterPopupOpen(column.field)) {
+                <div
+                  class="filter-popup"
+                  (click)="$event.stopPropagation()"
+                  (keydown)="$event.stopPropagation()"
+                  (keyup)="$event.stopPropagation()"
+                  tabindex="0"
+                  role="dialog"
+                  aria-label="Filter popup"
+                >
+                  <div class="filter-popup-content">
+                    <div class="filter-popup-header">
+                      <span>Filter {{ column.header }}</span>
+                      <button
+                        class="close-popup-btn"
+                        (click)="closeFilterPopup()"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div class="filter-popup-body">
+                      @if (column.filterType === 'date') {
+                      <div class="date-filter-controls">
+                        <p class="filter-info">
+                          Date columns support sorting only:
+                        </p>
+                        <button
+                          class="sort-btn-popup"
+                          (click)="onSort(column.field)"
+                          title="Sort {{ column.header }}"
+                        >
+                          {{ getSortIcon(column.field) }} Sort {{ sortOrder ===
+                          "asc" ? "Ascending" : "Descending" }}
+                        </button>
+                      </div>
+                      } @else if (column.filterType === 'select') {
+                      <select
+                        class="filter-popup-select"
+                        [value]="getFilterValue(column.field)"
+                        (change)="onFilterSelectChange(column.field, $event)"
+                      >
+                        <option value="">All {{ column.header }}</option>
+                        @for (option of getUniqueValues(column.field); track
+                        option) {
+                        <option [value]="option">{{ option }}</option>
+                        }
+                      </select>
+                      } @else if (column.filterType === 'number') {
+                      <input
+                        type="number"
+                        class="filter-popup-input"
+                        [value]="getFilterValue(column.field)"
+                        (input)="onFilterInputChange(column.field, $event)"
+                        [placeholder]="'Enter ' + column.header.toLowerCase()"
+                      />
+                      } @else {
+                      <input
+                        type="text"
+                        class="filter-popup-input"
+                        [value]="getFilterValue(column.field)"
+                        (input)="onFilterInputChange(column.field, $event)"
+                        [placeholder]="'Search ' + column.header.toLowerCase()"
+                      />
+                      <div class="text-filter-controls">
+                        <button
+                          class="sort-btn-popup"
+                          (click)="onSort(column.field)"
+                          title="Sort {{ column.header }}"
+                        >
+                          {{ getSortIcon(column.field) }} Sort {{ sortOrder ===
+                          "asc" ? "Ascending" : "Descending" }}
+                        </button>
+                      </div>
+                      } @if (getFilterValue(column.field)) {
+                      <button
+                        class="clear-filter-btn"
+                        (click)="onFilterChange(column.field, '')"
+                      >
+                        Clear Filter
+                      </button>
+                      }
+                    </div>
+                  </div>
+                </div>
+                }
+              </div> -->
+              }
+            </div>
+          </th>
+          } } } @else { @for (column of visibleColumns(); track column.field) {
+          <th
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+            [class.filtered-column]="hasActiveFilter(column.field)"
+          >
+            <!-- Header content for draggable columns with filter functionality (deeply nested case) -->
+            <div class="header-content">
+              {{ column.header }} @if (filterEnabled() && column.field !==
+              'action' && column.field !== 'actions') {
+              <ntv-column-filter
+                [column]="column"
+                [data]="displayData()"
+                [filterValue]="getFilterValue(column.field)"
+                [sortField]="sortField()"
+                [sortOrder]="_sortOrder()"
+                [isPopupOpen]="isFilterPopupOpen(column.field)"
+                (filterChange)="onFilterChange($event.field, $event.value)"
+                (sortChange)="onSort($event)"
+                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
+                (closePopup)="closeFilterPopup()"
+              ></ntv-column-filter>
+              }
+            </div>
+          </th>
+          } } } @else { @if (columnDraggable()) { @for (column of
+          visibleColumns(); track column.field; let i = $index) { @if
+          (column.field === 'action') {
+          <th
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+            [class.filtered-column]="hasActiveFilter(column.field)"
+          >
+            <!-- Header content for action columns (no filtering) -->
+            <div class="header-content">{{ column.header }}</div>
+          </th>
+          } @else {
+          <th
+            ntvDraggableColumn
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+            [dragData]="column"
+            [dragIndex]="i"
+            [columnField]="column.field"
+            [class.filtered-column]="hasActiveFilter(column.field)"
+            (columnReorder)="onColumnReorder($event)"
+          >
+            <!-- Header content for draggable columns with filter functionality (final case) -->
+            <div class="header-content">
+              {{ column.header }} @if (filterEnabled() && column.field !==
+              'action' && column.field !== 'actions') {
+              <ntv-column-filter
+                [column]="column"
+                [data]="displayData()"
+                [filterValue]="getFilterValue(column.field)"
+                [sortField]="sortField()"
+                [sortOrder]="_sortOrder()"
+                [isPopupOpen]="isFilterPopupOpen(column.field)"
+                (filterChange)="onFilterChange($event.field, $event.value)"
+                (sortChange)="onSort($event)"
+                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
+                (closePopup)="closeFilterPopup()"
+              ></ntv-column-filter>
+              }
+            </div>
+          </th>
+          } } } @else { @for (column of visibleColumns(); track column.field) {
+          <th
+            ntvExpandableColumn
+            [expandableColumn]="expandableColumn()"
+            [minWidth]="defaultMinWidth()"
+            [maxWidth]="defaultMaxWidth()"
+            [class.filtered-column]="hasActiveFilter(column.field)"
+          >
+            <!-- Header content for non-draggable columns with date sorting -->
+            <div class="header-content">
+              {{ column.header }} @if (filterEnabled() && column.filterType ===
+              'date') {
+              <button
+                class="sort-btn"
+                (click)="onSort(column.field)"
+                title="Sort {{ column.header }}"
+              >
+                {{ getSortIcon(column.field) }}
+              </button>
+              }
+            </div>
+          </th>
+          } } }
+        </tr>
+      </thead>
+      <tbody>
+        @if (bodyTemplate) { @for (rowData of sortedData(); track rowData; let i
+        = $index) {
+        <ng-container
+          [ngTemplateOutlet]="bodyTemplate"
+          [ngTemplateOutletContext]="{
+            $implicit: rowData,
+            columns: visibleColumns(),
+            isLocked: isRowLocked(rowData),
+            onLockRow: onLockRow.bind(this),
+            onUnlockRow: onUnlockRow.bind(this),
+            canLockMoreRows: canLockMoreRows(),
+            hasIndex: hasIndex(),
+            rowIndex: i + 1,
+            stickyTop: isRowLocked(rowData)
+              ? getLockedRowStickyTop(rowData)
+              : null,
+            expandableRows: expandableRows(),
+            isExpanded: expandableRows() ? isRowExpanded(rowData) : undefined,
+            onToggleExpansion: expandableRows()
+              ? toggleRowExpansion.bind(this)
+              : undefined,
+            expandIcon: expandableRows() ? getExpandIcon(rowData) : undefined
+          }"
+        ></ng-container>
+        <!-- Expandable Content Row for Custom Template -->
+        @if (expandableRows() && isRowExpanded(rowData) &&
+        expandedContentTemplate) {
+        <tr class="expanded-content-row">
+          <td
+            [attr.colspan]="getExpandedContentColspan()"
+            class="expanded-content-cell"
+          >
+            <div class="expanded-content-wrapper">
+              <ng-container
+                [ngTemplateOutlet]="expandedContentTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: rowData,
+                  rowData: rowData,
+                  columns: visibleColumns(),
+                  isExpanded: true
+                }"
+              ></ng-container>
+            </div>
+          </td>
+        </tr>
+        } } } @else { @for (rowData of sortedData(); track rowData; let i =
+        $index) {
+        <tr
+          [class.locked-row]="isRowLocked(rowData)"
+          [style.--sticky-top]="
+            isRowLocked(rowData) ? getLockedRowStickyTop(rowData) : null
+          "
+        >
+          <!-- Checkbox Column Data -->
+          @if (hasCheckBox()) {
+          <td class="checkbox-column">
+            <input
+              type="checkbox"
+              class="checkbox-input row-checkbox"
+              [checked]="isRowSelected(rowData)"
+              (change)="toggleRowSelection(rowData)"
+              [title]="isRowSelected(rowData) ? 'Deselect row' : 'Select row'"
+            />
+          </td>
+          }
+          <!-- Index Column Data -->
+          @if (hasIndex()) {
+          <td class="index-column">{{ i + 1 }}</td>
+          }
+          <!-- Expandable Column Data -->
+          @if (expandableRows()) {
+          <td class="expand-column">
+            <button
+              class="expand-btn"
+              (click)="toggleRowExpansion(rowData)"
+              [title]="isRowExpanded(rowData) ? 'Collapse row' : 'Expand row'"
+            >
+              {{ getExpandIcon(rowData) }}
+            </button>
+          </td>
+          } @for (col of visibleColumns(); track col.field) {
+          <td [class.filtered-column-cell]="hasActiveFilter(col.field)">
+            @if (col.field === 'status') {
+            <span [class]="'status-' + rowData[col.field]?.toLowerCase()">
+              {{ rowData[col.field] }}
+            </span>
+            } @else if (col.field === 'actions') {
+            <div class="action-buttons">
+              @if (isRowLocked(rowData)) {
+              <button
+                class="unlock-btn"
+                (click)="onUnlockRow(rowData)"
+                title="Unlock Row"
+              >
+                🔓
+              </button>
+              } @else { @if (canLockMoreRows()) {
+              <button
+                class="lock-btn"
+                (click)="onLockRow(rowData)"
+                title="Lock Row"
+              >
+                🔒
+              </button>
+              } }
+            </div>
+            } @else { {{ rowData[col.field] }} }
+          </td>
+          }
+        </tr>
+        <!-- Expandable Content Row -->
+        @if (expandableRows() && isRowExpanded(rowData) &&
+        expandedContentTemplate) {
+        <tr class="expanded-content-row">
+          <td
+            [attr.colspan]="getExpandedContentColspan()"
+            class="expanded-content-cell"
+          >
+            <div class="expanded-content-wrapper">
+              <ng-container
+                [ngTemplateOutlet]="expandedContentTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: rowData,
+                  rowData: rowData,
+                  columns: visibleColumns(),
+                  isExpanded: true
+                }"
+              ></ng-container>
+            </div>
+          </td>
+        </tr>
+        } } }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination: Show More  -->
+  <div class="pagination">
+    <p class="pagination-text">
+      Showing <span class="font-medium">{{ currentlyShowing() }}</span> of
+      <span class="font-medium">{{ totalItems() }}</span>
+    </p>
+
+    @if (hasMoreItems()) {
+    <button (click)="showMore()">Show More</button>
+    }
+  </div>
+
+  <!-- Loading Overlay -->
+  @if (isProcessing()) {
+  <div class="table__loading-overlay">
+    <div class="table__loading-content">
+      <div class="table__loading-spinner"></div>
+      <div class="table__loading-message">{{ loadingMessage() }}</div>
+    </div>
+  </div>
+  }
+</div>

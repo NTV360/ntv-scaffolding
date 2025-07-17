@@ -1,0 +1,418 @@
+@switch (mergedVariant()) { @case ('default') {
+<ol class="stepper sm:text-base">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getStepClasses(i) + (last ? '' : ' ' + getConnectorClasses(i))">
+    <div
+      class="step__content step__content--mobile-separator"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+    >
+      <span [class]="getStepNumberClasses(i)">
+        @if (isStepError(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ i + 1 }}</span>
+        }
+      </span>
+      @if (mergedShowLabels()) {
+      <span [class]="getLabelClasses(i)">{{ step.label }}</span>
+      }
+    </div>
+  </li>
+  }
+</ol>
+} @case ('progress') {
+<ol class="stepper text-xs font-medium sm:text-base">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getProgressStepClasses(i, last)">
+    <div
+      class="block whitespace-nowrap z-10 relative"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+      [class.step--clickable]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getProgressStepNumberClasses(i)">
+        @if (isStepError(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else { {{ i + 1 }} }
+      </span>
+      @if (mergedShowLabels()) {
+      <span [class]="getLabelClasses(i)">{{ step.label }}</span>
+      }
+    </div>
+  </li>
+  }
+</ol>
+} @case ('detailed') {
+<ol class="lg:flex items-center w-full space-y-4 lg:space-x-8 lg:space-y-0">
+  @for (step of steps(); track step.id; let i = $index) {
+  <li class="flex-1">
+    <a
+      [class]="getDetailedStepClasses(i)"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label + (step.description ? '. ' + step.description : '')"
+      [class.step--clickable]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getDetailedStepTextClasses(i)"> Step {{ i + 1 }} </span>
+      @if (mergedShowDescriptions() && step.description) {
+      <p [class]="getDetailedStepDescriptionClasses(i)">
+        {{ step.description }}
+      </p>
+      }
+      <h4 [class]="'text-base lg:text-lg font-medium ' + getLabelClasses(i)">{{ step.label }}</h4>
+    </a>
+  </li>
+  }
+</ol>
+} @case ('panel') {
+<ol class="lg:flex items-center w-full space-y-4 lg:space-y-0 gap-2">
+  @for (step of steps(); track step.id; let i = $index) {
+  <li class="flex-1">
+    <a
+      [class]="getPanelStepClasses(i)"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+      [class.step--clickable]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getStepNumberClasses(i)">
+        @if (isStepError(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ (i + 1).toString().padStart(2, '0') }}</span>
+        }
+      </span>
+      <h4 [class]="'text-base font-medium ml-4 ' + getLabelClasses(i)">{{ step.label }}</h4>
+    </a>
+  </li>
+  }
+</ol>
+} @case ('vertical') {
+<ol class="stepper--vertical">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getVerticalStepClasses(i, last)">
+    <a
+      class="flex items-center font-medium w-full"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label + (step.description ? '. ' + step.description : '')"
+      [class.cursor-pointer]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getVerticalStepNumberClasses(i)">
+        @if (isStepError(i)) {
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg
+          class="w-5 h-5 stroke-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 12L9.28722 16.2923C9.62045 16.6259 9.78706 16.7927 9.99421 16.7928C10.2014 16.7929 10.3681 16.6262 10.7016 16.2929L20 7"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ i + 1 }}</span>
+        }
+      </span>
+      <div class="block">
+        @if (mergedShowDescriptions() && step.description) {
+        <p [class]="getVerticalStepDescriptionClasses(i) + ' ' + getDescriptionClasses(i)">
+          {{ step.description }}
+        </p>
+        }
+        <h4 [class]="'text-base font-medium ' + getLabelClasses(i)">
+          {{ step.label }}
+        </h4>
+      </div>
+    </a>
+  </li>
+  }
+</ol>
+} @case ('vertical-reverse') {
+<ol class="stepper--vertical-reverse">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getVerticalReverseStepClasses(i, last)">
+    <a
+      class="flex items-center font-medium w-full flex-row-reverse"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label + (step.description ? '. ' + step.description : '')"
+      [class.cursor-pointer]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getVerticalReverseStepNumberClasses(i)">
+        @if (isStepError(i)) {
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg
+          class="w-5 h-5 stroke-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 12L9.28722 16.2923C9.62045 16.6259 9.78706 16.7927 9.99421 16.7928C10.2014 16.7929 10.3681 16.6262 10.7016 16.2929L20 7"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ i + 1 }}</span>
+        }
+      </span>
+      <div class="block text-right">
+        @if (mergedShowDescriptions() && step.description) {
+        <p [class]="getVerticalReverseStepDescriptionClasses(i) + ' ' + getDescriptionClasses(i)">
+          {{ step.description }}
+        </p>
+        }
+        <h4 [class]="'text-base font-medium ' + getLabelClasses(i)">
+          {{ step.label }}
+        </h4>
+      </div>
+    </a>
+  </li>
+  }
+</ol>
+} @case ('breadcrumb') {
+<ol class="lg:flex items-center w-full space-y-4 lg:space-y-0 lg:space-x-4">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li class="relative">
+    <a
+      class="flex items-center font-medium w-full"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+      [class.step--clickable]="mergedClickable() && !isStepDisabled(i)"
+    >
+      <span [class]="getStepNumberClasses(i) + ' lg:w-8 lg:h-8'">
+        @if (isStepError(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ i + 1 }}</span>
+        }
+      </span>
+      <div class="block">
+        <h4 [class]="'text-base font-medium ' + getLabelClasses(i)">{{ step.label }}</h4>
+      </div>
+      @if (!last) {
+      <svg
+        [class]="getBreadcrumbStepIconClasses(i)"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M5 18L9.67462 13.0607C10.1478 12.5607 10.3844 12.3107 10.3844 12C10.3844 11.6893 10.1478 11.4393 9.67462 10.9393L5 6M12.6608 18L17.3354 13.0607C17.8086 12.5607 18.0452 12.3107 18.0452 12C18.0452 11.6893 17.8086 11.4393 17.3354 10.9393L12.6608 6"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </svg>
+      }
+    </a>
+  </li>
+  }
+</ol>
+} @case ('form') {
+<ol class="stepper sm:text-base mb-12">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getStepClasses(i) + (last ? '' : ' ' + getConnectorClasses(i))">
+    <div
+      class="step__content step__content--mobile-separator"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+    >
+      <span [class]="getStepNumberClasses(i)">
+        @if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else {
+        <span>{{ i + 1 }}</span>
+        }
+      </span>
+      @if (mergedShowLabels()) {
+      <span [class]="getLabelClasses(i)">{{ step.label }}</span>
+      }
+    </div>
+  </li>
+  }
+</ol>
+} @case ('numbered') {
+<ol class="stepper sm:text-base">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getStepClasses(i) + (last ? '' : ' ' + getConnectorClasses(i))">
+    <div
+      class="step__content step__content--mobile-separator"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+    >
+      <span [class]="getStepNumberClasses(i)">
+        <span>{{ i + 1 }}</span>
+      </span>
+      @if (mergedShowLabels()) {
+      <span [class]="getLabelClasses(i)">{{ step.label }}</span>
+      }
+    </div>
+  </li>
+  }
+</ol>
+} @case ('icon') {
+<ol class="stepper sm:text-base">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+  <li [class]="getStepClasses(i) + (last ? '' : ' ' + getConnectorClasses(i))">
+    <div
+      class="step__content step__content--mobile-separator"
+      (click)="onStepClick(step, i)"
+      (keydown.enter)="onStepClick(step, i)"
+      (keydown.space)="onStepClick(step, i)"
+      [attr.tabindex]="mergedClickable() && !isStepDisabled(i) ? 0 : -1"
+      [attr.role]="mergedClickable() && !isStepDisabled(i) ? 'button' : null"
+      [attr.aria-label]="'Step ' + (i + 1) + ': ' + step.label"
+    >
+      <span [class]="getStepNumberClasses(i)">
+        @if (isStepCompleted(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else if (isStepActive(i)) {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        } @else {
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        }
+      </span>
+      @if (mergedShowLabels()) {
+      <span [class]="getLabelClasses(i)">{{ step.label }}</span>
+      }
+    </div>
+  </li>
+  }
+</ol>
+} }

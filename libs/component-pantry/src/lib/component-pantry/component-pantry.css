@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global font family */
+body {
+  font-family: 'Nunito', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+}
+
+/* Global Text Color Utilities */
+/* These classes automatically adjust text colors based on light/dark mode */
+
+/* Primary text colors - main content */
+.text-primary {
+  @apply text-gray-900;
+}
+
+.dark .text-primary {
+  @apply text-gray-50;
+}
+
+/* Secondary text colors - supporting content */
+.text-secondary {
+  @apply text-gray-600;
+}
+
+.dark .text-secondary {
+  @apply text-gray-200;
+}
+
+/* Tertiary text colors - less important content */
+.text-tertiary {
+  @apply text-gray-500;
+}
+
+.dark .text-tertiary {
+  @apply text-gray-300;
+}
+
+/* Muted text colors - subtle content like placeholders */
+.text-muted {
+  @apply text-gray-400;
+}
+
+.dark .text-muted {
+  @apply text-gray-400;
+}
+
+/* Inverted text colors - for use on colored backgrounds */
+.text-inverted {
+  @apply text-white;
+}
+
+.dark .text-inverted {
+  @apply text-gray-900;
+}
+
+/* Auto text colors - automatically contrasts with background */
+.text-auto {
+  @apply text-gray-900;
+}
+
+.dark .text-auto {
+  @apply text-gray-50;
+}
+
+/* Custom component styles using @apply */
+:host {
+  display: block;
+}
+
+.pantry-container {
+  @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8 rounded-lg shadow-lg max-w-md mx-auto;
+}
+
+.pantry-title {
+  @apply text-3xl font-bold mb-4;
+}
+
+.pantry-description {
+  @apply text-lg mb-4;
+}
+
+.pantry-tags {
+  @apply flex space-x-2;
+}
+
+.pantry-tag {
+  @apply bg-white px-3 py-1 rounded-full text-sm font-semibold;
+}
+
+.pantry-tag--blue {
+  @apply text-blue-600;
+}
+
+.pantry-tag--purple {
+  @apply text-purple-600;
+}
+
+.pantry-tag--green {
+  @apply text-green-600;
+}
+
+.pantry-button-container {
+  @apply mt-6;
+}
+
+.pantry-button {
+  @apply bg-white text-blue-600 hover:bg-gray-100 transition-colors duration-200 px-6 py-2 rounded-lg font-semibold shadow-md;
+}

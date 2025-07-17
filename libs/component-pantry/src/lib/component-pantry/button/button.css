@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base button styles */
+.btn {
+  @apply inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer;
+}
+
+/* Button variants */
+.btn--primary {
+  @apply text-white;
+  background-color: theme('colors.primary.600');
+}
+.btn--primary:hover {
+  background-color: theme('colors.primary.700');
+}
+.btn--primary:focus {
+  box-shadow: 0 0 0 2px theme('colors.primary.500');
+}
+
+.btn--accent {
+  @apply text-white;
+  background-color: theme('colors.accent.500');
+}
+.btn--accent:hover {
+  background-color: theme('colors.accent.600');
+}
+.btn--accent:focus {
+  box-shadow: 0 0 0 2px theme('colors.accent.500');
+}
+
+.btn--description {
+  @apply text-white;
+  background-color: theme('colors.description.600');
+}
+.btn--description:hover {
+  background-color: theme('colors.description.700');
+}
+.btn--description:focus {
+  box-shadow: 0 0 0 2px theme('colors.description.500');
+}
+
+.btn--info {
+  @apply text-white;
+  background-color: theme('colors.info.600');
+}
+.btn--info:hover {
+  background-color: theme('colors.info.700');
+}
+.btn--info:focus {
+  box-shadow: 0 0 0 2px theme('colors.info.500');
+}
+
+.btn--success {
+  @apply text-white;
+  background-color: theme('colors.success.600');
+}
+.btn--success:hover {
+  background-color: theme('colors.success.700');
+}
+.btn--success:focus {
+  box-shadow: 0 0 0 2px theme('colors.success.500');
+}
+
+.btn--warning {
+  @apply text-white;
+  background-color: theme('colors.warning.600');
+}
+.btn--warning:hover {
+  background-color: theme('colors.warning.700');
+}
+.btn--warning:focus {
+  box-shadow: 0 0 0 2px theme('colors.warning.500');
+}
+
+.btn--danger {
+  @apply text-white;
+  background-color: theme('colors.danger.600');
+}
+.btn--danger:hover {
+  background-color: theme('colors.danger.700');
+}
+.btn--danger:focus {
+  box-shadow: 0 0 0 2px theme('colors.danger.500');
+}
+
+.btn--secondary {
+  @apply bg-gray-200 text-gray-900 hover:bg-gray-300;
+}
+
+.btn--outline {
+  @apply bg-transparent border-2;
+}
+
+/* Button sizes */
+.btn--sm {
+  @apply px-3 py-1.5 text-sm;
+}
+.btn--md {
+  @apply px-4 py-2 text-base;
+}
+.btn--lg {
+  @apply px-6 py-3 text-lg;
+}
+.btn--xl {
+  @apply px-8 py-4 text-xl;
+}
+
+/* Button modifiers */
+.btn--disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+.btn--loading {
+  @apply cursor-wait;
+}
+.btn--full-width {
+  @apply w-full;
+}
+.btn--rounded-none {
+  @apply rounded-none;
+}
+.btn--rounded-sm {
+  @apply rounded-sm;
+}
+.btn--rounded-md {
+  @apply rounded-md;
+}
+.btn--rounded-lg {
+  @apply rounded-lg;
+}
+.btn--rounded-xl {
+  @apply rounded-xl;
+}
+.btn--rounded-full {
+  @apply rounded-full;
+}
+.btn--shadow {
+  @apply shadow-md hover:shadow-lg;
+}
+
+/* Loading spinner */
+.btn__spinner {
+  @apply w-4 h-4 mr-2;
+}
+.btn__spinner svg {
+  @apply w-full h-full;
+}
+
+/* Content with loading state */
+.btn__content--loading {
+  @apply opacity-75;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .btn--xl {
+    @apply px-6 py-3 text-lg;
+  }
+  .btn--lg {
+    @apply px-4 py-2 text-base;
+  }
+}

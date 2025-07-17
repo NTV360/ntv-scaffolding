@@ -1,0 +1,594 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Autocomplete Container */
+:host {
+  @apply relative block w-full;
+  /* Ensure dropdown can escape host boundaries */
+  overflow: visible !important;
+  z-index: auto;
+}
+
+.autocomplete-wrapper {
+  @apply relative w-full;
+  /* Ensure dropdown can escape wrapper boundaries */
+  overflow: visible !important;
+  z-index: auto;
+}
+
+/* Dropdown Arrow Animation */
+.dropdown-arrow {
+  @apply transition-transform duration-200 ease-in-out;
+}
+
+.dropdown-arrow.rotated {
+  @apply rotate-180;
+}
+
+/* Multi-Input Wrapper */
+.multi-input-wrapper {
+  @apply relative w-full;
+}
+
+.input-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+/* Multi-Input Container */
+.multi-input-container {
+  @apply relative flex items-stretch gap-1.5 p-1.5 min-h-[2.5rem];
+  @apply bg-white border border-gray-300 rounded-md shadow-sm;
+  @apply focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500;
+  @apply transition-colors duration-200 cursor-text;
+}
+
+.multi-input-container:hover {
+  @apply border-gray-400;
+}
+
+/* Chips container with horizontal scroll */
+.chips-container {
+  @apply flex items-center gap-1 overflow-x-auto;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 60%;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding-bottom: 4px;
+  margin-bottom: -4px;
+  cursor: grab;
+  user-select: none;
+  scroll-behavior: auto;
+}
+
+.chips-container:active {
+  cursor: grabbing;
+}
+
+.chips-container:empty {
+  display: none;
+}
+
+.chips-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Dark mode styles for multi-input */
+.dark .multi-input-container {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .multi-input-container:hover {
+  border-color: #4b5563;
+}
+
+.dark .multi-input-container:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dark .chips-container {
+  scrollbar-color: #4b5563 transparent;
+}
+
+.dark .chips-container::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark .chips-container::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.dark .overflow-chip {
+  @apply bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600;
+}
+
+/* Input controls container */
+.input-controls {
+  @apply flex items-center gap-1 flex-shrink-0;
+}
+
+/* Overflow chip indicator with dynamic colors */
+.overflow-chip {
+  @apply flex items-center justify-center px-2 py-1 rounded text-xs font-medium;
+  @apply border flex-shrink-0 cursor-pointer transition-all duration-200;
+  white-space: nowrap;
+  background-color: var(--chip-bg, #f3f4f6);
+  color: var(--chip-text, #374151);
+  border-color: var(--chip-border, #d1d5db);
+}
+
+.overflow-chip:hover {
+  background-color: var(--chip-bg-hover, #e5e7eb);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Size Variants */
+.multi-input--sm .multi-input-container {
+  @apply min-h-[2rem] p-1.5 text-sm;
+}
+
+.multi-input--lg .multi-input-container {
+  @apply min-h-[3rem] p-3 text-lg;
+}
+
+/* Variant Styles */
+.multi-input--primary .multi-input-container {
+  @apply border-blue-300 focus-within:border-blue-500 focus-within:ring-blue-500;
+}
+
+.multi-input--secondary .multi-input-container {
+  @apply border-gray-300 focus-within:border-gray-500 focus-within:ring-gray-500;
+}
+
+.multi-input--success .multi-input-container {
+  @apply border-green-300 focus-within:border-green-500 focus-within:ring-green-500;
+}
+
+/* Error State */
+.multi-input--error .multi-input-container {
+  @apply border-red-300 focus-within:border-red-500 focus-within:ring-red-500;
+}
+
+/* Disabled State */
+.multi-input--disabled .multi-input-container {
+  @apply bg-gray-50 border-gray-200 cursor-not-allowed;
+}
+
+/* Selected Chips with Dynamic Colors */
+.selected-chip {
+  @apply flex items-center gap-1 px-2 py-1 rounded text-sm font-medium;
+  @apply border max-w-[200px] flex-shrink-0 transition-all duration-200;
+  white-space: nowrap;
+  background-color: var(--chip-bg, #dbeafe);
+  color: var(--chip-text, #1e40af);
+  border-color: var(--chip-border, #bfdbfe);
+}
+
+.selected-chip:hover {
+  background-color: var(--chip-bg-hover, #bfdbfe);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chip-label {
+  @apply truncate;
+}
+
+.chip-remove {
+  @apply flex items-center justify-center w-4 h-4 rounded-full transition-all duration-200;
+  @apply focus:outline-none focus:ring-1 flex-shrink-0;
+  background-color: var(--chip-remove-bg, transparent);
+  color: var(--chip-remove-text, currentColor);
+}
+
+.chip-remove:hover {
+  background-color: var(--chip-remove-bg-hover, rgba(0, 0, 0, 0.1));
+  transform: scale(1.1);
+}
+
+.chip-remove svg {
+  @apply w-3 h-3 stroke-current;
+}
+
+/* Chip Color Variants */
+.selected-chip.chip-primary {
+  --chip-bg: #dbeafe;
+  --chip-text: #1e40af;
+  --chip-border: #bfdbfe;
+  --chip-bg-hover: #bfdbfe;
+  --chip-remove-bg-hover: rgba(30, 64, 175, 0.2);
+}
+
+.selected-chip.chip-success {
+  --chip-bg: #dcfce7;
+  --chip-text: #166534;
+  --chip-border: #bbf7d0;
+  --chip-bg-hover: #bbf7d0;
+  --chip-remove-bg-hover: rgba(22, 101, 52, 0.2);
+}
+
+.selected-chip.chip-warning {
+  --chip-bg: #fef3c7;
+  --chip-text: #92400e;
+  --chip-border: #fde68a;
+  --chip-bg-hover: #fde68a;
+  --chip-remove-bg-hover: rgba(146, 64, 14, 0.2);
+}
+
+.selected-chip.chip-error {
+  --chip-bg: #fee2e2;
+  --chip-text: #dc2626;
+  --chip-border: #fecaca;
+  --chip-bg-hover: #fecaca;
+  --chip-remove-bg-hover: rgba(220, 38, 38, 0.2);
+}
+
+.selected-chip.chip-purple {
+  --chip-bg: #f3e8ff;
+  --chip-text: #7c3aed;
+  --chip-border: #ddd6fe;
+  --chip-bg-hover: #ddd6fe;
+  --chip-remove-bg-hover: rgba(124, 58, 237, 0.2);
+}
+
+.selected-chip.chip-pink {
+  --chip-bg: #fce7f3;
+  --chip-text: #be185d;
+  --chip-border: #f9a8d4;
+  --chip-bg-hover: #f9a8d4;
+  --chip-remove-bg-hover: rgba(190, 24, 93, 0.2);
+}
+
+.selected-chip.chip-indigo {
+  --chip-bg: #e0e7ff;
+  --chip-text: #4338ca;
+  --chip-border: #c7d2fe;
+  --chip-bg-hover: #c7d2fe;
+  --chip-remove-bg-hover: rgba(67, 56, 202, 0.2);
+}
+
+.selected-chip.chip-gray {
+  --chip-bg: #f3f4f6;
+  --chip-text: #374151;
+  --chip-border: #d1d5db;
+  --chip-bg-hover: #e5e7eb;
+  --chip-remove-bg-hover: rgba(55, 65, 81, 0.2);
+}
+
+/* Multi-Input Field */
+.multi-input-field {
+  @apply flex-1 min-w-[120px] outline-none bg-transparent border-none;
+  @apply placeholder-gray-400 text-gray-900 dark:text-gray-100;
+  @apply py-1 px-2;
+  align-self: center;
+  width: 100%;
+}
+
+.multi-input-field:disabled {
+  @apply cursor-not-allowed text-gray-400;
+}
+
+/* Clear Button */
+.clear-button {
+  @apply flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-200 transition-colors;
+  @apply focus:outline-none focus:ring-1 focus:ring-blue-400 flex-shrink-0 ml-1;
+}
+
+.clear-button svg {
+  @apply w-4 h-4 stroke-current text-gray-500;
+}
+
+/* Input Messages */
+.input-message {
+  @apply mt-1 text-xs;
+}
+
+.input-message.error {
+  @apply text-red-600;
+}
+
+.input-message.info {
+  @apply text-gray-600;
+}
+
+/* Legacy Selected Options (kept for backward compatibility) */
+.selected-options {
+  @apply flex flex-wrap gap-2 mt-2 p-2 bg-gray-50 rounded-md border border-gray-200;
+}
+
+.selected-option {
+  @apply flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm font-medium;
+  @apply border border-blue-200;
+}
+
+.selected-option .option-label {
+  @apply truncate max-w-32;
+}
+
+.remove-option {
+  @apply flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors;
+  @apply focus:outline-none focus:ring-1 focus:ring-blue-400;
+}
+
+.remove-option svg {
+  @apply w-3 h-3 stroke-current;
+}
+
+/* Dropdown */
+.dropdown {
+  @apply absolute top-full left-0 right-0 z-[9999] mt-1;
+  @apply bg-white border border-gray-300 rounded-md shadow-lg;
+  @apply max-h-60 overflow-y-auto;
+  animation: dropdownFadeIn 0.15s ease-out;
+  /* Ensure dropdown appears above all other content */
+  position: absolute !important;
+  z-index: 9999 !important;
+}
+
+.dropdown.loading {
+  @apply pointer-events-none;
+}
+
+/* Dropdown Header (Multiple Mode Only) */
+.dropdown-header {
+  @apply flex justify-end items-center px-2 py-1 border-b border-gray-200 bg-gray-50;
+  @apply sticky top-0 z-10;
+}
+
+.close-dropdown {
+  @apply flex items-center justify-center w-6 h-6 rounded-full hover:bg-gray-200 transition-colors;
+  @apply focus:outline-none focus:ring-1 focus:ring-blue-400;
+}
+
+.close-dropdown svg {
+  @apply w-4 h-4 stroke-current text-gray-600;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  @apply flex items-center px-3 py-2 cursor-pointer transition-colors duration-150;
+  @apply hover:bg-gray-50 focus:bg-gray-50 focus:outline-none;
+}
+
+.dropdown-item.highlighted {
+  @apply bg-blue-50 text-blue-900;
+}
+
+.dropdown-item.selected {
+  @apply bg-blue-100 text-blue-900 font-medium;
+}
+
+.dropdown-item.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.dropdown-item.loading-item {
+  @apply justify-center gap-2 py-3 text-gray-500 cursor-default;
+}
+
+.dropdown-item.no-results {
+  @apply justify-center py-3 text-gray-500 cursor-default italic;
+}
+
+/* Selection Indicator */
+.selection-indicator {
+  @apply flex items-center justify-center w-5 h-5 mr-2;
+}
+
+.selection-indicator svg {
+  @apply text-blue-600;
+}
+
+/* Option Content */
+.option-content {
+  @apply flex-1 min-w-0;
+}
+
+.option-label {
+  @apply block truncate;
+}
+
+.option-group {
+  @apply block text-xs text-gray-500 truncate;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  @apply w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin;
+}
+
+/* Animations */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .dropdown {
+    @apply max-h-48;
+  }
+  
+  .selected-options {
+    @apply gap-1;
+  }
+  
+  .selected-option {
+    @apply text-xs px-1.5 py-0.5;
+  }
+  
+  .selected-option .option-label {
+    @apply max-w-24;
+  }
+}
+
+/* Dark Mode Support - Using Tailwind's dark: prefix */
+.dropdown {
+  @apply dark:bg-dark-bg-primary dark:border-dark-border-primary;
+}
+
+.dropdown-item {
+  @apply dark:text-dark-text-secondary dark:hover:bg-dark-bg-secondary dark:focus:bg-dark-bg-secondary;
+}
+
+.dropdown-item.highlighted {
+  @apply dark:bg-dark-accent-secondary dark:text-dark-text-primary;
+}
+
+.dropdown-item.selected {
+  @apply dark:bg-dark-accent-hover dark:text-dark-text-primary;
+}
+
+.dropdown-item.loading-item,
+.dropdown-item.no-results {
+  @apply dark:text-dark-text-muted;
+}
+
+/* Multi-Input Dark Mode */
+.multi-input-container {
+  @apply dark:bg-dark-bg-primary dark:border-dark-border-primary;
+  @apply overflow-x-auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.multi-input-container::-webkit-scrollbar {
+  display: none;
+}
+
+.multi-input-container:hover {
+  @apply dark:border-dark-border-secondary;
+}
+
+.multi-input--primary .multi-input-container {
+  @apply dark:border-dark-accent-primary dark:focus-within:border-dark-accent-hover dark:focus-within:ring-dark-accent-hover;
+}
+
+.multi-input--error .multi-input-container {
+  @apply dark:border-red-400 dark:focus-within:border-red-400 dark:focus-within:ring-red-400;
+}
+
+.multi-input--disabled .multi-input-container {
+  @apply dark:bg-dark-bg-secondary dark:border-dark-border-primary;
+}
+
+.selected-chip {
+  @apply dark:bg-dark-accent-secondary dark:text-dark-text-primary dark:border-dark-border-secondary;
+}
+
+.chip-remove {
+  @apply dark:hover:bg-dark-accent-hover;
+}
+
+.multi-input-field {
+  @apply dark:placeholder-dark-text-muted;
+}
+
+.clear-button {
+  @apply dark:hover:bg-dark-bg-secondary;
+}
+
+.clear-button svg {
+  @apply dark:text-dark-text-muted;
+}
+
+.input-message.error {
+  @apply dark:text-red-400;
+}
+
+.input-message.info {
+  @apply dark:text-dark-text-muted;
+}
+
+.input-label {
+  @apply dark:text-dark-text-primary;
+}
+
+/* Legacy Dark Mode */
+.selected-options {
+  @apply dark:bg-dark-bg-primary dark:border-dark-border-primary;
+}
+
+.selected-option {
+  @apply dark:bg-dark-accent-secondary dark:text-dark-text-primary dark:border-dark-border-secondary;
+}
+
+.remove-option {
+  @apply dark:hover:bg-dark-accent-hover;
+}
+
+.option-group {
+  @apply dark:text-dark-text-muted;
+}
+
+.loading-spinner {
+  @apply dark:border-dark-border-primary dark:border-t-dark-accent-primary;
+}
+
+.selection-indicator svg {
+  @apply dark:text-dark-accent-primary;
+}
+
+/* Dropdown Header Dark Mode */
+.dropdown-header {
+  @apply dark:bg-dark-bg-secondary dark:border-dark-border-secondary;
+}
+
+.close-dropdown {
+  @apply dark:hover:bg-dark-bg-tertiary;
+}
+
+.close-dropdown svg {
+  @apply dark:text-dark-text-secondary;
+}
+
+/* Focus States */
+:host(.variant-primary) .dropdown-item.highlighted {
+  @apply bg-blue-50 text-blue-900 dark:bg-dark-accent-secondary dark:text-dark-text-primary;
+}
+
+:host(.variant-success) .dropdown-item.highlighted {
+  @apply bg-green-50 text-green-900 dark:bg-success-700 dark:text-dark-text-primary;
+}
+
+:host(.variant-danger) .dropdown-item.highlighted {
+  @apply bg-red-50 text-red-900 dark:bg-danger-700 dark:text-dark-text-primary;
+}
+
+/* Custom Scrollbar */
+.dropdown::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.dropdown::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-dark-bg-tertiary rounded;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-dark-border-secondary rounded hover:bg-gray-400 dark:hover:bg-dark-text-muted;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .dropdown {
+    @apply border-2 border-black;
+  }
+  
+  .dropdown-item.highlighted {
+    @apply bg-black text-white;
+  }
+  
+  .selected-option {
+    @apply border-2 border-blue-800;
+  }
+}
