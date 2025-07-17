@@ -1,6 +1,60 @@
 <ntv-layout>
   <ntv-sidebar />
   <div main>
+    <div class="step-controls-container">
+      <h3>Installation Flow Controls</h3>
+      
+      <!-- Current Step Info -->
+      <div class="step-info">
+        <p>Current Step: <strong>{{ currentStepInfo.stepNumber }} of {{ currentStepInfo.totalSteps }}</strong></p>
+        <p>{{ currentStepInfo.step.label }}</p>
+      </div>
+
+      <!-- Navigation Controls -->
+      <div class="navigation-controls">
+        <button 
+          class="nav-button prev-button"
+          (click)="previousStep()"
+          [disabled]="currentStepInfo.isFirst"
+          type="button">
+          ← Previous
+        </button>
+        
+        <button 
+          class="nav-button complete-button"
+          (click)="completeCurrentStep()"
+          type="button">
+          ✓ Complete Step
+        </button>
+        
+        <button 
+          class="nav-button next-button"
+          (click)="nextStep()"
+          [disabled]="currentStepInfo.isLast"
+          type="button">
+          Next →
+        </button>
+      </div>
+
+      <!-- Error Testing Controls -->
+      <div class="error-controls">
+        <h4>Error Testing</h4>
+        <button 
+          class="error-button trigger-error"
+          (click)="triggerCurrentStepError()"
+          type="button">
+          ⚠ Trigger Error
+        </button>
+        
+        <button 
+          class="error-button clear-error"
+          (click)="clearCurrentStepError()"
+          type="button">
+          ✓ Clear Error
+        </button>
+      </div>
+    </div>
+    
     <router-outlet></router-outlet>
   </div>
 </ntv-layout>

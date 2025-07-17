@@ -291,30 +291,30 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__number--danger';
-      if (isCompleted) {
-        classes += ' step__number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__number--danger--completed';
       } else {
         classes += ' step__number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__number--${color}`;
-      if (isCompleted) {
-        classes += ` step__number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__number--${color}--completed`;
       } else {
         classes += ` step__number--${color}--inactive`;
       }
     }
 
     // Add basic state classes for fallback
-    if (isCompleted) {
-      classes += ' step__number--completed';
-    } else if (isActive) {
+    if (isActive) {
       classes += ' step__number--active';
+    } else if (isCompleted) {
+      classes += ' step__number--completed';
     } else {
       classes += ' step__number--inactive';
     }
@@ -420,10 +420,10 @@ export class Stepper {
     }
 
     // Add state classes
-    if (isCompleted) {
-      classes += ' step__number--completed';
-    } else if (isActive) {
+    if (isActive) {
       classes += ' step__number--active';
+    } else if (isCompleted) {
+      classes += ' step__number--completed';
     } else {
       classes += ' step__number--inactive';
     }
@@ -448,10 +448,10 @@ export class Stepper {
 
     if (isError) {
       classes += ' step__detailed--error';
-    } else if (isCompleted) {
-      classes += ' step__detailed--completed';
     } else if (isActive) {
       classes += ' step__detailed--active';
+    } else if (isCompleted) {
+      classes += ' step__detailed--completed';
     } else {
       classes += ' step__detailed--inactive';
     }
@@ -528,10 +528,10 @@ export class Stepper {
 
     if (isError) {
       classes += ' step__panel--error';
-    } else if (isCompleted) {
-      classes += ' step__panel--completed';
     } else if (isActive) {
       classes += ' step__panel--active';
+    } else if (isCompleted) {
+      classes += ' step__panel--completed';
     } else {
       classes += ' step__panel--inactive';
     }
@@ -606,20 +606,20 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__vertical-number--danger';
-      if (isCompleted) {
-        classes += ' step__vertical-number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__vertical-number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__vertical-number--danger--completed';
       } else {
         classes += ' step__vertical-number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__vertical-number--${color}`;
-      if (isCompleted) {
-        classes += ` step__vertical-number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__vertical-number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__vertical-number--${color}--completed`;
       } else {
         classes += ` step__vertical-number--${color}--inactive`;
       }
@@ -628,10 +628,10 @@ export class Stepper {
     // Add basic state classes for fallback
     if (isError) {
       classes += ' step__vertical-number--error';
-    } else if (isCompleted) {
-      classes += ' step__vertical-number--completed';
     } else if (isActive) {
       classes += ' step__vertical-number--active';
+    } else if (isCompleted) {
+      classes += ' step__vertical-number--completed';
     } else {
       classes += ' step__vertical-number--inactive';
     }
@@ -773,20 +773,20 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__vertical-reverse-number--danger';
-      if (isCompleted) {
-        classes += ' step__vertical-reverse-number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__vertical-reverse-number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__vertical-reverse-number--danger--completed';
       } else {
         classes += ' step__vertical-reverse-number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__vertical-reverse-number--${color}`;
-      if (isCompleted) {
-        classes += ` step__vertical-reverse-number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__vertical-reverse-number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__vertical-reverse-number--${color}--completed`;
       } else {
         classes += ` step__vertical-reverse-number--${color}--inactive`;
       }
@@ -795,10 +795,10 @@ export class Stepper {
     // Add basic state classes for fallback
     if (isError) {
       classes += ' step__vertical-reverse-number--error';
-    } else if (isCompleted) {
-      classes += ' step__vertical-reverse-number--completed';
     } else if (isActive) {
       classes += ' step__vertical-reverse-number--active';
+    } else if (isCompleted) {
+      classes += ' step__vertical-reverse-number--completed';
     } else {
       classes += ' step__vertical-reverse-number--inactive';
     }
