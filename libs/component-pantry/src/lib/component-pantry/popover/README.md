@@ -4,7 +4,7 @@ A highly configurable popover component that supports multiple placement options
 
 ## Features
 
-- ✅ 12 placement options (top, bottom, left, right with start/end variants)
+- ✅ 8 placement options (top, bottom with start/end variants, left, right)
 - ✅ Click, hover, and manual trigger modes
 - ✅ Customizable arrow indicator
 - ✅ Click outside and escape key closing
@@ -46,13 +46,9 @@ A highly configurable popover component that supports multiple placement options
 
 <!-- Left placements -->
 <ntv-popover placement="left">Content</ntv-popover>
-<ntv-popover placement="left-start">Content</ntv-popover>
-<ntv-popover placement="left-end">Content</ntv-popover>
 
 <!-- Right placements -->
 <ntv-popover placement="right">Content</ntv-popover>
-<ntv-popover placement="right-start">Content</ntv-popover>
-<ntv-popover placement="right-end">Content</ntv-popover>
 ```
 
 ## Configuration Pattern
@@ -116,8 +112,8 @@ For cleaner templates when using multiple properties:
 type PopoverPlacement =
   | 'top' | 'top-start' | 'top-end'
   | 'bottom' | 'bottom-start' | 'bottom-end'
-  | 'left' | 'left-start' | 'left-end'
-  | 'right' | 'right-start' | 'right-end';
+  | 'left'
+  | 'right';
 ```
 
 ## Advanced Examples

@@ -6,11 +6,7 @@ export type PopoverPlacement =
   | 'bottom-start'
   | 'bottom-end'
   | 'left'
-  | 'left-start'
-  | 'left-end'
-  | 'right'
-  | 'right-start'
-  | 'right-end';
+  | 'right';
 
 export interface PopoverConfig {
   placement?: PopoverPlacement;

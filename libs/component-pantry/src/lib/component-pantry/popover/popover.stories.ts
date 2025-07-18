@@ -21,7 +21,7 @@ const meta: Meta<Popover> = {
 A highly configurable popover component that supports multiple placement options, trigger methods, and customizable styling.
 
 ## Features
-- 12 placement options (top, bottom, left, right with start/end variants)
+- 8 placement options (top, bottom, left, right with start/end variants)
 - Click, hover, and manual trigger modes
 - Customizable arrow indicator
 - Click outside and escape key closing
@@ -156,7 +156,7 @@ export const AllPlacements: Story = {
     template: `
       <div class="grid grid-cols-3 gap-8 p-8 min-h-[600px]">
         <!-- Top row -->
-        <div class="flex justify-center">
+        <div>
           <div class="space-y-2">
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="topStart.toggle($event)">Top Start</button>
             <ntv-popover #topStart placement="top-start">
@@ -174,7 +174,7 @@ export const AllPlacements: Story = {
           </div>
         </div>
         
-        <div class="flex justify-center">
+        <div class="flex justify-end">
           <div class="space-y-2">
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="topEnd.toggle($event)">Top End</button>
             <ntv-popover #topEnd placement="top-end">
@@ -184,53 +184,33 @@ export const AllPlacements: Story = {
         </div>
         
         <!-- Middle row -->
-        <div class="flex justify-center items-center">
+        <div>
           <div class="space-x-2 flex">
-            <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="leftStart.toggle($event)">Left Start</button>
-            <ntv-popover #leftStart placement="left-start">
-              <p>Left Start placement</p>
-            </ntv-popover>
-            
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="left.toggle($event)">Left</button>
             <ntv-popover #left placement="left">
               <p>Left placement</p>
             </ntv-popover>
-            
-            <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="leftEnd.toggle($event)">Left End</button>
-            <ntv-popover #leftEnd placement="left-end">
-              <p>Left End placement</p>
-            </ntv-popover>
           </div>
         </div>
         
-        <div class="flex justify-center items-center">
+        <div>
           <div class="text-center text-gray-500 dark:text-gray-400">
             <p class="text-sm">Popover</p>
             <p class="text-sm">Placements</p>
           </div>
         </div>
         
-        <div class="flex justify-center items-center">
-          <div class="space-x-2 flex">
-            <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="rightStart.toggle($event)">Right Start</button>
-            <ntv-popover #rightStart placement="right-start">
-              <p>Right Start placement</p>
-            </ntv-popover>
-            
+        <div>
+          <div class="space-x-2 flex justify-end">
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="right.toggle($event)">Right</button>
             <ntv-popover #right placement="right">
               <p>Right placement</p>
-            </ntv-popover>
-            
-            <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="rightEnd.toggle($event)">Right End</button>
-            <ntv-popover #rightEnd placement="right-end">
-              <p>Right End placement</p>
             </ntv-popover>
           </div>
         </div>
         
         <!-- Bottom row -->
-        <div class="flex justify-center">
+        <div>
           <div class="space-y-2">
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="bottomStart.toggle($event)">Bottom Start</button>
             <ntv-popover #bottomStart placement="bottom-start">
@@ -248,7 +228,7 @@ export const AllPlacements: Story = {
           </div>
         </div>
         
-        <div class="flex justify-center">
+        <div class="flex justify-end">
           <div class="space-y-2">
             <button class="px-3 py-1.5 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" (click)="bottomEnd.toggle($event)">Bottom End</button>
             <ntv-popover #bottomEnd placement="bottom-end">
@@ -390,6 +370,33 @@ export const Disabled: Story = {
           #disabledPopover
           [disabled]="disabled">
           <p>This content won't be shown because the popover is disabled.</p>
+        </ntv-popover>
+      </div>
+    `,
+  }),
+};
+
+// Hover trigger example
+export const HoverTrigger: Story = {
+  render: () => ({
+    template: `
+      <div class="flex items-center justify-center min-h-[200px]">
+        <div 
+          #hoverTrigger
+          class="px-4 py-2 bg-orange-600 text-white rounded-md cursor-pointer hover:bg-orange-700 transition-colors"
+          (mouseenter)="hoverPopover.show(hoverTrigger)"
+          (mouseleave)="hoverPopover.hide()">
+          Hover to Show Popover
+        </div>
+        
+        <ntv-popover 
+          #hoverPopover
+          placement="bottom"
+          [config]="{ closeOnClickOutside: false }">
+          <div class="text-center">
+            <p class="text-gray-600 dark:text-gray-300">This popover is triggered by hover!</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Move your mouse away to hide it.</p>
+          </div>
         </ntv-popover>
       </div>
     `,
