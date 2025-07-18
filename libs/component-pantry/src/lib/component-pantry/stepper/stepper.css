@@ -101,7 +101,7 @@
 
 /* Vertical reverse step number styles */
 .step__vertical-reverse-number {
-  @apply rounded-full flex justify-center items-center ml-3 w-8 h-8 text-sm lg:w-10 lg:h-10;
+  @apply rounded-full flex justify-center items-center ml-6 w-8 h-8 text-sm lg:w-10 lg:h-10;
 }
 
 .step__vertical-reverse-number--completed {
@@ -168,8 +168,6 @@
 .step__vertical-reverse-title--primary.step__vertical-reverse-title--active {
   color: theme('colors.primary.500');
 }
-
-
 
 .step__vertical-reverse-title--accent.step__vertical-reverse-title--active {
   color: theme('colors.accent.500');
@@ -248,8 +246,6 @@
 .step__text--primary.step__text--active {
   color: theme('colors.info.500');
 }
-
-
 
 .step__text--accent.step__text--completed,
 .step__text--accent.step__text--active {
@@ -433,7 +429,7 @@
     opacity: 0.5;
     transform: scaleY(0.3);
   }
-   70% {
+  70% {
     opacity: 0.8;
     transform: scaleY(0.7);
   }
@@ -486,8 +482,6 @@
   border-color: theme('colors.primary.500');
 }
 
-
-
 .step__detailed--accent.step__detailed--completed,
 .step__detailed--accent.step__detailed--active {
   background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
@@ -532,7 +526,11 @@
 
 .step__detailed--neutral-dark.step__detailed--completed,
 .step__detailed--neutral-dark.step__detailed--active {
-  background-color: color-mix(in srgb, theme('colors.neutral-dark.600') 10%, white);
+  background-color: color-mix(
+    in srgb,
+    theme('colors.neutral-dark.600') 10%,
+    white
+  );
   border-color: theme('colors.neutral-dark.600');
 }
 
@@ -545,8 +543,6 @@
 .step__detailed-text--primary.step__detailed-text--active {
   color: theme('colors.primary.500');
 }
-
-
 
 .step__detailed-text--accent.step__detailed-text--active {
   color: theme('colors.accent.500');
@@ -602,8 +598,6 @@
 .step__detailed-title--primary.step__detailed-title--active {
   color: theme('colors.primary.500');
 }
-
-
 
 .step__detailed-title--accent.step__detailed-title--active {
   color: theme('colors.accent.500');
@@ -746,8 +740,6 @@
   border-color: theme('colors.primary.500');
 }
 
-
-
 .step__panel--accent.step__panel--completed,
 .step__panel--accent.step__panel--active {
   background-color: color-mix(in srgb, theme('colors.accent.500') 10%, white);
@@ -792,7 +784,11 @@
 
 .step__panel--neutral-dark.step__panel--completed,
 .step__panel--neutral-dark.step__panel--active {
-  background-color: color-mix(in srgb, theme('colors.neutral-dark.600') 10%, white);
+  background-color: color-mix(
+    in srgb,
+    theme('colors.neutral-dark.600') 10%,
+    white
+  );
   border-color: theme('colors.neutral-dark.600');
 }
 
@@ -800,8 +796,6 @@
 .step__panel-text--primary.step__panel-text--active {
   color: theme('colors.primary.500');
 }
-
-
 
 .step__panel-text--accent.step__panel-text--active {
   color: theme('colors.accent.500');
@@ -1006,8 +1000,6 @@
 .step__vertical-reverse-description--primary.step__vertical-reverse-description--active {
   color: theme('colors.primary.500');
 }
-
-
 
 .step__vertical-reverse-description--accent.step__vertical-reverse-description--active {
   color: theme('colors.accent.500');
