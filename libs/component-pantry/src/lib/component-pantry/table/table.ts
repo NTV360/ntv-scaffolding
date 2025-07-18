@@ -159,9 +159,8 @@ export class Table implements AfterViewInit {
   /** SVG */
   public readonly settingsIcon: SafeHtml;
   public readonly filtersIcon: SafeHtml;
-  public readonly rightIcon: SafeHtml;
-  public readonly downIcon: SafeHtml;
-
+  public readonly rightArrow: SafeHtml;
+  public readonly downArrow: SafeHtml;
 
   constructor() {
     this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
@@ -172,15 +171,13 @@ export class Table implements AfterViewInit {
       FILE_ICONS['SETTINGS']
     );
 
-       this.rightIcon = this.sanitizer.bypassSecurityTrustHtml(
+    this.rightArrow = this.sanitizer.bypassSecurityTrustHtml(
       FILE_ICONS['RIGHT_ARROW']
     );
 
-       this.downIcon = this.sanitizer.bypassSecurityTrustHtml(
+    this.downArrow = this.sanitizer.bypassSecurityTrustHtml(
       FILE_ICONS['DOWN_ARROW']
     );
-
-
 
     // Initialize internal columns from input - only run once during initialization
     effect(
@@ -627,7 +624,9 @@ export class Table implements AfterViewInit {
   // Filtered data based on current filters
   filteredData = computed(() => {
     // Check if any column has filtering enabled
-    const hasFilterEnabledColumns = this.displayColumns().some(col => col.filter === true);
+    const hasFilterEnabledColumns = this.displayColumns().some(
+      (col) => col.filter === true
+    );
     if (!hasFilterEnabledColumns && !this.filterEnabled()) {
       return this._data();
     }
@@ -1085,7 +1084,7 @@ export class Table implements AfterViewInit {
   }
 
   getExpandIcon(rowData: any): SafeHtml {
-    return this.isRowExpanded(rowData) ? this.downIcon : this.rightIcon;
+    return this.isRowExpanded(rowData) ? this.downArrow : this.rightArrow;
   }
 
   getExpandedContentColspan(): number {
