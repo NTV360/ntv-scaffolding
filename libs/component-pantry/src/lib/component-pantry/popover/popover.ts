@@ -1,10 +1,29 @@
-import { Component, input, output, computed, signal, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, Renderer2, inject } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  computed,
+  signal,
+  OnDestroy,
+  ElementRef,
+  HostListener,
+  Renderer2,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PopoverConfig, PopoverPlacement, PopoverTrigger, PopoverVariant, PopoverSize, PopoverPosition } from './popover.types';
+import {
+  PopoverConfig,
+  PopoverPlacement,
+  PopoverTrigger,
+  PopoverVariant,
+  PopoverSize,
+  PopoverPosition,
+} from './popover.types';
 
 /**
  * Advanced popover component with flexible positioning and trigger options
- * 
+ *
  * @description A feature-rich popover component that supports:
  * - Multiple placement options (12 positions)
  * - Various trigger types (click, hover, focus, manual)
@@ -15,7 +34,7 @@ import { PopoverConfig, PopoverPlacement, PopoverTrigger, PopoverVariant, Popove
  * - Accessibility features
  * - Smooth animations
  * - Custom offset and delay options
- * 
+ *
  * @example
  * // Basic usage with click trigger
  * <ntv-popover placement="top" trigger="click">
@@ -25,7 +44,7 @@ import { PopoverConfig, PopoverPlacement, PopoverTrigger, PopoverVariant, Popove
  *     <p>This is the popover content</p>
  *   </div>
  * </ntv-popover>
- * 
+ *
  * @example
  * // With configuration object
  * <ntv-popover [config]="popoverConfig">
@@ -45,56 +64,56 @@ export class Popover implements OnDestroy {
   private elementRef = inject(ElementRef);
 
   // ViewChild references
-  @ViewChild('triggerElement', { static: false }) triggerElement!: ElementRef;
-  @ViewChild('popoverElement', { static: false }) popoverElement!: ElementRef;
+  readonly triggerElement = viewChild.required<ElementRef>('triggerElement');
+  readonly popoverElement = viewChild.required<ElementRef>('popoverElement');
 
   // Signal inputs
-  
+
   /** Placement position of the popover */
   placement = input<PopoverPlacement>('bottom');
-  
+
   /** Trigger type for showing/hiding the popover */
   trigger = input<PopoverTrigger>('click');
-  
+
   /** Visual style variant of the popover */
   variant = input<PopoverVariant>('default');
-  
+
   /** Size of the popover */
   size = input<PopoverSize>('md');
-  
+
   /** Whether to show the arrow indicator */
   showArrow = input<boolean>(true);
-  
+
   /** Offset distance from the trigger element */
   offset = input<number>(8);
-  
+
   /** Delay before showing/hiding (in milliseconds) */
   delay = input<number>(0);
-  
+
   /** Whether to close when clicking outside */
   closeOnClickOutside = input<boolean>(true);
-  
+
   /** Whether to close when pressing escape key */
   closeOnEscape = input<boolean>(true);
-  
+
   /** Whether the popover is disabled */
   disabled = input<boolean>(false);
-  
+
   /** Configuration object for DRY usage */
   config = input<PopoverConfig>();
 
   // Signal outputs
-  
+
   /**
    * Event emitted when the popover is shown
    */
   popoverShow = output<void>();
-  
+
   /**
    * Event emitted when the popover is hidden
    */
   popoverHide = output<void>();
-  
+
   /**
    * Event emitted when the popover visibility changes
    */
@@ -102,7 +121,9 @@ export class Popover implements OnDestroy {
 
   // Internal state
   public _isVisible = signal<boolean>(false);
-  private _popoverId = signal<string>('popover-' + Math.random().toString(36).substr(2, 9));
+  private _popoverId = signal<string>(
+    'popover-' + Math.random().toString(36).substr(2, 9)
+  );
   private _position = signal<PopoverPosition>({ top: 0, left: 0 });
   private _hoverTimeout: any;
   private _clickOutsideListener?: () => void;
@@ -110,43 +131,39 @@ export class Popover implements OnDestroy {
   private _scrollListener?: () => void;
 
   // Computed properties that merge config with individual inputs
-  
+
   readonly mergedPlacement = computed(
     () => this.config()?.placement ?? this.placement()
   );
-  
+
   readonly mergedTrigger = computed(
     () => this.config()?.trigger ?? this.trigger()
   );
-  
+
   readonly mergedVariant = computed(
     () => this.config()?.variant ?? this.variant()
   );
-  
-  readonly mergedSize = computed(
-    () => this.config()?.size ?? this.size()
-  );
-  
+
+  readonly mergedSize = computed(() => this.config()?.size ?? this.size());
+
   readonly mergedShowArrow = computed(
     () => this.config()?.showArrow ?? this.showArrow()
   );
-  
+
   readonly mergedOffset = computed(
     () => this.config()?.offset ?? this.offset()
   );
-  
-  readonly mergedDelay = computed(
-    () => this.config()?.delay ?? this.delay()
-  );
-  
+
+  readonly mergedDelay = computed(() => this.config()?.delay ?? this.delay());
+
   readonly mergedCloseOnClickOutside = computed(
     () => this.config()?.closeOnClickOutside ?? this.closeOnClickOutside()
   );
-  
+
   readonly mergedCloseOnEscape = computed(
     () => this.config()?.closeOnEscape ?? this.closeOnEscape()
   );
-  
+
   readonly mergedDisabled = computed(
     () => this.config()?.disabled ?? this.disabled()
   );
@@ -177,10 +194,10 @@ export class Popover implements OnDestroy {
 
   /** Computed property for the visible state */
   isVisible = computed(() => this._isVisible());
-  
+
   /** Computed property for the popover ID */
   popoverId = computed(() => this._popoverId());
-  
+
   /** Computed property for the position */
   position = computed(() => this._position());
 
@@ -251,7 +268,7 @@ export class Popover implements OnDestroy {
     if (this.mergedDisabled()) return;
 
     const triggerType = this.mergedTrigger();
-    
+
     switch (event.type) {
       case 'click':
         if (triggerType === 'click') {
@@ -286,15 +303,17 @@ export class Popover implements OnDestroy {
    * Updates the popover position based on placement
    */
   private updatePosition(): void {
-    if (!this.triggerElement || !this.popoverElement) return;
+    const triggerElement = this.triggerElement();
+    const popoverElement = this.popoverElement();
+    if (!triggerElement || !popoverElement) return;
 
-    const triggerRect = this.triggerElement.nativeElement.getBoundingClientRect();
-    const popoverRect = this.popoverElement.nativeElement.getBoundingClientRect();
+    const triggerRect = triggerElement.nativeElement.getBoundingClientRect();
+    const popoverRect = popoverElement.nativeElement.getBoundingClientRect();
     const placement = this.mergedPlacement();
     const offset = this.mergedOffset();
-    
+
     const position: PopoverPosition = { top: 0, left: 0 };
-    
+
     // Calculate base position
     switch (placement) {
       case 'top':
@@ -318,12 +337,13 @@ export class Popover implements OnDestroy {
         position.left = triggerRect.right + offset;
         break;
     }
-    
+
     // Calculate secondary axis position
     switch (placement) {
       case 'top':
       case 'bottom':
-        position.left = triggerRect.left + (triggerRect.width - popoverRect.width) / 2;
+        position.left =
+          triggerRect.left + (triggerRect.width - popoverRect.width) / 2;
         break;
       case 'top-start':
       case 'bottom-start':
@@ -335,7 +355,8 @@ export class Popover implements OnDestroy {
         break;
       case 'left':
       case 'right':
-        position.top = triggerRect.top + (triggerRect.height - popoverRect.height) / 2;
+        position.top =
+          triggerRect.top + (triggerRect.height - popoverRect.height) / 2;
         break;
       case 'left-start':
       case 'right-start':
@@ -346,16 +367,22 @@ export class Popover implements OnDestroy {
         position.top = triggerRect.bottom - popoverRect.height;
         break;
     }
-    
+
     // Ensure popover stays within viewport
     const viewport = {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
-    
-    position.left = Math.max(8, Math.min(position.left, viewport.width - popoverRect.width - 8));
-    position.top = Math.max(8, Math.min(position.top, viewport.height - popoverRect.height - 8));
-    
+
+    position.left = Math.max(
+      8,
+      Math.min(position.left, viewport.width - popoverRect.width - 8)
+    );
+    position.top = Math.max(
+      8,
+      Math.min(position.top, viewport.height - popoverRect.height - 8)
+    );
+
     this._position.set(position);
   }
 
@@ -364,11 +391,15 @@ export class Popover implements OnDestroy {
    */
   private setupEventListeners(): void {
     if (this.mergedCloseOnClickOutside()) {
-      this._clickOutsideListener = this.renderer.listen('document', 'click', (event) => {
-        if (!this.elementRef.nativeElement.contains(event.target)) {
-          this.hide();
+      this._clickOutsideListener = this.renderer.listen(
+        'document',
+        'click',
+        (event) => {
+          if (!this.elementRef.nativeElement.contains(event.target)) {
+            this.hide();
+          }
         }
-      });
+      );
     }
 
     this._resizeListener = this.renderer.listen('window', 'resize', () => {

@@ -47,6 +47,7 @@ export interface StepperConfig {
   showLabels?: boolean;
   showDescriptions?: boolean;
   allowSkipping?: boolean;
+  animateProgress?: boolean;
 }
 
 export const DEFAULT_STEPPER_CONFIG: StepperConfig = {
@@ -59,6 +60,7 @@ export const DEFAULT_STEPPER_CONFIG: StepperConfig = {
   showLabels: true,
   showDescriptions: false,
   allowSkipping: false,
+  animateProgress: false,
 };
 
 // Legacy alias for backward compatibility
