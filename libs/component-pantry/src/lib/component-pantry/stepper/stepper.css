@@ -41,7 +41,7 @@
 }
 
 .step--progress {
-  @apply w-full relative;
+  @apply flex-1 relative;
 }
 
 .step--detailed,
@@ -239,6 +239,56 @@
 
 .step__text--inactive {
   @apply text-gray-600;
+}
+
+/* Error state styles */
+.step__number--error {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply border text-white;
+}
+
+.step--error {
+  @apply border-red-500;
+}
+
+/* Danger color */
+.step__number--danger.step__number--completed {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+}
+
+.step__number--danger.step__number--active {
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+.step__number--danger.step__number--inactive {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply text-white;
+}
+
+/* Progress number danger states */
+.step__progress-number--danger--error {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply text-white;
+}
+
+/* Label danger error states */
+.step__label--danger--error {
+  color: theme('colors.danger.500');
+}
+
+/* Description danger error states */
+.step__description--danger--error {
+  color: theme('colors.danger.500');
+}
+
+/* Subtitle danger error states */
+.step__subtitle--danger--error {
+  color: theme('colors.danger.500');
 }
 
 /* Dynamic text colors */

@@ -285,6 +285,9 @@ export class Stepper {
     const isError = this.isStepError(index);
     let classes = 'step__number';
 
+    // Add size classes
+    classes += ` step__number--${this.mergedSize()}`;
+
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__number--danger';
@@ -308,12 +311,10 @@ export class Stepper {
     }
 
     // Add basic state classes for fallback
-    if (isError) {
-      classes += ' step__number--error';
+    if (isCompleted) {
+      classes += ' step__number--completed';
     } else if (isActive) {
       classes += ' step__number--active';
-    } else if (isCompleted) {
-      classes += ' step__number--completed';
     } else {
       classes += ' step__number--inactive';
     }
@@ -361,13 +362,18 @@ export class Stepper {
    * @returns Space-separated CSS class string for progress steps
    */
   getProgressStepClasses(index: number, isLast: boolean): string {
-    let classes = 'relative';
+    const isCompleted = this.isStepCompleted(index);
+    const isError = this.isStepError(index);
+    let classes = 'step--progress';
 
     if (!isLast) {
-      const isCompleted = this.isStepCompleted(index);
       classes += ' step__connector--progress';
       // Add color classes for connector
-      classes += ` step__connector--${this.mergedStepperColor()}`;
+      if (isError) {
+        classes += ' step__connector--danger';
+      } else {
+        classes += ` step__connector--${this.mergedStepperColor()}`;
+      }
 
       if (isCompleted) {
         classes += ' step__connector--progress-completed';
@@ -389,33 +395,25 @@ export class Stepper {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
     const isError = this.isStepError(index);
-    let classes = 'step__progress-number';
+    let classes = 'step__number';
 
-    // Add combined color and state classes for CSS optimization compatibility
+    // Add size classes
+    classes += ` step__number--${this.mergedSize()}`;
+
+    // Add color classes
     if (isError) {
-      classes += ' step__progress-number--danger';
-      classes += ' step__progress-number--danger--error';
+      classes += ' step__number--danger';
     } else {
-      const color = this.mergedStepperColor();
-      classes += ` step__progress-number--${color}`;
-      if (isActive) {
-        classes += ` step__progress-number--${color}--active`;
-      } else if (isCompleted) {
-        classes += ` step__progress-number--${color}--completed`;
-      } else {
-        classes += ` step__progress-number--${color}--inactive`;
-      }
+      classes += ` step__number--${this.mergedStepperColor()}`;
     }
 
-    // Add basic state classes for fallback
-    if (isError) {
-      classes += ' step__progress-number--error';
+    // Add state classes
+    if (isCompleted) {
+      classes += ' step__number--completed';
     } else if (isActive) {
-      classes += ' step__progress-number--active';
-    } else if (isCompleted) {
-      classes += ' step__progress-number--completed';
+      classes += ' step__number--active';
     } else {
-      classes += ' step__progress-number--inactive';
+      classes += ' step__number--inactive';
     }
 
     return classes;
