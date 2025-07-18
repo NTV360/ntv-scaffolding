@@ -6,7 +6,7 @@ export const INSTALLATION_STEPS: InstallationStep[] = [
     id: 'step1',
     subtitle: 'Step 1',
     label: 'Create a Host',
-    description: 'Set up your host device and configure basic settings',
+    description: 'You can fill on the forms manually or search a business',
   },
   {
     id: 'step2',
