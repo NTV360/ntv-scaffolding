@@ -38,10 +38,18 @@
 
 .step--default {
   @apply md:w-full;
+
+  &:last-child {
+    @apply md:w-auto;
+  }
 }
 
 .step--progress {
   @apply flex-1 relative;
+
+  &:last-child {
+    @apply flex-none md:w-auto;
+  }
 }
 
 .step--detailed,
