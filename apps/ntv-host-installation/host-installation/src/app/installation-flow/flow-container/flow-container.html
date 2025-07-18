@@ -1,37 +1,56 @@
 <ntv-layout>
   <ntv-sidebar />
+
+  <div main>
+    <div class="flex items-center justify-between">
+      <div>
+        <h2>{{pageTitle()}}</h2>
+        <p>pageSubtitle()</p>
+      </div>
+    </div>
+  </div>
+
   <div main>
     <div class="step-controls-container">
       <h3>Installation Flow Controls</h3>
-      
+
       <!-- Current Step Info -->
       <div class="step-info">
-        <p>Current Step: <strong>{{ currentStepInfo.stepNumber }} of {{ currentStepInfo.totalSteps }}</strong></p>
+        <p>
+          Current Step:
+          <strong
+            >{{ currentStepInfo.stepNumber }} of {{ currentStepInfo.totalSteps
+            }}</strong
+          >
+        </p>
         <p>{{ currentStepInfo.step.label }}</p>
       </div>
 
       <!-- Navigation Controls -->
       <div class="navigation-controls">
-        <button 
+        <button
           class="nav-button prev-button"
           (click)="previousStep()"
           [disabled]="currentStepInfo.isFirst"
-          type="button">
+          type="button"
+        >
           ← Previous
         </button>
-        
-        <button 
+
+        <button
           class="nav-button complete-button"
           (click)="completeCurrentStep()"
-          type="button">
+          type="button"
+        >
           ✓ Complete Step
         </button>
-        
-        <button 
+
+        <button
           class="nav-button next-button"
           (click)="nextStep()"
           [disabled]="currentStepInfo.isLast"
-          type="button">
+          type="button"
+        >
           Next →
         </button>
       </div>
@@ -39,22 +58,24 @@
       <!-- Error Testing Controls -->
       <div class="error-controls">
         <h4>Error Testing</h4>
-        <button 
+        <button
           class="error-button trigger-error"
           (click)="triggerCurrentStepError()"
-          type="button">
+          type="button"
+        >
           ⚠ Trigger Error
         </button>
-        
-        <button 
+
+        <button
           class="error-button clear-error"
           (click)="clearCurrentStepError()"
-          type="button">
+          type="button"
+        >
           ✓ Clear Error
         </button>
       </div>
     </div>
-    
+
     <router-outlet></router-outlet>
   </div>
 </ntv-layout>

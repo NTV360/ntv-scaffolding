@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Layout } from '../../components/layout/layout';
@@ -14,6 +14,12 @@ import { InstallationFlowService } from '../../services';
 })
 export class FlowContainer {
   private installationFlowService = inject(InstallationFlowService);
+
+  /** Holds the current route  */
+  public readonly currentRoute = signal('');
+
+  /** Stores the current page title  */
+  public readonly pageTitle = signal('');
 
   /**
    * Navigate to the next step
@@ -41,7 +47,11 @@ export class FlowContainer {
    */
   triggerCurrentStepError(): void {
     this.installationFlowService.markCurrentStepError();
-    console.log(`Step ${this.installationFlowService.currentStepIndex() + 1} marked as error`);
+    console.log(
+      `Step ${
+        this.installationFlowService.currentStepIndex() + 1
+      } marked as error`
+    );
   }
 
   /**
@@ -60,14 +70,14 @@ export class FlowContainer {
     const currentIndex = this.installationFlowService.currentStepIndex();
     const currentStep = this.installationFlowService.currentStep();
     const totalSteps = this.installationFlowService.steps().length;
-    
+
     return {
       index: currentIndex,
       step: currentStep,
       isFirst: currentIndex === 0,
       isLast: currentIndex === totalSteps - 1,
       stepNumber: currentIndex + 1,
-      totalSteps
+      totalSteps,
     };
   }
 }
