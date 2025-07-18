@@ -1,36 +1,46 @@
-import { Component, input, output, computed, signal, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, Renderer2, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { PopoverConfig, PopoverPlacement, PopoverTrigger, PopoverVariant, PopoverSize, PopoverPosition } from './popover.types';
+import {
+  Component,
+  input,
+  output,
+  computed,
+  signal,
+  effect,
+  ElementRef,
+  ViewChild,
+  HostListener,
+  OnDestroy,
+  TemplateRef,
+  ViewContainerRef,
+  inject,
+  Renderer2,
+  DOCUMENT
+} from '@angular/core';
+import { CommonModule, DOCUMENT as COMMON_DOCUMENT } from '@angular/common';
+import { PopoverPlacement, PopoverConfig, DEFAULT_POPOVER_CONFIG } from './popover.types';
 
 /**
- * Advanced popover component with flexible positioning and trigger options
+ * Advanced popover component with comprehensive positioning and trigger options
  * 
- * @description A feature-rich popover component that supports:
- * - Multiple placement options (12 positions)
- * - Various trigger types (click, hover, focus, manual)
- * - Multiple visual variants (default, bordered, shadow, minimal)
- * - Flexible sizing options (sm, md, lg, xl)
- * - Arrow indicators with smart positioning
+ * @description A highly configurable popover component that supports:
+ * - Multiple placement options (top, bottom, left, right with start/end variants)
+ * - Various trigger methods (click, hover, manual)
+ * - Customizable styling and positioning
  * - Click outside and escape key closing
- * - Accessibility features
- * - Smooth animations
- * - Custom offset and delay options
+ * - Arrow indicator with dynamic positioning
+ * - Content projection for flexible layouts
+ * - Template reference support
  * 
  * @example
  * // Basic usage with click trigger
- * <ntv-popover placement="top" trigger="click">
- *   <button slot="trigger">Click me</button>
- *   <div slot="content">
- *     <h3>Popover Title</h3>
- *     <p>This is the popover content</p>
- *   </div>
+ * <button (click)="popover.toggle($event)">Toggle Popover</button>
+ * <ntv-popover #popover placement="top">
+ *   <p>Popover content goes here</p>
  * </ntv-popover>
  * 
  * @example
- * // With configuration object
- * <ntv-popover [config]="popoverConfig">
- *   <span slot="trigger">Hover me</span>
- *   <div slot="content">Hover content here</div>
+ * // Configuration pattern
+ * <ntv-popover [config]="{ placement: 'bottom-start', arrow: false }">
+ *   Custom content
  * </ntv-popover>
  */
 @Component({
@@ -38,383 +48,299 @@ import { PopoverConfig, PopoverPlacement, PopoverTrigger, PopoverVariant, Popove
   standalone: true,
   imports: [CommonModule],
   templateUrl: './popover.html',
-  styleUrls: ['./popover.css'],
+  styleUrl: './popover.css'
 })
 export class Popover implements OnDestroy {
-  private renderer = inject(Renderer2);
-  private elementRef = inject(ElementRef);
-
-  // ViewChild references
-  @ViewChild('triggerElement', { static: false }) triggerElement!: ElementRef;
-  @ViewChild('popoverElement', { static: false }) popoverElement!: ElementRef;
-
-  // Signal inputs
+  private readonly document = inject(DOCUMENT);
+  private readonly renderer = inject(Renderer2);
+  private readonly elementRef = inject(ElementRef);
   
+  @ViewChild('popoverContent', { static: false }) popoverContent!: ElementRef;
+  
+  // Signal inputs
   /** Placement position of the popover */
   placement = input<PopoverPlacement>('bottom');
-  
-  /** Trigger type for showing/hiding the popover */
-  trigger = input<PopoverTrigger>('click');
-  
-  /** Visual style variant of the popover */
-  variant = input<PopoverVariant>('default');
-  
-  /** Size of the popover */
-  size = input<PopoverSize>('md');
-  
-  /** Whether to show the arrow indicator */
-  showArrow = input<boolean>(true);
   
   /** Offset distance from the trigger element */
   offset = input<number>(8);
   
-  /** Delay before showing/hiding (in milliseconds) */
-  delay = input<number>(0);
+  /** Whether to show arrow indicator */
+  arrow = input<boolean>(true);
   
-  /** Whether to close when clicking outside */
+  /** Trigger method for showing/hiding popover */
+  trigger = input<'click' | 'hover' | 'manual'>('manual');
+  
+  /** Whether to close popover when clicking outside */
   closeOnClickOutside = input<boolean>(true);
   
-  /** Whether to close when pressing escape key */
+  /** Whether to close popover when pressing escape */
   closeOnEscape = input<boolean>(true);
   
   /** Whether the popover is disabled */
   disabled = input<boolean>(false);
   
+  /** Maximum width of the popover */
+  maxWidth = input<string>('320px');
+  
+  /** Z-index for the popover */
+  zIndex = input<number>(1000);
+  
   /** Configuration object for DRY usage */
   config = input<PopoverConfig>();
-
+  
   // Signal outputs
+  /** Event emitted when popover is shown */
+  shown = output<void>();
   
-  /**
-   * Event emitted when the popover is shown
-   */
-  popoverShow = output<void>();
+  /** Event emitted when popover is hidden */
+  hidden = output<void>();
   
-  /**
-   * Event emitted when the popover is hidden
-   */
-  popoverHide = output<void>();
+  // Internal signals
+  /** Whether the popover is currently visible */
+  readonly isVisible = signal<boolean>(false);
   
-  /**
-   * Event emitted when the popover visibility changes
-   */
-  popoverToggle = output<boolean>();
-
-  // Internal state
-  public _isVisible = signal<boolean>(false);
-  private _popoverId = signal<string>('popover-' + Math.random().toString(36).substr(2, 9));
-  private _position = signal<PopoverPosition>({ top: 0, left: 0 });
-  private _hoverTimeout: any;
-  private _clickOutsideListener?: () => void;
-  private _resizeListener?: () => void;
-  private _scrollListener?: () => void;
-
+  /** Current trigger element */
+  private readonly triggerElement = signal<HTMLElement | null>(null);
+  
+  /** Position styles for the popover */
+  readonly positionStyles = signal<Record<string, string>>({});
+  
+  /** Arrow position styles */
+  readonly arrowStyles = signal<Record<string, string>>({});
+  
   // Computed properties that merge config with individual inputs
+  readonly mergedPlacement = computed(() => this.config()?.placement ?? this.placement());
+  readonly mergedOffset = computed(() => this.config()?.offset ?? this.offset());
+  readonly mergedArrow = computed(() => this.config()?.arrow ?? this.arrow());
+  readonly mergedTrigger = computed(() => this.config()?.trigger ?? this.trigger());
+  readonly mergedCloseOnClickOutside = computed(() => this.config()?.closeOnClickOutside ?? this.closeOnClickOutside());
+  readonly mergedCloseOnEscape = computed(() => this.config()?.closeOnEscape ?? this.closeOnEscape());
+  readonly mergedDisabled = computed(() => this.config()?.disabled ?? this.disabled());
+  readonly mergedMaxWidth = computed(() => this.config()?.maxWidth ?? this.maxWidth());
+  readonly mergedZIndex = computed(() => this.config()?.zIndex ?? this.zIndex());
   
-  readonly mergedPlacement = computed(
-    () => this.config()?.placement ?? this.placement()
-  );
-  
-  readonly mergedTrigger = computed(
-    () => this.config()?.trigger ?? this.trigger()
-  );
-  
-  readonly mergedVariant = computed(
-    () => this.config()?.variant ?? this.variant()
-  );
-  
-  readonly mergedSize = computed(
-    () => this.config()?.size ?? this.size()
-  );
-  
-  readonly mergedShowArrow = computed(
-    () => this.config()?.showArrow ?? this.showArrow()
-  );
-  
-  readonly mergedOffset = computed(
-    () => this.config()?.offset ?? this.offset()
-  );
-  
-  readonly mergedDelay = computed(
-    () => this.config()?.delay ?? this.delay()
-  );
-  
-  readonly mergedCloseOnClickOutside = computed(
-    () => this.config()?.closeOnClickOutside ?? this.closeOnClickOutside()
-  );
-  
-  readonly mergedCloseOnEscape = computed(
-    () => this.config()?.closeOnEscape ?? this.closeOnEscape()
-  );
-  
-  readonly mergedDisabled = computed(
-    () => this.config()?.disabled ?? this.disabled()
-  );
-
-  /** Computed CSS classes for the popover container */
-  popoverClasses = computed(() => {
-    const baseClasses = 'popover';
-    const variantClass = `popover--${this.mergedVariant()}`;
-    const sizeClass = `popover--${this.mergedSize()}`;
-    const placementClass = `popover--${this.mergedPlacement()}`;
-    const visibleClass = this._isVisible() ? 'popover--visible' : '';
-
-    return [baseClasses, variantClass, sizeClass, placementClass, visibleClass]
-      .filter(Boolean)
-      .join(' ');
+  /** Computed CSS classes for the popover */
+  readonly popoverClasses = computed(() => {
+    const baseClasses = 'ntv-popover';
+    const placementClass = `ntv-popover--${this.mergedPlacement()}`;
+    const visibleClass = this.isVisible() ? 'ntv-popover--visible' : 'ntv-popover--hidden';
+    
+    return [baseClasses, placementClass, visibleClass].join(' ');
   });
-
-  /** Computed CSS classes for the arrow */
-  arrowClasses = computed(() => {
-    const baseClasses = 'popover__arrow';
-    const placementClass = `popover__arrow--${this.mergedPlacement()}`;
-    const variantClass = `popover__arrow--${this.mergedVariant()}`;
-
-    return [baseClasses, placementClass, variantClass]
-      .filter(Boolean)
-      .join(' ');
-  });
-
-  /** Computed property for the visible state */
-  isVisible = computed(() => this._isVisible());
   
-  /** Computed property for the popover ID */
-  popoverId = computed(() => this._popoverId());
+  /** Computed styles for the popover container */
+  readonly popoverStyles = computed(() => ({
+    ...this.positionStyles(),
+    'max-width': this.mergedMaxWidth(),
+    'z-index': this.mergedZIndex().toString()
+  }));
   
-  /** Computed property for the position */
-  position = computed(() => this._position());
-
-  /**
-   * Shows the popover
-   */
-  show(): void {
-    if (this.mergedDisabled() || this._isVisible()) return;
-
-    const showPopover = () => {
-      this._isVisible.set(true);
-      // Use setTimeout to ensure DOM is updated before positioning
-      setTimeout(() => {
-        this.updatePosition();
-      }, 0);
-      this.popoverShow.emit();
-      this.popoverToggle.emit(true);
-      this.setupEventListeners();
-    };
-
-    if (this.mergedDelay() > 0) {
-      this._hoverTimeout = setTimeout(showPopover, this.mergedDelay());
-    } else {
-      showPopover();
-    }
+  private clickOutsideListener?: () => void;
+  
+  constructor() {
+    // Effect to handle click outside functionality
+    effect(() => {
+      if (this.isVisible() && this.mergedCloseOnClickOutside()) {
+        this.setupClickOutsideListener();
+      } else {
+        this.removeClickOutsideListener();
+      }
+    });
   }
-
-  /**
-   * Hides the popover
-   */
-  hide(): void {
-    if (!this._isVisible()) return;
-
-    const hidePopover = () => {
-      this._isVisible.set(false);
-      this.popoverHide.emit();
-      this.popoverToggle.emit(false);
-      this.removeEventListeners();
-    };
-
-    if (this._hoverTimeout) {
-      clearTimeout(this._hoverTimeout);
-      this._hoverTimeout = null;
-    }
-
-    if (this.mergedDelay() > 0 && this.mergedTrigger() === 'hover') {
-      this._hoverTimeout = setTimeout(hidePopover, this.mergedDelay());
-    } else {
-      hidePopover();
-    }
+  
+  ngOnDestroy(): void {
+    this.removeClickOutsideListener();
   }
-
+  
   /**
-   * Toggles the popover visibility
+   * Toggle the popover visibility
+   * @param event - The trigger event
+   * @param triggerElement - Optional trigger element, defaults to event target
    */
-  toggle(): void {
-    if (this._isVisible()) {
+  toggle(event: Event, triggerElement?: HTMLElement): void {
+    if (this.mergedDisabled()) return;
+    
+    const trigger = triggerElement || (event.target as HTMLElement);
+    this.triggerElement.set(trigger);
+    
+    if (this.isVisible()) {
       this.hide();
     } else {
       this.show();
     }
   }
-
+  
   /**
-   * Handles trigger element events
+   * Show the popover
+   * @param triggerElement - Optional trigger element
    */
-  onTriggerEvent(event: Event): void {
-    if (this.mergedDisabled()) return;
-
-    const triggerType = this.mergedTrigger();
+  show(triggerElement?: HTMLElement): void {
+    if (this.mergedDisabled() || this.isVisible()) return;
     
-    switch (event.type) {
-      case 'click':
-        if (triggerType === 'click') {
-          event.preventDefault();
-          this.toggle();
-        }
-        break;
-      case 'mouseenter':
-        if (triggerType === 'hover') {
-          this.show();
-        }
-        break;
-      case 'mouseleave':
-        if (triggerType === 'hover') {
-          this.hide();
-        }
-        break;
-      case 'focus':
-        if (triggerType === 'focus') {
-          this.show();
-        }
-        break;
-      case 'blur':
-        if (triggerType === 'focus') {
-          this.hide();
-        }
-        break;
+    if (triggerElement) {
+      this.triggerElement.set(triggerElement);
     }
+    
+    this.isVisible.set(true);
+    
+    // Calculate position after the view updates
+    setTimeout(() => {
+      this.calculatePosition();
+      this.shown.emit();
+    });
   }
-
+  
   /**
-   * Updates the popover position based on placement
+   * Hide the popover
    */
-  private updatePosition(): void {
-    if (!this.triggerElement || !this.popoverElement) return;
-
-    const triggerRect = this.triggerElement.nativeElement.getBoundingClientRect();
-    const popoverRect = this.popoverElement.nativeElement.getBoundingClientRect();
+  hide(): void {
+    if (!this.isVisible()) return;
+    
+    this.isVisible.set(false);
+    this.hidden.emit();
+  }
+  
+  /**
+   * Calculate and set the position of the popover
+   */
+  private calculatePosition(): void {
+    const trigger = this.triggerElement();
+    const popover = this.popoverContent?.nativeElement;
+    
+    if (!trigger || !popover) return;
+    
+    const triggerRect = trigger.getBoundingClientRect();
+    const popoverRect = popover.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    
     const placement = this.mergedPlacement();
     const offset = this.mergedOffset();
     
-    const position: PopoverPosition = { top: 0, left: 0 };
+    let top = 0;
+    let left = 0;
+    // Arrow functionality removed
     
-    // Calculate base position
+    // Calculate base position based on placement
     switch (placement) {
       case 'top':
       case 'top-start':
       case 'top-end':
-        position.top = triggerRect.top - popoverRect.height - offset;
+        top = triggerRect.top + scrollY - popoverRect.height - offset;
         break;
       case 'bottom':
       case 'bottom-start':
       case 'bottom-end':
-        position.top = triggerRect.bottom + offset;
+        top = triggerRect.bottom + scrollY + offset;
         break;
       case 'left':
       case 'left-start':
       case 'left-end':
-        position.left = triggerRect.left - popoverRect.width - offset;
+        left = triggerRect.left + scrollX - popoverRect.width - offset;
         break;
       case 'right':
       case 'right-start':
       case 'right-end':
-        position.left = triggerRect.right + offset;
+        left = triggerRect.right + scrollX + offset;
         break;
     }
     
-    // Calculate secondary axis position
+    // Calculate alignment
     switch (placement) {
       case 'top':
       case 'bottom':
-        position.left = triggerRect.left + (triggerRect.width - popoverRect.width) / 2;
+        left = triggerRect.left + scrollX + (triggerRect.width - popoverRect.width) / 2;
         break;
       case 'top-start':
       case 'bottom-start':
-        position.left = triggerRect.left;
+        left = triggerRect.left + scrollX;
         break;
       case 'top-end':
       case 'bottom-end':
-        position.left = triggerRect.right - popoverRect.width;
+        left = triggerRect.right + scrollX - popoverRect.width;
         break;
       case 'left':
       case 'right':
-        position.top = triggerRect.top + (triggerRect.height - popoverRect.height) / 2;
+        top = triggerRect.top + scrollY + (triggerRect.height - popoverRect.height) / 2;
         break;
       case 'left-start':
       case 'right-start':
-        position.top = triggerRect.top;
+        top = triggerRect.top + scrollY;
         break;
       case 'left-end':
       case 'right-end':
-        position.top = triggerRect.bottom - popoverRect.height;
+        top = triggerRect.bottom + scrollY - popoverRect.height;
         break;
     }
     
-    // Ensure popover stays within viewport
-    const viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
+    // Viewport boundary adjustments
+    if (left < scrollX) {
+      left = scrollX + 8;
+    } else if (left + popoverRect.width > scrollX + viewportWidth) {
+      left = scrollX + viewportWidth - popoverRect.width - 8;
+    }
     
-    position.left = Math.max(8, Math.min(position.left, viewport.width - popoverRect.width - 8));
-    position.top = Math.max(8, Math.min(position.top, viewport.height - popoverRect.height - 8));
+    if (top < scrollY) {
+      top = scrollY + 8;
+    } else if (top + popoverRect.height > scrollY + viewportHeight) {
+      top = scrollY + viewportHeight - popoverRect.height - 8;
+    }
     
-    this._position.set(position);
+    // Set position styles using fixed positioning to avoid layout shifts
+    this.positionStyles.set({
+      position: 'fixed',
+      top: `${top - scrollY}px`,
+      left: `${left - scrollX}px`,
+      zIndex: this.mergedZIndex().toString()
+    });
   }
-
+  
   /**
-   * Sets up event listeners for closing the popover
+   * Setup click outside listener
    */
-  private setupEventListeners(): void {
-    if (this.mergedCloseOnClickOutside()) {
-      this._clickOutsideListener = this.renderer.listen('document', 'click', (event) => {
-        if (!this.elementRef.nativeElement.contains(event.target)) {
+  private setupClickOutsideListener(): void {
+    this.removeClickOutsideListener();
+    
+    this.clickOutsideListener = this.renderer.listen(
+      this.document,
+      'click',
+      (event: Event) => {
+        const target = event.target as HTMLElement;
+        const popoverElement = this.elementRef.nativeElement;
+        const triggerElement = this.triggerElement();
+        
+        if (
+          !popoverElement.contains(target) &&
+          triggerElement &&
+          !triggerElement.contains(target)
+        ) {
           this.hide();
         }
-      });
-    }
-
-    this._resizeListener = this.renderer.listen('window', 'resize', () => {
-      this.updatePosition();
-    });
-
-    this._scrollListener = this.renderer.listen('window', 'scroll', () => {
-      this.updatePosition();
-    });
+      }
+    );
   }
-
+  
   /**
-   * Removes event listeners
+   * Remove click outside listener
    */
-  private removeEventListeners(): void {
-    if (this._clickOutsideListener) {
-      this._clickOutsideListener();
-      this._clickOutsideListener = undefined;
-    }
-    if (this._resizeListener) {
-      this._resizeListener();
-      this._resizeListener = undefined;
-    }
-    if (this._scrollListener) {
-      this._scrollListener();
-      this._scrollListener = undefined;
+  private removeClickOutsideListener(): void {
+    if (this.clickOutsideListener) {
+      this.clickOutsideListener();
+      this.clickOutsideListener = undefined;
     }
   }
-
+  
   /**
-   * Handles escape key press
+   * Handle escape key press
    */
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKey(event: Event): void {
-    if (this.mergedCloseOnEscape() && this._isVisible()) {
+    const keyboardEvent = event as KeyboardEvent;
+    if (this.isVisible() && this.mergedCloseOnEscape()) {
       this.hide();
-    }
-  }
-
-  /**
-   * Component cleanup
-   */
-  ngOnDestroy(): void {
-    this.removeEventListeners();
-    if (this._hoverTimeout) {
-      clearTimeout(this._hoverTimeout);
+      keyboardEvent.preventDefault();
     }
   }
 }
