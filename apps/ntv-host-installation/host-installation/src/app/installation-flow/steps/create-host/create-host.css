@@ -1,0 +1,11 @@
+.create-host-container {
+  @apply space-y-6;
+}
+
+.stepper-card {
+  @apply bg-white rounded-lg shadow-sm;
+}
+
+.step-content {
+  @apply bg-gray-50 rounded-lg p-6;
+}

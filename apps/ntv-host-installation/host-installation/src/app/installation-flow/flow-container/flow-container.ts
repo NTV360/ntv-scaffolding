@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Button } from '@ntv-scaffolding/component-pantry';
 import { Layout } from '../../components/layout/layout';
@@ -27,6 +27,9 @@ import { ReviewInformation } from '../steps/review-information/review-informatio
 export class FlowContainer {
   private installationFlowService = inject(InstallationFlowService);
 
+  // ViewChild reference to CreateHost component for nested navigation
+  @ViewChild(CreateHost) createHostComponent!: CreateHost;
+
   // Public computed signals from service
   currentStep = this.installationFlowService.currentStep;
   currentStepIndex = this.installationFlowService.currentStepIndex;
@@ -51,16 +54,36 @@ export class FlowContainer {
   });
 
   /**
-   * Navigate to the next step
+   * Navigate to the next step with nested step support
    */
   nextStep(): void {
+    // Check if we're on step1 (create-host) and it has internal sub-steps
+    if (this.currentStep()?.id === 'step1' && this.createHostComponent) {
+      // If not on the last sub-step, advance to next sub-step
+      if (!this.createHostComponent.isLastSubStep()) {
+        this.createHostComponent.nextSubStep();
+        return;
+      }
+    }
+    
+    // Otherwise, advance to next main step
     this.installationFlowService.nextStep();
   }
 
   /**
-   * Navigate to the previous step
+   * Navigate to the previous step with nested step support
    */
   previousStep(): void {
+    // Check if we're on step1 (create-host) and it has internal sub-steps
+    if (this.currentStep()?.id === 'step1' && this.createHostComponent) {
+      // If not on the first sub-step, go back to previous sub-step
+      if (!this.createHostComponent.isFirstSubStep()) {
+        this.createHostComponent.previousSubStep();
+        return;
+      }
+    }
+    
+    // Otherwise, go back to previous main step
     this.installationFlowService.previousStep();
   }
 

@@ -1,3 +1,25 @@
-<ntv-card>
-  <ntv-stepper></ntv-stepper>
-</ntv-card>
+<div class="create-host-container">
+  <ntv-card class="stepper-card">
+    <div class="p-6">
+      <ntv-stepper
+        [steps]="steps"
+        [currentStep]="currentStep()"
+        [config]="stepperConfig"
+        (stepClick)="onStepClick($event)"
+      >
+      </ntv-stepper>
+    </div>
+  </ntv-card>
+
+  <div class="step-content">
+    @switch (currentStep()) { @case (0) {
+    <app-search-host-place />
+    } @case (1) {
+    <app-create-host-place />
+    } @default {
+    <div class="text-center py-8">
+      <p class="text-gray-500">Step not found</p>
+    </div>
+    } }
+  </div>
+</div>
