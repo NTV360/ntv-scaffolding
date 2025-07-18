@@ -1628,7 +1628,7 @@
 }
 
 .step__label--active {
-  @apply font-semibold;
+  /* Font weight remains consistent - removed font-semibold */
 }
 
 .step__label--inactive {
@@ -1732,7 +1732,7 @@
 
 /* Subtitle styles */
 .step__subtitle {
-  @apply text-xs font-medium;
+  @apply text-sm font-medium;
 }
 
 .step__subtitle--active {
