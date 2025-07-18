@@ -4,23 +4,27 @@ import { StepperConfig } from '@ntv-scaffolding/component-pantry';
 export const INSTALLATION_STEPS: InstallationStep[] = [
   {
     id: 'step1',
+    subtitle: 'Step 1',
     label: 'Create a Host',
-    description: 'Step 1',
+    description: 'You can fill on the forms manually or search a business',
   },
   {
     id: 'step2',
+    subtitle: 'Step 2',
     label: 'Create Screen',
-    description: 'Step 2',
+    description: 'Define screen layout and display configuration',
   },
   {
     id: 'step3',
+    subtitle: 'Step 3',
     label: 'Set Installation Date',
-    description: 'Step 3',
+    description: 'Schedule when the installation should take place',
   },
   {
     id: 'step4',
+    subtitle: 'Step 4',
     label: 'Review Information',
-    description: 'Step 4',
+    description: 'Verify all settings before finalizing the installation',
   },
 ];
 

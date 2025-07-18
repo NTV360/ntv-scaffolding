@@ -1,81 +1,28 @@
-.step-controls-container {
-  @apply bg-white border border-gray-200 rounded-lg p-6 mb-6 mx-4 mt-4 shadow-sm;
+.main-container {
+  position: relative;
 }
 
-.step-controls-container h3 {
-  @apply text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2;
-}
-
-.step-controls-container h4 {
-  @apply text-lg font-medium text-gray-700 mb-3;
-}
-
-/* Step Info Styles */
-.step-info {
-  @apply bg-blue-50 border border-blue-200 rounded-md p-4 mb-6;
-}
-
-.step-info p {
-  @apply text-gray-700 mb-1 last:mb-0;
+/* Step Content Container */
+.step-content-container {
 }
 
 /* Navigation Controls */
 .navigation-controls {
-  @apply flex gap-3 mb-6 flex-wrap;
-}
-
-.nav-button {
-  @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.prev-button {
-  @apply bg-gray-500 hover:bg-gray-600 text-white focus:ring-gray-500;
-}
-
-.prev-button:disabled {
-  @apply bg-gray-300 cursor-not-allowed opacity-50;
-}
-
-.complete-button {
-  @apply bg-green-500 hover:bg-green-600 text-white focus:ring-green-500;
-}
-
-.next-button {
-  @apply bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500;
-}
-
-.next-button:disabled {
-  @apply bg-gray-300 cursor-not-allowed opacity-50;
-}
-
-/* Error Controls */
-.error-controls {
-  @apply border-t border-gray-200 pt-4 flex flex-col gap-3;
-}
-
-.error-controls > div {
-  @apply flex gap-3 flex-wrap;
-}
-
-.error-button {
-  @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-}
-
-.trigger-error {
-  @apply bg-red-500 hover:bg-red-600 text-white focus:ring-red-500;
-}
-
-.clear-error {
-  @apply bg-emerald-500 hover:bg-emerald-600 text-white focus:ring-emerald-500;
+  @apply mt-8 flex justify-between items-center;
 }
 
 /* Responsive Design */
 @media (max-width: 640px) {
   .navigation-controls {
-    @apply flex-col;
+    @apply flex-col gap-4;
   }
-  
-  .nav-button, .error-button {
+
+  .navigation-controls > button,
+  .navigation-controls > div {
     @apply w-full;
+  }
+
+  .navigation-controls > div {
+    @apply flex flex-col gap-3;
   }
 }

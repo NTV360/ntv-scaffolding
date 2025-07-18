@@ -1,6 +1,7 @@
 export interface StepData {
   id: string;
   label: string;
+  subtitle?: string;
   description?: string;
   completed?: boolean;
   active?: boolean;

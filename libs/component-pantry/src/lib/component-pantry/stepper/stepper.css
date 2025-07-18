@@ -38,10 +38,18 @@
 
 .step--default {
   @apply md:w-full;
+
+  &:last-child {
+    @apply md:w-auto;
+  }
 }
 
 .step--progress {
-  @apply w-full relative;
+  @apply flex-1 relative;
+
+  &:last-child {
+    @apply flex-none md:w-auto;
+  }
 }
 
 .step--detailed,
@@ -239,6 +247,56 @@
 
 .step__text--inactive {
   @apply text-gray-600;
+}
+
+/* Error state styles */
+.step__number--error {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply border text-white;
+}
+
+.step--error {
+  @apply border-red-500;
+}
+
+/* Danger color */
+.step__number--danger.step__number--completed {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+}
+
+.step__number--danger.step__number--active {
+  border-color: theme('colors.danger.500');
+  color: theme('colors.danger.500');
+}
+
+.step__number--danger.step__number--inactive {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply text-white;
+}
+
+/* Progress number danger states */
+.step__progress-number--danger--error {
+  background-color: theme('colors.danger.500');
+  border-color: theme('colors.danger.500');
+  @apply text-white;
+}
+
+/* Label danger error states */
+.step__label--danger--error {
+  color: theme('colors.danger.500');
+}
+
+/* Description danger error states */
+.step__description--danger--error {
+  color: theme('colors.danger.500');
+}
+
+/* Subtitle danger error states */
+.step__subtitle--danger--error {
+  color: theme('colors.danger.500');
 }
 
 /* Dynamic text colors */
@@ -1628,7 +1686,7 @@
 }
 
 .step__label--active {
-  @apply font-semibold;
+  /* Font weight remains consistent - removed font-semibold */
 }
 
 .step__label--inactive {
@@ -1730,6 +1788,60 @@
   color: theme('colors.neutral-dark.600');
 }
 
+/* Subtitle styles */
+.step__subtitle {
+  @apply text-sm font-medium;
+}
+
+.step__subtitle--active {
+  @apply opacity-100;
+}
+
+.step__subtitle--inactive {
+  @apply text-gray-600 opacity-70;
+}
+
+.step__subtitle--error {
+  color: theme('colors.danger.500');
+}
+
+/* Subtitle color variants */
+.step__subtitle--primary.step__subtitle--active {
+  color: theme('colors.primary.500');
+}
+
+.step__subtitle--accent.step__subtitle--active {
+  color: theme('colors.accent.500');
+}
+
+.step__subtitle--success.step__subtitle--active {
+  color: theme('colors.success.500');
+}
+
+.step__subtitle--warning.step__subtitle--active {
+  color: theme('colors.warning.500');
+}
+
+.step__subtitle--danger.step__subtitle--active {
+  color: theme('colors.danger.500');
+}
+
+.step__subtitle--info.step__subtitle--active {
+  color: theme('colors.info.500');
+}
+
+.step__subtitle--white.step__subtitle--active {
+  color: theme('colors.white');
+}
+
+.step__subtitle--neutral.step__subtitle--active {
+  color: theme('colors.neutral.300');
+}
+
+.step__subtitle--neutral-dark.step__subtitle--active {
+  color: theme('colors.neutral-dark.600');
+}
+
 /* Dark mode support */
 :host-context(.dark) {
   .step__number--inactive {
@@ -1777,6 +1889,10 @@
   }
 
   .step__description--inactive {
+    @apply text-gray-400;
+  }
+
+  .step__subtitle--inactive {
     @apply text-gray-400;
   }
 }

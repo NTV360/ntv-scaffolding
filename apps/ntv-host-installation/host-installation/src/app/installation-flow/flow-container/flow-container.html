@@ -1,60 +1,44 @@
 <ntv-layout>
   <ntv-sidebar />
-  <div main>
-    <div class="step-controls-container">
-      <h3>Installation Flow Controls</h3>
-      
-      <!-- Current Step Info -->
-      <div class="step-info">
-        <p>Current Step: <strong>{{ currentStepInfo.stepNumber }} of {{ currentStepInfo.totalSteps }}</strong></p>
-        <p>{{ currentStepInfo.step.label }}</p>
-      </div>
 
-      <!-- Navigation Controls -->
-      <div class="navigation-controls">
-        <button 
-          class="nav-button prev-button"
-          (click)="previousStep()"
-          [disabled]="currentStepInfo.isFirst"
-          type="button">
-          ← Previous
-        </button>
-        
-        <button 
-          class="nav-button complete-button"
-          (click)="completeCurrentStep()"
-          type="button">
-          ✓ Complete Step
-        </button>
-        
-        <button 
-          class="nav-button next-button"
-          (click)="nextStep()"
-          [disabled]="currentStepInfo.isLast"
-          type="button">
-          Next →
-        </button>
-      </div>
-
-      <!-- Error Testing Controls -->
-      <div class="error-controls">
-        <h4>Error Testing</h4>
-        <button 
-          class="error-button trigger-error"
-          (click)="triggerCurrentStepError()"
-          type="button">
-          ⚠ Trigger Error
-        </button>
-        
-        <button 
-          class="error-button clear-error"
-          (click)="clearCurrentStepError()"
-          type="button">
-          ✓ Clear Error
-        </button>
+  <div class="main-container" main>
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">{{ pageTitle() }}</h2>
+        <p class="text-gray-600">{{ pageSubtitle() }}</p>
       </div>
     </div>
-    
-    <router-outlet></router-outlet>
+
+    <!-- Step Content Area -->
+    <div class="step-content-container">
+      @switch (currentStep().id) { @case ('step1') {
+      <ntv-create-host />
+      } @case ('step2') {
+      <app-create-screen />
+      } @case ('step3') {
+      <app-set-installation />
+      } @case ('step4') {
+      <app-review-information />
+      } @default {
+      <div class="text-center py-8">
+        <p class="text-gray-500">Step not found</p>
+      </div>
+      } }
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="navigation-controls">
+      <ntv-button
+        variant="primary"
+        rounded="full"
+        (buttonClick)="previousStep()"
+      >
+        ← Previous
+      </ntv-button>
+
+      <ntv-button variant="accent" rounded="full" (buttonClick)="nextStep()">
+        Next →
+      </ntv-button>
+    </div>
   </div>
 </ntv-layout>
