@@ -998,4 +998,43 @@ export class Stepper {
 
     return classes;
   }
+
+  /**
+   * Generates CSS classes for step subtitles with appropriate color theming.
+   *
+   * @param index - The zero-based step index
+   * @returns Space-separated CSS class string for step subtitles
+   */
+  getSubtitleClasses(index: number): string {
+    const isCompleted = this.isStepCompleted(index);
+    const isActive = this.isStepActive(index);
+    const isError = this.isStepError(index);
+
+    let classes = 'step__subtitle';
+
+    // Add combined color and state classes for CSS optimization compatibility
+    if (isError) {
+      classes += ' step__subtitle--danger';
+      classes += ' step__subtitle--danger--error';
+    } else {
+      const color = this.mergedDescriptionColor();
+      classes += ` step__subtitle--${color}`;
+      if (isCompleted || isActive) {
+        classes += ` step__subtitle--${color}--active`;
+      } else {
+        classes += ` step__subtitle--${color}--inactive`;
+      }
+    }
+
+    // Add basic state classes for fallback
+    if (isError) {
+      classes += ' step__subtitle--error';
+    } else if (isCompleted || isActive) {
+      classes += ' step__subtitle--active';
+    } else {
+      classes += ' step__subtitle--inactive';
+    }
+
+    return classes;
+  }
 }

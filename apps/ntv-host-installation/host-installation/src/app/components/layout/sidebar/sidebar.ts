@@ -22,10 +22,11 @@ export class Sidebar {
   installationSteps = this.installationFlowService.steps;
   currentStep = this.installationFlowService.currentStepIndex;
 
-  // Stepper configuration with clickable enabled
+  // Stepper configuration with clickable enabled and descriptions disabled for sidebar
   stepperConfig: StepperConfig = {
     ...DEFAULT_STEPPER_CONFIG,
     clickable: true,
+    showDescriptions: false,
   };
 
   /**
