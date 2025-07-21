@@ -73,6 +73,10 @@ export class Table implements AfterViewInit {
   filterEnabled = input<boolean>(false);
   // Optional: Enable checkbox selection
   hasCheckBox = input<boolean>(false);
+  // Optional: Enable localStorage persistence for column visibility
+  persistColumnVisibility = input<boolean>(true);
+  // Optional: Custom localStorage key for column visibility
+  storageKey = input<string>('ntv-table-columns');
 
   // Modern Angular outputs using output() function with better typing
   dataChange = output<any[]>();
@@ -191,7 +195,11 @@ export class Table implements AfterViewInit {
           currentCols.length === 0 &&
           !this.externalColumnControl()
         ) {
-          this._columns.set([...initialCols]);
+          // Load column visibility from localStorage if enabled
+          const columnsWithVisibility = this.persistColumnVisibility()
+            ? this.loadColumnVisibilityFromStorage([...initialCols])
+            : [...initialCols];
+          this._columns.set(columnsWithVisibility);
         }
       },
       { allowSignalWrites: true }
@@ -478,6 +486,11 @@ export class Table implements AfterViewInit {
         : col
     );
     this._columns.set(newColumns);
+    
+    // Save to localStorage if persistence is enabled
+    if (this.persistColumnVisibility()) {
+      this.saveColumnVisibilityToStorage(newColumns);
+    }
   }
 
   // Column search functionality
@@ -579,6 +592,11 @@ export class Table implements AfterViewInit {
         visible: true,
       }));
       this._columns.set(newColumns);
+      
+      // Save to localStorage if persistence is enabled
+      if (this.persistColumnVisibility()) {
+        this.saveColumnVisibilityToStorage(newColumns);
+      }
     }
   }
 
@@ -597,6 +615,11 @@ export class Table implements AfterViewInit {
       // Handle internally - reset to original columns from input
       const originalColumns = this.columns();
       this._columns.set([...originalColumns]);
+      
+      // Clear localStorage if persistence is enabled
+      if (this.persistColumnVisibility()) {
+        this.clearColumnVisibilityFromStorage();
+      }
     }
     // Clear search term and reset shrunk state
     this._columnSearchTerm.set('');
@@ -1182,5 +1205,46 @@ export class Table implements AfterViewInit {
       const identifier = row[this.lockIdentifierField()];
       return selectedIdentifiers.has(identifier);
     });
+  }
+
+  // LocalStorage utility methods for column visibility persistence
+  private saveColumnVisibilityToStorage(columns: TableColumn[]): void {
+    try {
+      const visibilityMap: Record<string, boolean> = {};
+      columns.forEach((col) => {
+        visibilityMap[col.field] = col.visible !== false;
+      });
+      localStorage.setItem(this.storageKey(), JSON.stringify(visibilityMap));
+    } catch (error) {
+      console.warn('Failed to save column visibility to localStorage:', error);
+    }
+  }
+
+  private loadColumnVisibilityFromStorage(columns: TableColumn[]): TableColumn[] {
+    try {
+      const stored = localStorage.getItem(this.storageKey());
+      if (!stored) {
+        return columns;
+      }
+
+      const visibilityMap: Record<string, boolean> = JSON.parse(stored);
+      return columns.map((col) => ({
+        ...col,
+        visible: Object.prototype.hasOwnProperty.call(visibilityMap, col.field)
+          ? visibilityMap[col.field]
+          : col.visible !== false,
+      }));
+    } catch (error) {
+      console.warn('Failed to load column visibility from localStorage:', error);
+      return columns;
+    }
+  }
+
+  private clearColumnVisibilityFromStorage(): void {
+    try {
+      localStorage.removeItem(this.storageKey());
+    } catch (error) {
+      console.warn('Failed to clear column visibility from localStorage:', error);
+    }
   }
 }

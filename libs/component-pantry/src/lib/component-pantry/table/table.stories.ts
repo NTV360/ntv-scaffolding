@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { Table } from './table';
 import { Card } from '../card/card';
 import { sampleColumns, sampleData } from './table.constants';
-
 import { TruncatePipe } from '../../pipes/index';
 
 // Global utility functions for all stories
@@ -33,9 +32,9 @@ const globalHandlers = {
     const base = 'font-bold rounded-md px-2 py-[2px] ';
 
     if (display === 'ON') {
-      return base + 'bg-green-300 text-green-600';
+      return base + 'bg-green-400 text-green-800';
     } else {
-      return base + 'bg-red-300 text-red-600';
+      return base + 'bg-red-400 text-red-800';
     }
   },
 
@@ -113,6 +112,15 @@ A highly configurable table component that supports multiple features and custom
       control: 'boolean',
       description: 'Show column settings button',
     },
+    persistColumnVisibility: {
+      control: 'boolean',
+      description: 'Enable localStorage persistence for column visibility',
+    },
+    storageKey: {
+      control: 'text',
+      description:
+        'Custom localStorage key for column visibility (default: "ntv-table-columns")',
+    },
   },
 };
 
@@ -184,15 +192,10 @@ export const Default: Story = {
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-lime-400"></span>
                 <span>
-                  {{ rowData[col.field] | truncate:15 }}
+                  {{ rowData[col.field] | truncate: 15 }}
                 </span>
               </div>
-              } @else if (col.field === 'dealer') {
-               <div class="flex items-center gap-2">
-                  <span><svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path opacity="0.5" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="#8DCB2C"></path> <path d="M16.807 19.0112C15.4398 19.9504 13.7841 20.5 12 20.5C10.2159 20.5 8.56023 19.9503 7.193 19.0111C6.58915 18.5963 6.33109 17.8062 6.68219 17.1632C7.41001 15.8302 8.90973 15 12 15C15.0903 15 16.59 15.8303 17.3178 17.1632C17.6689 17.8062 17.4108 18.5964 16.807 19.0112Z" fill="#8DCB2C"></path> <path d="M12 12C13.6569 12 15 10.6569 15 9C15 7.34315 13.6569 6 12 6C10.3432 6 9.00004 7.34315 9.00004 9C9.00004 10.6569 10.3432 12 12 12Z" fill="#8DCB2C"></path> </g></svg></span>
-                  <span>{{ rowData[col.field] }}</span>
-               </div>
-               }@else if (col.field === 'display') {
+              } @else if (col.field === 'display') {
               <span [class]="displayClass(rowData[col.field])">
                 {{ rowData[col.field] }} 
               </span>
@@ -283,101 +286,108 @@ export const WithFiltering: Story = {
       ...globalHandlers,
     },
     template: `
-      <ntv-table 
-        [columns]="columns"
-        [data]="data"
-        [tableStyle]="tableStyle"
-        [columnDraggable]="columnDraggable"
-        [expandableColumn]="expandableColumn"
-        [expandableRows]="expandableRows"
-        [hasIndex]="hasIndex"
-        
-        [maxLockedRows]="maxLockedRows"
-        [lockIdentifierField]="lockIdentifierField"
-        [showColumnSettings]="showColumnSettings">
-        <ng-template #header let-column>
-          {{ column.header }}
-        </ng-template>
+       <div class="m-4">
+        <ntv-card [variant]="'default'" [rounded]="'lg'">
+          <div class="p-4">
+            <ntv-table 
+            [columns]="columns"
+            [data]="data"
+            [tableStyle]="tableStyle"
+            [columnDraggable]="columnDraggable"
+            [expandableColumn]="expandableColumn"
+            [expandableRows]="expandableRows"
+            [hasIndex]="hasIndex"
+            
+            [maxLockedRows]="maxLockedRows"
+            [lockIdentifierField]="lockIdentifierField"
+            [showColumnSettings]="showColumnSettings">
+            <ng-template #header let-column>
+              {{ column.header }}
+            </ng-template>
 
-         <ng-template
-        #body
-        let-rowData
-        let-columns="columns"
-        let-isLocked="isLocked"
-        let-onLockRow="onLockRow"
-        let-onUnlockRow="onUnlockRow"
-        let-canLockMoreRows="canLockMoreRows"
-        let-hasIndex="hasIndex"
-        let-rowIndex="rowIndex"
-        let-stickyTop="stickyTop"
-        let-expandableRows="expandableRows"
-        let-onToggleExpansion="onToggleExpansion"
-    >
-      <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
-        @if (hasIndex) {
-          <td class="index-column">{{ rowIndex }}</td>
-        } 
-        @for (col of columns; track col.field) {
-        <td>
-          @if (col.field === 'licenseKey') {
-          <span>
-            {{ rowData[col.field] }}
-          </span>
-          } @else if (col.field === 'display') {
-           <span [class]="displayClass(rowData[col.field])">
-            {{ rowData[col.field] }} 
-          </span>
-          } @else if (col.field === 'downloadSpeed') {
-           <span>
-            {{ rowData[col.field] }} Mbps
-          </span>
-          }
-           @else if (col.field === 'uploadSpeed') {
-           <span [class]="getUploadSpeedClass(rowData[col.field])">
-            {{ rowData[col.field] }} Mbps
-          </span>
-          } @else if (col.field === 'action') {
-          <div class="action-buttons">
-            <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
-              ✏️
-            </button>
-            <button
-              class="delete-btn"
-              title="Delete"
-              (click)="onDeleteRow(rowData)"
-            >
-              🗑️
-            </button>
-            @if (isLocked) {
-            <button
-              class="lock-btn locked"
-              title="Unlock Row"
-              (click)="onUnlockRow(rowData)"
-            >
-              🔒
-            </button>
-            } @else {
-            <button
-              class="lock-btn unlocked"
-              title="Lock Row"
-              [disabled]="!canLockMoreRows"
-              (click)="onLockRow(rowData)"
-            >
-              🔓
-            </button>
+            <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-expandableRows="expandableRows"
+            let-onToggleExpansion="onToggleExpansion"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
             }
-            <button class="more-btn" title="More">⋯</button>
+          </tr>
+        </ng-template>
+            </ntv-table>
           </div>
-          } @else {
-          <span>
-            {{ rowData[col.field] }}
-          </span>
-          }
-        </td>
-        }
-      </tr>
-    </ng-template>
-      </ntv-table>
+       </ntv-card>
+       </div>
+   
     `,
   }),
   parameters: {
@@ -407,6 +417,9 @@ export const WithDraggableColumns: Story = {
   render: (args) => ({
     props: args,
     template: `
+    <div class="m-4">
+      <ntv-card [variant]="'default'" [rounded]="'lg'">
+      <div class="p-4">
       <ntv-table 
         [columns]="columns"
         [data]="data"
@@ -422,6 +435,9 @@ export const WithDraggableColumns: Story = {
           {{ column.header }}
         </ng-template>
       </ntv-table>
+      </div>
+      </ntv-card>
+    </div>
     `,
   }),
   parameters: {
@@ -570,6 +586,10 @@ export const FullFeatured: Story = {
       },
     },
     template: `
+
+    <div class="m-4">
+      <ntv-card [variant]="'elevated'" [rounded]="'lg'">
+      <div class="p-4">
       <ntv-table 
         [columns]="columns"
         [data]="data"
@@ -588,6 +608,9 @@ export const FullFeatured: Story = {
           {{ column.header }}
         </ng-template>
       </ntv-table>
+      </div>
+      </ntv-card>
+    </div>
     `,
   }),
   parameters: {
@@ -595,6 +618,124 @@ export const FullFeatured: Story = {
       description: {
         story:
           'Table with all features enabled: draggable columns, expandable columns, expandable rows, filtering, row locking, and checkbox selection.',
+      },
+    },
+  },
+};
+
+// 7. Table with LocalStorage Persistence
+export const WithLocalStoragePersistence: Story = {
+  args: {
+    columns: sampleColumns(),
+    data: sampleData(),
+    tableStyle: { 'min-width': '50rem' },
+    columnDraggable: false,
+    expandableRows: false,
+    hasIndex: true,
+    hasCheckBox: false,
+    maxLockedRows: 3,
+    lockIdentifierField: 'licenseKey',
+    showColumnSettings: true,
+    persistColumnVisibility: true,
+    storageKey: 'demo-table-columns',
+  },
+  render: (args) => ({
+    props: args,
+    template: `
+      <div>
+        <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <h4 class="font-semibold mb-2 text-blue-800 dark:text-blue-200">LocalStorage Persistence Demo</h4>
+          <p class="text-sm text-blue-700 dark:text-blue-300 mb-2">
+            This table saves column visibility to localStorage with key: <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">{{ storageKey }}</code>
+          </p>
+          <p class="text-sm text-blue-700 dark:text-blue-300">
+            Try hiding/showing columns using the column settings, then refresh the page to see the state persist.
+          </p>
+        </div>
+        <ntv-table 
+          [columns]="columns"
+          [data]="data"
+          [tableStyle]="tableStyle"
+          [columnDraggable]="columnDraggable"
+          [expandableColumn]="expandableColumn"
+          [expandableRows]="expandableRows"
+          [hasIndex]="hasIndex"
+          [hasCheckBox]="hasCheckBox"
+          [maxLockedRows]="maxLockedRows"
+          [lockIdentifierField]="lockIdentifierField"
+          [showColumnSettings]="showColumnSettings"
+          [persistColumnVisibility]="persistColumnVisibility"
+          [storageKey]="storageKey">
+          <ng-template #header let-column>
+            {{ column.header }}
+          </ng-template>
+        </ntv-table>
+      </div>
+    `,
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Table with localStorage persistence enabled. Column visibility changes are automatically saved to localStorage and restored on page refresh. Use a custom storage key to avoid conflicts with other tables.',
+      },
+    },
+  },
+};
+
+// 8. Table with Header
+export const WithHeaderTable: Story = {
+  args: {
+    columns: sampleColumns(),
+    data: sampleData(),
+    tableStyle: { 'min-width': '50rem' },
+    columnDraggable: false,
+    expandableRows: false,
+    hasIndex: true,
+    hasCheckBox: false,
+    maxLockedRows: 3,
+    lockIdentifierField: 'licenseKey',
+    showColumnSettings: true,
+    persistColumnVisibility: true,
+    storageKey: 'demo-tableHeaders-columns',
+  },
+  render: (args) => ({
+    props: args,
+    template: `
+      <div class="outline outline-1 outline-gray-400 rounded-lg p-4 m-4">
+     <div class="">
+     - searchbar here
+
+    - when multiple items selected show the multiple delete here
+     
+     </div>
+      
+        <ntv-table 
+          [columns]="columns"
+          [data]="data"
+          [tableStyle]="tableStyle"
+          [columnDraggable]="columnDraggable"
+          [expandableColumn]="expandableColumn"
+          [expandableRows]="expandableRows"
+          [hasIndex]="hasIndex"
+          [hasCheckBox]="hasCheckBox"
+          [maxLockedRows]="maxLockedRows"
+          [lockIdentifierField]="lockIdentifierField"
+          [showColumnSettings]="showColumnSettings"
+          [persistColumnVisibility]="persistColumnVisibility"
+          [storageKey]="storageKey">
+          <ng-template #header let-column>
+            {{ column.header }}
+          </ng-template>
+        </ntv-table>
+      </div>
+    `,
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Table with localStorage persistence enabled. Column visibility changes are automatically saved to localStorage and restored on page refresh. Use a custom storage key to avoid conflicts with other tables.',
       },
     },
   },

@@ -5,8 +5,6 @@ export const sampleColumns = signal<TableColumn[]>([
   {
     field: 'screenshot',
     header: 'Screenshot',
-    filter: true,
-    filterType: 'text',
   },
   {
     field: 'licenseKey',
