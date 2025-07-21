@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { ModalComponent } from './modal';
 import {
   DEFAULT_ALERT_ERROR_CONFIG,
-  DEFAULT_ALERT_SUCCESS_CONFIG,
   DEFAULT_MODAL_CONFIG,
   ModalAlertConfig,
   ModalFormConfig,
