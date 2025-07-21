@@ -1,0 +1,212 @@
+<div 
+  [class]="containerClasses()"
+  [ngStyle]="containerStyles()"
+  role="grid"
+  [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
+  
+  @for (item of itemsWithSelection(); track item.id; let i = $index) {
+    <div 
+      [class]="getItemClasses(item)"
+      [attr.role]="mergedConfig().selectable ? 'gridcell' : 'button'"
+      [attr.aria-selected]="mergedConfig().selectable ? item.selected : null"
+      [attr.tabindex]="mergedConfig().clickable ? '0' : '-1'"
+      [attr.aria-label]="item.name + (item.selected ? ' (selected)' : '')"
+      (click)="onItemClick(item, i, $event)"
+      (contextmenu)="onContextMenu(item, $event)"
+      (mouseenter)="onMouseEnter(item)"
+      (mouseleave)="onMouseLeave()"
+      (keydown.enter)="onItemClick(item, i, $event)"
+      (keydown.space)="onItemClick(item, i, $event)">
+      
+      <!-- Thumbnail Content -->
+      <div class="thumbnail-content">
+        
+        <!-- Image/Video Thumbnail -->
+        @if (item.type === 'image' && item.src) {
+          <div class="thumbnail-media">
+            <img 
+              [src]="item.src" 
+              [alt]="item.name"
+              class="thumbnail-image"
+              loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="thumbnail-fallback" style="display: none;">
+              <span class="thumbnail-icon">{{ getFileIcon(item) }}</span>
+            </div>
+          </div>
+        } @else if (item.type === 'video' && item.src) {
+          <div class="thumbnail-media">
+            <video 
+              [src]="item.src" 
+              class="thumbnail-video"
+              preload="metadata"
+              muted>
+            </video>
+            <div class="thumbnail-overlay">
+              <span class="play-icon">▶️</span>
+            </div>
+          </div>
+        } @else {
+          <!-- File Type Icon -->
+          <div class="thumbnail-icon-container" [style.background-color]="getFileTypeColor(item) + '20'">
+            <span class="thumbnail-icon" [style.color]="getFileTypeColor(item)">{{ getFileIcon(item) }}</span>
+          </div>
+        }
+        
+        <!-- Selection Indicator -->
+        @if (mergedConfig().selectable) {
+          <div class="thumbnail-selection">
+            <div class="selection-checkbox" [class.selected]="item.selected">
+              @if (item.selected) {
+                <span class="checkmark">✓</span>
+              }
+            </div>
+          </div>
+        }
+        
+        <!-- File Type Badge -->
+        @if (mergedConfig().layout === 'grid') {
+          <div class="thumbnail-badge">
+            <span class="badge-text">{{ item.type.toUpperCase() }}</span>
+          </div>
+        }
+        
+        <!-- More Options Button Overlay -->
+        @if (showActionButtons() && (hoveredItem() === item || item.selected)) {
+          @if (showContextMenu()) {
+            <div class="thumbnail-actions-overlay">
+              <div class="action-buttons">
+                <button 
+                  class="action-button action-button--more"
+                  title="More options"
+                  [attr.aria-label]="'More options for ' + item.name"
+                  tabindex="0"
+                  (click)="onContextMenu(item, $event)"
+                  (keydown.enter)="onContextMenu(item, $event)"
+                  (keydown.space)="onContextMenu(item, $event)">
+                  <span class="action-icon">⋯</span>
+                </button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+      
+      <!-- Item Information -->
+      @if (mergedConfig().showLabels || mergedConfig().showMetadata || mergedConfig().showFileSize || mergedConfig().showModified) {
+        <div class="thumbnail-info">
+          
+          <!-- File Name -->
+          @if (mergedConfig().showLabels) {
+            <div class="thumbnail-name" [title]="item.name">{{ item.name }}</div>
+          }
+          
+          <!-- Metadata Row -->
+          @if (mergedConfig().showMetadata || mergedConfig().showFileSize || mergedConfig().showModified) {
+            <div class="thumbnail-metadata">
+              
+              <!-- File Size -->
+              @if (mergedConfig().showFileSize && item.size) {
+                <span class="metadata-item size">{{ formatFileSize(item.size) }}</span>
+              }
+              
+              <!-- Modified Date -->
+              @if (mergedConfig().showModified && item.modified) {
+                <span class="metadata-item date">{{ formatDate(item.modified) }}</span>
+              }
+              
+              <!-- Custom Metadata -->
+              @if (mergedConfig().showMetadata && item.metadata) {
+                @if (item.metadata['dimensions']) {
+                  <span class="metadata-item dimensions">{{ item.metadata['dimensions'] }}</span>
+                }
+                @if (item.metadata['duration']) {
+                  <span class="metadata-item duration">{{ item.metadata['duration'] }}</span>
+                }
+                @if (item.metadata['pages']) {
+                  <span class="metadata-item pages">{{ item.metadata['pages'] }} pages</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @empty {
+    <!-- Empty State -->
+    <div class="thumbnail-empty">
+      <div class="empty-icon">📁</div>
+      <div class="empty-message">No items to display</div>
+      <div class="empty-description">Add some files to see them here</div>
+    </div>
+  }
+</div>
+
+<!-- Context Menu -->
+@if (contextMenuVisible() && contextMenuItem()) {
+  <div 
+    class="thumbnail-context-menu"
+    [style.left.px]="contextMenuPosition().x"
+    [style.top.px]="contextMenuPosition().y"
+    role="menu"
+    [attr.aria-label]="'Context menu for ' + contextMenuItem()!.name"
+    tabindex="-1"
+    (click)="$event.stopPropagation()"
+    (keydown.enter)="$event.stopPropagation()"
+    (keydown.space)="$event.stopPropagation()">
+    
+    <div class="context-menu-header">
+      <span class="context-menu-title">{{ contextMenuItem()!.name }}</span>
+    </div>
+    
+    <div class="context-menu-content">
+      @for (action of contextMenuActions(); track action.type) {
+        <div class="context-menu-item-wrapper">
+          <button 
+             class="context-menu-item"
+              [class.disabled]="action.disabled"
+              [class.has-submenu]="!!action.submenu"
+              [disabled]="action.disabled"
+              role="menuitem"
+              [attr.aria-label]="action.label + (action.submenu ? ' (has submenu)' : '')"
+              [attr.aria-expanded]="action.submenu ? (activeSubmenu() === action.type) : null"
+              tabindex="0"
+             (click)="action.submenu ? toggleSubmenu(action.type, $event) : onActionClick(action, contextMenuItem()!, $event)"
+             (keydown.enter)="action.submenu ? toggleSubmenu(action.type, $event) : onActionClick(action, contextMenuItem()!, $event)"
+             (keydown.space)="action.submenu ? toggleSubmenu(action.type, $event) : onActionClick(action, contextMenuItem()!, $event)">
+             <span class="menu-item-icon">{{ action.icon }}</span>
+             <span class="menu-item-label">{{ action.label }}</span>
+             @if (action.submenu) {
+               <span class="menu-item-arrow">▶</span>
+             }
+           </button>
+          
+          <!-- Submenu -->
+          @if (action.submenu && activeSubmenu() === action.type) {
+            <div class="context-submenu">
+              @for (subAction of action.submenu; track subAction.type) {
+                <button 
+                 class="context-menu-item submenu-item"
+                  [class.disabled]="subAction.disabled"
+                  [disabled]="subAction.disabled"
+                  role="menuitem"
+                  [attr.aria-label]="subAction.label"
+                  tabindex="0"
+                 (click)="onActionClick(subAction, contextMenuItem()!, $event)"
+                 (keydown.enter)="onActionClick(subAction, contextMenuItem()!, $event)"
+                 (keydown.space)="onActionClick(subAction, contextMenuItem()!, $event)">
+                 <span class="menu-item-icon">{{ subAction.icon }}</span>
+                 <span class="menu-item-label">{{ subAction.label }}</span>
+               </button>
+              }
+            </div>
+          }
+          
+          @if (action.divider) {
+            <div class="context-menu-divider"></div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

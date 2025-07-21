@@ -14,3 +14,5 @@ export type * from './lib/component-pantry/stepper/stepper.types';
 export * from './lib/component-pantry/popover/popover';
 export * from './lib/component-pantry/popover/popover.types';
 export * from './lib/component-pantry/text-demo/text-demo.component';
+export * from './lib/component-pantry/thumbnail/thumbnail';
+export * from './lib/component-pantry/thumbnail/thumbnail.types';
