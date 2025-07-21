@@ -92,7 +92,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   private lottieScript?: HTMLScriptElement;
 
   /** Signal indicating if Lottie script has been loaded */
-  private lottieLoaded = signal<boolean>(false);
+  protected lottieLoaded = signal<boolean>(false);
 
   /** Static file icons mapping */
   protected FILE_ICONS = FILE_ICONS;
@@ -252,13 +252,13 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   });
 
   /** Path to the Lottie animation file */
-  readonly lottieAnimationPath = computed<SafeResourceUrl | string>(() => {
-    if (!this.showLottieAnimation()) return '';
-    const animationType = this.alertType();
-    return this.sanitizer.bypassSecurityTrustResourceUrl(
-      LOTTIE_ANIMATIONS[animationType]
-    );
-  });
+  readonly lottieAnimationPath = computed<SafeResourceUrl | string>(() =>
+    this.showLottieAnimation()
+      ? this.sanitizer.bypassSecurityTrustResourceUrl(
+          LOTTIE_ANIMATIONS[this.alertType()]
+        )
+      : ''
+  );
 
   // Computed to sync input with internal signal
   readonly isVisibleSignal = computed(() => this._isVisible());
@@ -272,118 +272,115 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
 
   // Compute the final size configuration
   readonly sizeConfig = computed(() => {
-    const customSize = this.mergedCustomSize();
-    if (customSize) {
-      return customSize;
-    }
-
-    const sizeVariant = this.mergedSize();
-    const preset =
-      MODAL_SIZE_PRESETS[sizeVariant as keyof typeof MODAL_SIZE_PRESETS];
-
-    if (preset) {
-      return preset;
-    }
-
-    // Handle custom string sizes (e.g., '500px', '80vw')
-    if (
-      (typeof sizeVariant === 'string' && sizeVariant.includes('px')) ||
-      sizeVariant.includes('vw') ||
-      sizeVariant.includes('vh') ||
-      sizeVariant.includes('%')
-    ) {
-      return { width: sizeVariant, maxWidth: sizeVariant };
-    }
-
-    // Fallback to medium size
-    return MODAL_SIZE_PRESETS['medium'];
+    return (
+      this.mergedCustomSize() ??
+      MODAL_SIZE_PRESETS[
+        this.mergedSize() as keyof typeof MODAL_SIZE_PRESETS
+      ] ??
+      (typeof this.mergedSize() === 'string' &&
+      (this.mergedSize().includes('px') ||
+        this.mergedSize().includes('vw') ||
+        this.mergedSize().includes('vh') ||
+        this.mergedSize().includes('%'))
+        ? { width: this.mergedSize(), maxWidth: this.mergedSize() }
+        : MODAL_SIZE_PRESETS['medium'])
+    );
   });
 
-  modalClasses = computed(() => {
-    const baseClasses = 'modal';
-    const sizeClass = `modal--${this.mergedSize()}`;
-    const variantClass = `modal--${this.mergedVariant()}`;
-    const positionClass = `modal--${this.mergedPosition()}`;
-    const backdropClass = `modal--backdrop-${this.mergedBackdrop()}`;
-    const fullscreenClass = this.mergedFullscreen() ? 'modal--fullscreen' : '';
-    const scrollableClass = this.mergedScrollable() ? 'modal--scrollable' : '';
-    const centeredClass = this.mergedCentered() ? 'modal--centered' : '';
-    const animationClass = this.mergedAnimation() ? 'modal--animated' : '';
-    const visibleClass = this.isVisibleSignal() ? 'modal--visible' : '';
-    const animatingClass = this.isAnimating() ? 'modal--animating' : '';
-    const customClass = this.mergedCustomClass() || '';
-    return [
-      baseClasses,
-      sizeClass,
-      variantClass,
-      positionClass,
-      backdropClass,
-      fullscreenClass,
-      scrollableClass,
-      centeredClass,
-      animationClass,
-      visibleClass,
-      animatingClass,
-      customClass,
+  modalClasses = computed(() =>
+    [
+      'modal',
+      `modal--${this.mergedSize()}`,
+      `modal--${this.mergedVariant()}`,
+      `modal--${this.mergedPosition()}`,
+      `modal--backdrop-${this.mergedBackdrop()}`,
+      this.mergedFullscreen() && 'modal--fullscreen',
+      this.mergedScrollable() && 'modal--scrollable',
+      this.mergedCentered() && 'modal--centered',
+      this.mergedAnimation() && 'modal--animated',
+      this.isVisibleSignal() && 'modal--visible',
+      this.isAnimating() && 'modal--animating',
+      this.mergedCustomClass(),
     ]
       .filter(Boolean)
-      .join(' ');
-  });
+      .join(' ')
+  );
 
-  modalContentClasses = computed(() => {
-    const baseClasses = 'modal__content';
-    const sizeClass = `modal__content--${this.mergedSize()}`;
-    const variantClass = `modal__content--${this.mergedVariant()}`;
-    const fullscreenClass = this.mergedFullscreen()
-      ? 'modal__content--fullscreen'
-      : '';
-    return [baseClasses, sizeClass, variantClass, fullscreenClass]
+  modalContentClasses = computed(() =>
+    [
+      'modal__content',
+      `modal__content--${this.mergedSize()}`,
+      `modal__content--${this.mergedVariant()}`,
+      this.mergedFullscreen() && 'modal__content--fullscreen',
+    ]
       .filter(Boolean)
-      .join(' ');
-  });
+      .join(' ')
+  );
 
-  modalBackdropClasses = computed(() => {
-    const baseClasses = 'modal__backdrop';
-    const backdropClass = `modal__backdrop--${this.mergedBackdrop()}`;
-    const visibleClass = this.isVisibleSignal()
-      ? 'modal__backdrop--visible'
-      : '';
-    return [baseClasses, backdropClass, visibleClass].filter(Boolean).join(' ');
-  });
+  modalBackdropClasses = computed(() =>
+    [
+      'modal__backdrop',
+      `modal__backdrop--${this.mergedBackdrop()}`,
+      this.isVisibleSignal() && 'modal__backdrop--visible',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  );
 
   // Compute inline style for modal content based on size configuration
   modalContentStyle = computed(() => {
     const sizeConfig = this.sizeConfig();
-    const style: Record<string, string> = {};
 
-    const sizeProperties = [
-      'width',
-      'height',
-      'maxWidth',
-      'maxHeight',
-      'minWidth',
-      'minHeight',
-    ] as const;
-    sizeProperties.forEach((prop) => {
-      const value = sizeConfig[prop as keyof typeof sizeConfig];
+    return (
+      [
+        'width',
+        'height',
+        'maxWidth',
+        'maxHeight',
+        'minWidth',
+        'minHeight',
+      ] as const
+    ).reduce((style, prop) => {
+      const value = sizeConfig[prop];
       if (value) {
         style[prop] = value;
       }
-    });
-
-    return style;
+      return style;
+    }, {} as Record<string, unknown>);
   });
 
   // --- Lifecycle hooks ---
   ngAfterViewInit(): void {
-    // Focus modal if needed
     if (this.isVisibleSignal() && this.modalContent?.nativeElement) {
       this.modalContent.nativeElement.focus();
     }
+
+    if (
+      this.isAlertVariant() &&
+      ['success', 'error'].includes(this.alertType())
+    ) {
+      this.loadLottieScript();
+    }
+  }
+
+  /**
+   * Loads the Lottie player script if not already loaded
+   */
+  private loadLottieScript(): void {
+    if (this.lottieLoaded()) return;
+
+    this.ngZone.runOutsideAngular(() => {
+      const script = document.createElement('script');
+      script.src =
+        'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js';
+      script.async = true;
+      script.onload = () => this.ngZone.run(() => this.lottieLoaded.set(true));
+      document.body.appendChild(script);
+      this.lottieScript = script;
+    });
   }
 
   ngOnDestroy(): void {
-    // Clean up Lottie player if it was loaded by us
     if (this.lottieScript && document.body.contains(this.lottieScript)) {
       document.body.removeChild(this.lottieScript);
     }
@@ -396,8 +393,10 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
    */
   public open(): void {
     if (this.isVisibleSignal()) return;
+
     this.isAnimating.set(true);
     this._isVisible.set(true);
+
     setTimeout(() => {
       this.modalOpen.emit();
       this.isAnimating.set(false);
@@ -410,8 +409,10 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
    */
   public close(): void {
     if (!this.isVisibleSignal() || this.mergedPreventClose()) return;
+
     this.isAnimating.set(true);
     this._isVisible.set(false);
+
     setTimeout(() => {
       this.modalClose.emit();
       this.isAnimating.set(false);
@@ -423,19 +424,19 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
    * Closes modal if click target is backdrop and closeOnBackdrop is true.
    * @param event - The click event
    */
-  public onBackdropClick(event: Event): void {
+  public onBackdropClick = (event: Event): void => {
     if (event.target === event.currentTarget && this.mergedCloseOnBackdrop()) {
       this.backdropClick.emit();
       this.close();
     }
-  }
+  };
 
   /**
    * Handles escape key press.
    * Closes modal if visible, closeOnEscape is true, and preventClose is false.
    */
   @HostListener('document:keydown.escape')
-  public onEscapeKey(): void {
+  public onEscapeKey = (): void => {
     if (
       this.isVisibleSignal() &&
       this.mergedCloseOnEscape() &&
@@ -444,7 +445,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       this.escapeKey.emit();
       this.close();
     }
-  }
+  };
 
   // --- Template helpers ---
   /**

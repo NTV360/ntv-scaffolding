@@ -177,7 +177,15 @@ Use the Controls panel below to experiment with different configurations. The pr
     },
     variant: {
       control: { type: 'select' },
-      options: ['default', 'form', 'confirmation', 'alert', 'info'],
+      options: [
+        'default',
+        'form',
+        'confirmation',
+        'alert',
+        'info',
+        'success',
+        'error',
+      ],
       description:
         'Sets the modal variant which determines its appearance and behavior.',
       table: {
@@ -196,9 +204,9 @@ Use the Controls panel below to experiment with different configurations. The pr
     },
     backdrop: {
       control: { type: 'select' },
-      options: ['blur', 'dark', 'none'],
+      options: ['blur', 'dark', 'none', 'glass', 'gradient'],
       description:
-        'Sets the backdrop style. "blur" adds a frosted glass effect, "dark" dims the background, "none" removes the backdrop.',
+        'Sets the backdrop style. "blur" adds a frosted glass effect, "dark" dims the background, "none" removes the backdrop, "glass" creates a glassy effect, "gradient" applies a gradient overlay.',
       table: {
         defaultValue: { summary: 'blur' },
         type: { summary: 'string' },

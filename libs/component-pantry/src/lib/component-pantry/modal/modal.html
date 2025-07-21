@@ -16,24 +16,23 @@
       [attr.aria-describedby]="getShowHeader() ? 'modal-desc' : null"
     >
       <!-- Modal Header -->
-      @if(getShowHeader()) {
+      @if (getShowHeader()) {
       <header class="modal__header">
         <div class="flex items-center justify-between w-full">
           <div>
             <h2 id="modal-title" class="modal__title">
               {{ getHeaderTitle() }}
             </h2>
-            <p
-              *ngIf="getHeaderSubtitle()"
-              id="modal-desc"
-              class="modal__subtitle"
-            >
+
+            @if (getHeaderSubtitle()) {
+            <p id="modal-desc" class="modal__subtitle">
               {{ getHeaderSubtitle() }}
             </p>
+            }
           </div>
 
+          @if (getClosable()) {
           <button
-            *ngIf="getClosable()"
             type="button"
             class="modal__close"
             aria-label="Close"
@@ -51,56 +50,60 @@
               />
             </svg>
           </button>
+          }
         </div>
       </header>
       }
 
-      <!-- Modal Body (Content Projection) -->
+      <!-- Modal Body -->
       <section class="modal__body">
-        <!-- Alert Animation Container -->
+        @if (isAlertVariant() && (alertType() === 'success' || alertType() ===
+        'error')) {
         <div
-          *ngIf="isAlertVariant() && (alertType() === 'success' || alertType() === 'error')"
           class="modal__alert-animation"
           [style]="alertType() === 'error' ? {
-          width: '200px',
-          height: '200px',
-          margin: '0 auto 1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative'
-        } : {
-          width: '200px',
-          height: '200px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative'
-        }"
+              width: '200px',
+              height: '200px',
+              margin: '0 auto 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            } : {
+              width: '200px',
+              height: '200px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }"
         >
-          <!-- Lottie animation -->
           <iframe
             [src]="lottieAnimationPath()"
             [style]="alertType() === 'error' ? {
-              width: '200px',
-              height: '200px',
-              border: 'none',
-              background: 'transparent'
-            } : {
-              width: '200px',
-              height: '300px',
-              border: 'none',
-              background: 'transparent'
-            }"
+                width: '200px',
+                height: '200px',
+                border: 'none',
+                background: 'transparent'
+              } : {
+                width: '200px',
+                height: '300px',
+                border: 'none',
+                background: 'transparent'
+              }"
           ></iframe>
         </div>
+        }
+
         <ng-content></ng-content>
       </section>
 
       <!-- Modal Footer -->
-      <footer *ngIf="getShowFooter()" class="modal__footer">
+      @if (getShowFooter()) {
+      <footer class="modal__footer">
         <ng-content select="[modal-footer]"></ng-content>
       </footer>
+      }
     </div>
   </div>
 </div>
