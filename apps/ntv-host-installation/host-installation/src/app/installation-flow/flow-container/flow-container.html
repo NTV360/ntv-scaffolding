@@ -1,6 +1,44 @@
 <ntv-layout>
   <ntv-sidebar />
-  <div main>
-    <router-outlet></router-outlet>
+
+  <div class="main-container" main>
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">{{ pageTitle() }}</h2>
+        <p class="text-gray-600">{{ pageSubtitle() }}</p>
+      </div>
+    </div>
+
+    <!-- Step Content Area -->
+    <div class="step-content-container">
+      @switch (currentStep().id) { @case ('step1') {
+      <ntv-create-host />
+      } @case ('step2') {
+      <app-create-screen />
+      } @case ('step3') {
+      <app-set-installation />
+      } @case ('step4') {
+      <app-review-information />
+      } @default {
+      <div class="text-center py-8">
+        <p class="text-gray-500">Step not found</p>
+      </div>
+      } }
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="navigation-controls">
+      <ntv-button
+        variant="primary"
+        rounded="full"
+        (buttonClick)="previousStep()"
+      >
+        ← Previous
+      </ntv-button>
+
+      <ntv-button variant="accent" rounded="full" (buttonClick)="nextStep()">
+        Next →
+      </ntv-button>
+    </div>
   </div>
 </ntv-layout>

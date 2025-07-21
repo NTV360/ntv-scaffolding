@@ -6,9 +6,10 @@
   <!-- Vertical Reverse Stepper -->
   <div class="stepper-container">
     <ntv-stepper
-      [steps]="installationSteps"
-      [currentStep]="currentStep"
+      [steps]="installationSteps()"
+      [currentStep]="currentStep()"
       [config]="stepperConfig"
+      (stepClick)="onStepClick($event)"
       class="installation-stepper"
     >
     </ntv-stepper>
