@@ -69,10 +69,10 @@ const LOTTIE_ANIMATIONS = {
  */
 @Component({
   selector: 'ntv-modal',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './modal.html',
   styleUrls: ['./modal.css'],
+  standalone: true,
+  imports: [CommonModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // Add support for web components
 })
 /**
@@ -356,24 +356,20 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     const sizeConfig = this.sizeConfig();
     const style: Record<string, string> = {};
 
-    if (sizeConfig.width) {
-      style['width'] = sizeConfig.width;
-    }
-    if (sizeConfig.height) {
-      style['height'] = sizeConfig.height;
-    }
-    if (sizeConfig.maxWidth) {
-      style['maxWidth'] = sizeConfig.maxWidth;
-    }
-    if (sizeConfig.maxHeight) {
-      style['maxHeight'] = sizeConfig.maxHeight;
-    }
-    if (sizeConfig.minWidth) {
-      style['minWidth'] = sizeConfig.minWidth;
-    }
-    if (sizeConfig.minHeight) {
-      style['minHeight'] = sizeConfig.minHeight;
-    }
+    const sizeProperties = [
+      'width',
+      'height',
+      'maxWidth',
+      'maxHeight',
+      'minWidth',
+      'minHeight',
+    ] as const;
+    sizeProperties.forEach((prop) => {
+      const value = sizeConfig[prop as keyof typeof sizeConfig];
+      if (value) {
+        style[prop] = value;
+      }
+    });
 
     return style;
   });

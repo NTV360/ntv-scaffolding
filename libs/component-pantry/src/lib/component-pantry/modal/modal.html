@@ -16,7 +16,8 @@
       [attr.aria-describedby]="getShowHeader() ? 'modal-desc' : null"
     >
       <!-- Modal Header -->
-      <header *ngIf="getShowHeader()" class="modal__header">
+      @if(getShowHeader()) {
+      <header class="modal__header">
         <div class="flex items-center justify-between w-full">
           <div>
             <h2 id="modal-title" class="modal__title">
@@ -52,6 +53,7 @@
           </button>
         </div>
       </header>
+      }
 
       <!-- Modal Body (Content Projection) -->
       <section class="modal__body">
