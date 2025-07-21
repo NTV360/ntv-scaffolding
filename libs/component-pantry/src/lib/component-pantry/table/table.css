@@ -37,7 +37,6 @@ ntv-table td {
 
 ntv-table .table-container {
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: white !important;
   position: relative;
 }
@@ -140,8 +139,6 @@ thead th.expand-column {
   min-width: 50px;
   max-width: 50px;
   text-align: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-right: 1px solid #dee2e6;
 }
 
 /* Filtered column styling */
@@ -201,6 +198,68 @@ tbody td.checkbox-column {
   padding: 8px;
 }
 
+/* Column actions styling */
+.column-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.column-actions ntv-button {
+  transition: all 0.2s ease;
+}
+
+/* Expandable column transition */
+th[ntvExpandableColumn],
+td[ntvExpandableColumn] {
+  transition: width 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
+}
+
+/* Shrunk columns styling - focus on width management */
+.table.columns-shrunk th,
+.table.columns-shrunk td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Default narrow column widths */
+.table
+  th:not(.checkbox-column):not(.index-column):not(.expand-column):not(
+    .expandable-column
+  ),
+.table
+  td:not(.checkbox-column):not(.index-column):not(.expand-column):not(
+    .expandable-column
+  ) {
+  min-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Fixed table width when columns are shrunk */
+.table.columns-shrunk {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Dynamic column widths when shrunk - let inline styles control width */
+.table.columns-shrunk
+  th:not(.checkbox-column):not(.index-column):not(.expand-column):not(
+    .column-actions
+  ):not(.expandable-column),
+.table.columns-shrunk
+  td:not(.checkbox-column):not(.index-column):not(.expand-column):not(
+    .column-actions
+  ):not(.expandable-column) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Remove fixed width constraints to allow dynamic sizing */
+}
+
 /* Index column specific styling */
 tbody td.index-column {
   width: 60px;
@@ -218,8 +277,6 @@ tbody td.expand-column {
   min-width: 50px;
   max-width: 50px;
   text-align: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-right: 1px solid #e2e8f0;
   padding: 8px;
 }
 
@@ -253,12 +310,12 @@ tbody td.expand-column {
 .expanded-content-row {
   background-color: #f8f9fa;
   border-top: 1px solid #e9ecef;
-  animation: expandRow 0.3s ease-out;
+  animation: slideDown 0.3s ease-out;
   transition: all 0.3s ease-out;
 }
 
 .expanded-content-row.collapsing {
-  animation: collapseRow 0.3s ease-in forwards;
+  animation: slideUp 0.3s ease-in forwards;
 }
 
 .expanded-content-cell {
@@ -356,31 +413,25 @@ tbody td.expand-column {
 }
 
 /* Keyframe animations for expanded rows */
-@keyframes expandRow {
+@keyframes slideDown {
   from {
-    max-height: 0;
+    transform: translateY(-10%);
     opacity: 0;
-    transform: scaleY(0);
   }
   to {
-    max-height: 500px;
+    transform: translateY(0);
     opacity: 1;
-    transform: scaleY(1);
   }
 }
 
-@keyframes collapseRow {
+@keyframes slideUp {
   from {
-    max-height: 500px;
+    transform: translateY(0);
     opacity: 1;
-    transform: scaleY(1);
   }
   to {
-    max-height: 0;
+    transform: translateY(-20%);
     opacity: 0;
-    transform: scaleY(0);
-    margin-top: 0;
-    margin-bottom: 0;
   }
 }
 
@@ -474,7 +525,6 @@ tbody td.expand-column {
 
 .expandable-column.expanded {
   background-color: #f8f9fa;
-  box-shadow: inset 0 0 0 2px #007bff;
 }
 
 .resize-handle {
@@ -594,8 +644,7 @@ body.resizing * {
   max-height: 200px;
   overflow-y: auto;
   margin-bottom: 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
+  border-block: 1px solid #e9ecef;
 }
 
 .column-count-info {
@@ -643,7 +692,7 @@ body.resizing * {
 
 .column-option {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   padding: 8px 16px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -653,9 +702,57 @@ body.resizing * {
   background-color: #f8f9fa;
 }
 
-.column-option input[type='checkbox'] {
+/* Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
   margin-right: 8px;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
   cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-slider {
+  background-color: #8dcb2c;
+}
+
+.toggle-input:focus + .toggle-slider {
+  box-shadow: 0 0 1px #8dcb2c;
+}
+
+.toggle-input:checked + .toggle-slider:before {
+  transform: translateX(20px);
 }
 
 .column-option span {

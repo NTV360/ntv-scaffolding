@@ -77,6 +77,7 @@ export class ColumnFilter {
   getUniqueValues(): string[] {
     const data = this.data();
     const field = this.column().field;
+    // Get all unique values from the original data, excluding current column's filter
     const values = data
       .map((item) => item[field])
       .filter((value) => value !== null && value !== undefined);
