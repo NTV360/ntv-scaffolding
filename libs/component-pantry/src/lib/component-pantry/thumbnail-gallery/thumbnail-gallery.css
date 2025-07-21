@@ -1,0 +1,300 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Thumbnail Gallery Component Styles */
+
+/* Container Styles */
+.thumbnail-gallery {
+  @apply w-full relative;
+}
+
+/* Grid Layout */
+.thumbnail-gallery--grid {
+  @apply grid gap-4 p-4;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+/* List Layout */
+.thumbnail-gallery--list {
+  @apply flex flex-col gap-2 p-4;
+}
+
+/* Size Variants for Grid */
+.thumbnail-gallery--grid.thumbnail-gallery--sm {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.thumbnail-gallery--grid.thumbnail-gallery--md {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.thumbnail-gallery--grid.thumbnail-gallery--lg {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.thumbnail-gallery--grid.thumbnail-gallery--xl {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-16 px-4 text-center;
+}
+
+.empty-icon {
+  @apply text-6xl mb-4 opacity-50;
+}
+
+.empty-message {
+  @apply text-lg font-medium text-gray-600 mb-2;
+}
+
+.empty-description {
+  @apply text-sm text-gray-500;
+}
+
+/* Context Menu */
+.thumbnail-context-menu {
+  @apply fixed z-[1000] bg-white rounded-lg shadow-xl border border-black/10 min-w-[220px] max-w-[280px] overflow-hidden;
+  animation: contextMenuFadeIn 0.15s ease-out;
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.context-menu-header {
+  @apply px-4 pt-3 pb-2 border-b border-gray-200 bg-gray-50;
+}
+
+.context-menu-title {
+  @apply text-sm font-semibold text-gray-700 block whitespace-nowrap overflow-hidden text-ellipsis;
+}
+
+.context-menu-content {
+  @apply py-1;
+}
+
+.context-menu-item-wrapper {
+  @apply relative;
+}
+
+.context-menu-item {
+  @apply flex items-center w-full px-4 py-2 border-0 bg-transparent cursor-pointer transition-colors duration-150 text-left text-sm text-gray-700;
+}
+
+.context-menu-item:hover {
+  @apply bg-gray-100;
+}
+
+.context-menu-item:active {
+  @apply bg-gray-200;
+}
+
+.context-menu-item.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.context-menu-item.has-submenu:hover {
+  @apply bg-blue-50;
+}
+
+.menu-item-icon {
+  @apply w-5 h-5 flex items-center justify-center mr-3 text-base flex-shrink-0;
+}
+
+.menu-item-label {
+  @apply flex-1 whitespace-nowrap overflow-hidden text-ellipsis;
+}
+
+.menu-item-arrow {
+  @apply ml-2 text-xs text-gray-400 transition-transform duration-150;
+}
+
+.context-menu-item.has-submenu:hover .menu-item-arrow {
+  @apply translate-x-0.5;
+}
+
+.context-menu-divider {
+  @apply h-px bg-gray-200 my-1;
+}
+
+/* Submenu */
+.context-submenu {
+  @apply absolute left-full top-0 bg-white rounded-lg shadow-xl border border-black/10 min-w-[180px] z-[1001];
+  animation: submenuSlideIn 0.15s ease-out;
+}
+
+@keyframes submenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.submenu-item {
+  @apply px-3 py-1.5 text-[13px];
+}
+
+.submenu-item .menu-item-icon {
+  @apply w-4 h-4 mr-2 text-sm;
+}
+
+/* Action Buttons Overlay */
+.thumbnail-actions-overlay {
+  @apply absolute top-2 right-2 opacity-0 transition-opacity duration-200 pointer-events-none z-20;
+}
+
+.thumbnail-gallery:hover .thumbnail-actions-overlay {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.action-buttons {
+  @apply flex gap-1 bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/50 p-1 shadow-lg;
+}
+
+.action-button {
+  @apply flex items-center justify-center w-8 h-8 border-0 bg-transparent cursor-pointer transition-all duration-150 text-gray-600 text-sm hover:bg-gray-100 hover:text-gray-800 active:bg-gray-200 rounded;
+}
+
+.action-button.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.action-button--more {
+  @apply font-bold;
+}
+
+.action-button--more:hover {
+  @apply bg-blue-50 text-blue-600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .thumbnail-gallery--grid {
+    @apply gap-3 p-3;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--sm {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--md {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--lg {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--xl {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-gallery--grid {
+    @apply gap-2 p-2;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--sm {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--md {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--lg {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--xl {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .empty-state {
+    @apply py-12;
+  }
+
+  .empty-icon {
+    @apply text-4xl mb-3;
+  }
+
+  .empty-message {
+    @apply text-base;
+  }
+
+  .action-buttons {
+    @apply scale-90;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .empty-message {
+    @apply text-gray-300;
+  }
+
+  .empty-description {
+    @apply text-gray-400;
+  }
+
+  .action-buttons {
+    @apply bg-gray-800/95 border-white/10;
+  }
+
+  .action-button {
+    @apply text-gray-300;
+  }
+
+  .action-button:hover {
+    @apply bg-blue-500/20 text-blue-400;
+  }
+
+  .thumbnail-context-menu {
+    @apply bg-gray-800 border-white/10;
+  }
+
+  .context-menu-header {
+    @apply bg-gray-900 border-white/10;
+  }
+
+  .context-menu-title {
+    @apply text-gray-100;
+  }
+
+  .context-menu-item {
+    @apply text-gray-300;
+  }
+
+  .context-menu-item:hover {
+    @apply bg-gray-700;
+  }
+
+  .context-menu-item:active {
+    @apply bg-gray-600;
+  }
+
+  .context-menu-divider {
+    @apply bg-white/10;
+  }
+
+  .context-submenu {
+    @apply bg-gray-800 border-white/10;
+  }
+}

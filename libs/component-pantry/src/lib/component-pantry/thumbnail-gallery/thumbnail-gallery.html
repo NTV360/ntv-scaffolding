@@ -1,0 +1,127 @@
+<div 
+  [class]="containerClasses()"
+  [ngStyle]="containerStyles()"
+  role="grid"
+  [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
+  
+  @if (items().length === 0) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">📁</div>
+      <div class="empty-message">No items to display</div>
+      <div class="empty-description">Add some files to see them here</div>
+    </div>
+  } @else {
+    <!-- Thumbnail Items -->
+    @for (item of itemsWithSelection(); track item.id; let i = $index) {
+      <ntv-thumbnail-item
+        [item]="item"
+        [index]="i"
+        [size]="mergedConfig().size"
+        [variant]="mergedConfig().variant"
+        [layout]="mergedConfig().layout"
+        [selectable]="mergedConfig().selectable"
+        [showLabels]="mergedConfig().showLabels"
+        [showMetadata]="mergedConfig().showMetadata"
+        [showFileSize]="mergedConfig().showFileSize"
+        [showModified]="mergedConfig().showModified"
+        [hoverEffects]="mergedConfig().hoverEffects"
+        [clickable]="mergedConfig().clickable"
+        [showActionButtons]="mergedConfig().showActionButtons"
+        (itemClick)="onItemClick($event)"
+        (selectionToggle)="onSelectionToggle($event)"
+        (contextMenuRequest)="onContextMenuRequest($event)"
+        (mouseEnter)="onMouseEnter($event)"
+        (mouseLeave)="onMouseLeave()">
+      </ntv-thumbnail-item>
+    }
+  }
+</div>
+
+<!-- Context Menu -->
+@if (contextMenuVisible() && showContextMenu()) {
+  <div class="thumbnail-context-menu"
+       [style.left.px]="contextMenuPosition().x"
+       [style.top.px]="contextMenuPosition().y">
+    
+    <!-- Context Menu Header -->
+    @if (contextMenuItem()) {
+      <div class="context-menu-header">
+        <div class="context-menu-title" [title]="contextMenuItem()!.name">
+          {{ contextMenuItem()!.name }}
+        </div>
+      </div>
+    }
+    
+    <!-- Context Menu Content -->
+    <div class="context-menu-content">
+      @for (action of contextMenuActions(); track action.type) {
+        <div class="context-menu-item-wrapper">
+          @if (action.submenu && action.submenu.length > 0) {
+            <!-- Menu item with submenu -->
+            <div class="context-menu-item has-submenu"
+                 [class.disabled]="action.disabled"
+                 (click)="toggleSubmenu(action.type, $event)">
+              <div class="menu-item-icon" [innerHTML]="action.icon"></div>
+              <div class="menu-item-label">{{ action.label }}</div>
+              <div class="menu-item-arrow">▶</div>
+            </div>
+            
+            <!-- Submenu -->
+            @if (activeSubmenu() === action.type) {
+              <div class="context-submenu">
+                @for (subAction of action.submenu; track subAction.type) {
+                  <div class="context-menu-item submenu-item"
+                       [class.disabled]="subAction.disabled"
+                       (click)="onActionClick(subAction, contextMenuItem()!, $event)">
+                    <div class="menu-item-icon" [innerHTML]="subAction.icon"></div>
+                    <div class="menu-item-label">{{ subAction.label }}</div>
+                  </div>
+                  @if (subAction.divider) {
+                    <div class="context-menu-divider"></div>
+                  }
+                }
+              </div>
+            }
+          } @else {
+            <!-- Regular menu item -->
+            <div class="context-menu-item"
+                 [class.disabled]="action.disabled"
+                 (click)="onActionClick(action, contextMenuItem()!, $event)">
+              <div class="menu-item-icon" [innerHTML]="action.icon"></div>
+              <div class="menu-item-label">{{ action.label }}</div>
+            </div>
+          }
+          
+          @if (action.divider) {
+            <div class="context-menu-divider"></div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Action Buttons Overlay (for hovered items) -->
+@if (hoveredItem() && showActionButtons()) {
+  <div class="thumbnail-actions-overlay">
+    <div class="action-buttons">
+      @for (action of contextMenuActions().slice(0, 3); track action.type) {
+        <button class="action-button"
+                [class]="'action-button--' + action.type"
+                [disabled]="action.disabled"
+                [title]="action.label"
+                (click)="onActionClick(action, hoveredItem()!, $event)">
+          <span [innerHTML]="action.icon"></span>
+        </button>
+      }
+      @if (contextMenuActions().length > 3) {
+        <button class="action-button action-button--more"
+                title="More actions"
+                (click)="onContextMenuRequest({item: hoveredItem()!, event: $event})">
+          <span>⋯</span>
+        </button>
+      }
+    </div>
+  </div>
+}

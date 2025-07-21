@@ -1,0 +1,333 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Thumbnail Item Component Styles */
+
+/* Base Item Styles */
+.thumbnail-item {
+  @apply relative bg-white border border-gray-200 rounded-lg transition-all duration-200 cursor-pointer;
+}
+
+/* Grid Item Layout */
+.thumbnail-item--grid {
+  @apply flex flex-col aspect-square;
+  min-height: var(--thumbnail-size);
+}
+
+/* List Item Layout */
+.thumbnail-item--list {
+  @apply flex flex-row items-center p-3 min-h-[60px];
+}
+
+/* Variant Styles */
+.thumbnail-item--bordered {
+  @apply border-2 border-gray-300;
+}
+
+.thumbnail-item--shadow {
+  @apply shadow-md;
+}
+
+.thumbnail-item--rounded {
+  @apply rounded-xl;
+}
+
+/* Selection State */
+.thumbnail-item--selected {
+  @apply border-blue-500 bg-blue-50;
+  animation: selectPulse 0.3s ease-out;
+}
+
+/* Clickable State */
+.thumbnail-item--clickable:hover {
+  border-color: theme('colors.accent.500');
+}
+
+/* Hover Effects */
+.thumbnail-item:hover {
+  @apply -translate-y-0.5;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-item--hover:hover .thumbnail-content {
+  @apply border-blue-500/30;
+}
+
+/* Focus State */
+.thumbnail-item:focus {
+  @apply outline-none ring-2 ring-accent-500 ring-offset-2;
+}
+
+/* Thumbnail Content */
+.thumbnail-content {
+  @apply relative flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden;
+}
+
+.thumbnail-item--grid .thumbnail-content {
+  @apply flex-1 m-2 mb-0;
+}
+
+.thumbnail-item--list .thumbnail-content {
+  @apply w-12 h-12 min-h-[48px] mr-3 flex-shrink-0;
+}
+
+/* Media Elements */
+.thumbnail-media {
+  @apply relative w-full h-full;
+}
+
+.thumbnail-image {
+  @apply w-full h-full object-cover;
+}
+
+.thumbnail-video {
+  @apply w-full h-full object-cover;
+}
+
+/* Video Overlay */
+.thumbnail-overlay {
+  @apply absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-200;
+}
+
+.thumbnail-media:hover .thumbnail-overlay {
+  @apply opacity-100;
+}
+
+.play-icon {
+  @apply text-white text-2xl drop-shadow-lg;
+}
+
+/* Icon Container */
+.thumbnail-icon-container {
+  @apply w-full h-full flex items-center justify-center rounded-lg;
+}
+
+.thumbnail-icon {
+  @apply text-white;
+  font-size: var(--thumbnail-icon-size, 2rem);
+}
+
+/* File Type Badge */
+.file-type-badge {
+  @apply absolute top-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-medium;
+}
+
+/* Selection Checkbox */
+.selection-checkbox {
+  @apply absolute top-2 left-2 w-5 h-5 bg-white border-2  rounded flex items-center justify-center transition-all duration-200 z-10;
+}
+
+.selection-checkbox.selected {
+  @apply bg-blue-500 border-blue-500;
+}
+
+.selection-checkbox svg {
+  @apply w-3 h-3 text-white opacity-0 transition-opacity duration-200;
+}
+
+.selection-checkbox.selected svg {
+  @apply opacity-100;
+}
+
+/* Thumbnail Info */
+.thumbnail-info {
+  @apply p-2 border-t border-gray-100;
+}
+
+.thumbnail-item--list .thumbnail-info {
+  @apply flex-1 border-t-0 p-0;
+}
+
+.thumbnail-name {
+  @apply text-sm font-medium text-gray-900 truncate;
+  font-size: var(--thumbnail-font-size, 0.875rem);
+}
+
+.thumbnail-metadata {
+  @apply text-xs text-gray-500 mt-1 space-x-2;
+}
+
+/* Action Buttons Overlay */
+.thumbnail-actions-overlay {
+  @apply absolute top-2 right-2 z-[12] opacity-0 -translate-y-1 transition-all duration-200 pointer-events-none;
+}
+
+.thumbnail-item:hover .thumbnail-actions-overlay {
+  @apply opacity-100 translate-y-0 pointer-events-auto;
+}
+
+.action-buttons {
+  @apply flex gap-1 bg-white p-1 border-b border-l border-black/10;
+  -webkit-border-bottom-left-radius: 0.375rem;
+  -moz-border-radius-bottomleft: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.action-button {
+  @apply w-5 h-5 flex items-center justify-center rounded-md transition-all duration-200 border-none bg-transparent hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1;
+}
+
+.action-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.action-icon {
+  @apply text-gray-600 text-sm font-bold;
+}
+
+.metadata-item {
+  @apply inline-block;
+}
+
+.metadata-item--dimensions {
+  @apply text-blue-600;
+}
+
+.metadata-item--duration {
+  @apply text-green-600;
+}
+
+.metadata-item--pages {
+  @apply text-purple-600;
+}
+
+.metadata-item--size {
+  @apply text-gray-600;
+}
+
+.metadata-item--modified {
+  @apply text-gray-500;
+}
+
+/* Size Variants */
+.thumbnail-container--sm {
+  --thumbnail-size: 120px;
+  --thumbnail-icon-size: 1.5rem;
+  --thumbnail-font-size: 0.75rem;
+  min-width: 120px;
+}
+
+.thumbnail-container--md {
+  --thumbnail-size: 160px;
+  --thumbnail-icon-size: 2rem;
+  --thumbnail-font-size: 0.875rem;
+}
+
+.thumbnail-container--lg {
+  --thumbnail-size: 200px;
+  --thumbnail-icon-size: 2.5rem;
+  --thumbnail-font-size: 1rem;
+}
+
+.thumbnail-container--xl {
+  --thumbnail-size: 240px;
+  --thumbnail-icon-size: 3rem;
+  --thumbnail-font-size: 1.125rem;
+}
+
+/* Animations */
+@keyframes selectPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Focus visible for better accessibility */
+.thumbnail-item:focus-visible {
+  @apply outline-2 outline-offset-2;
+  outline-color: theme('colors.accent.500');
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .thumbnail-item {
+    @apply border-2;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .thumbnail-container--sm {
+    --thumbnail-size: 120px;
+    --thumbnail-icon-size: 2rem;
+    --thumbnail-font-size: 0.75rem;
+  }
+
+  .thumbnail-container--md {
+    --thumbnail-size: 140px;
+    --thumbnail-icon-size: 2.25rem;
+    --thumbnail-font-size: 0.875rem;
+  }
+
+  .thumbnail-container--lg {
+    --thumbnail-size: 160px;
+    --thumbnail-icon-size: 2.5rem;
+    --thumbnail-font-size: 1rem;
+  }
+
+  .thumbnail-container--xl {
+    --thumbnail-size: 180px;
+    --thumbnail-icon-size: 2.75rem;
+    --thumbnail-font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-item--list {
+    @apply p-2;
+  }
+
+  .thumbnail-item--list .thumbnail-content {
+    @apply w-12 h-12 min-h-[48px] mr-3;
+  }
+
+  .thumbnail-item--list .thumbnail-icon {
+    @apply text-xl;
+  }
+
+  .thumbnail-name {
+    @apply text-xs leading-tight;
+  }
+
+  .thumbnail-metadata {
+    @apply text-xs;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .thumbnail-item {
+    @apply bg-gray-800 border-gray-600 text-gray-50;
+  }
+
+  .thumbnail-item--selected {
+    @apply bg-blue-800 border-blue-500;
+  }
+
+  .thumbnail-name {
+    @apply text-gray-50;
+  }
+
+  .thumbnail-info {
+    @apply border-t-gray-600;
+  }
+
+  .thumbnail-icon-container {
+    @apply bg-gray-600;
+  }
+
+  .selection-checkbox {
+    @apply bg-gray-700 border-gray-500;
+  }
+
+  .file-type-badge {
+    @apply bg-gray-900/80;
+  }
+}

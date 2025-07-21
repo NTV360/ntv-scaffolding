@@ -1,0 +1,116 @@
+<div 
+  [class]="itemClasses()"
+  [attr.role]="selectable() ? 'gridcell' : 'button'"
+  [attr.aria-selected]="selectable() ? item().selected : null"
+  [attr.tabindex]="clickable() ? '0' : '-1'"
+  [attr.aria-label]="item().name + (item().selected ? ' (selected)' : '')"
+  (click)="onItemClick($event)"
+  (contextmenu)="onContextMenu($event)"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  (keydown.enter)="onItemClick($event)"
+  (keydown.space)="onItemClick($event)">
+
+  <!-- Selection Checkbox (for selectable items) -->
+  @if (selectable()) {
+    <div class="selection-checkbox" 
+         [class.selected]="item().selected"
+         [attr.aria-hidden]="true"
+         (click)="onCheckboxClick($event)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20,6 9,17 4,12"></polyline>
+      </svg>
+    </div>
+  }
+
+  <!-- Thumbnail Content -->
+  <div class="thumbnail-content">
+    <!-- Media (Image/Video) -->
+    @if (item().src && (item().type === 'image' || item().type === 'video')) {
+      <div class="thumbnail-media">
+        @if (item().type === 'image') {
+          <img 
+            [src]="item().src" 
+            [alt]="item().name"
+            class="thumbnail-image"
+            loading="lazy"
+            (error)="$event.target.style.display='none'" />
+        } @else if (item().type === 'video') {
+          <video 
+            [src]="item().src" 
+            class="thumbnail-video"
+            preload="metadata"
+            muted>
+          </video>
+          <div class="thumbnail-overlay">
+            <div class="play-icon">▶</div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- File Type Icon -->
+      <div class="thumbnail-icon-container" [style.background]="getFileTypeColor()">
+        <div class="thumbnail-icon" [innerHTML]="getFileIcon()"></div>
+      </div>
+    }
+
+    <!-- File Type Badge -->
+    @if (item().type !== 'image' && item().type !== 'video') {
+      <div class="file-type-badge">{{ item().type.toUpperCase() }}</div>
+    }
+  </div>
+
+  <!-- Action Buttons Overlay (for hovered items) -->
+  @if (isHovered() && showActionButtons()) {
+    <div class="thumbnail-actions-overlay">
+      <div class="action-buttons">
+        <button class="action-button action-button--more"
+                title="More options"
+                [attr.aria-label]="'More options for ' + item().name"
+                tabindex="0"
+                (click)="onMoreOptionsClick($event)"
+                (keydown.enter)="onMoreOptionsClick($event)"
+                (keydown.space)="onMoreOptionsClick($event)">
+          <span class="action-icon">⋯</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Thumbnail Info -->
+  @if (showLabels() || showMetadata() || showFileSize() || showModified()) {
+    <div class="thumbnail-info">
+      <!-- File Name -->
+      @if (showLabels()) {
+        <div class="thumbnail-name" [title]="item().name">{{ item().name }}</div>
+      }
+      
+      <!-- Metadata -->
+      @if (showMetadata() && item().metadata) {
+        <div class="thumbnail-metadata">
+          @if (item().metadata['dimensions']) {
+            <span class="metadata-item metadata-item--dimensions">{{ item().metadata['dimensions'] }}</span>
+          }
+          @if (item().metadata['duration']) {
+            <span class="metadata-item metadata-item--duration">{{ item().metadata['duration'] }}</span>
+          }
+          @if (item().metadata['pages']) {
+            <span class="metadata-item metadata-item--pages">{{ item().metadata['pages'] }} pages</span>
+          }
+        </div>
+      }
+      
+      <!-- File Size and Modified Date -->
+      @if (showFileSize() || showModified()) {
+        <div class="thumbnail-metadata">
+          @if (showFileSize() && item().size) {
+            <span class="metadata-item metadata-item--size">{{ formatFileSize(item().size) }}</span>
+          }
+          @if (showModified() && item().modified) {
+            <span class="metadata-item metadata-item--modified">{{ formatDate(item().modified) }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
