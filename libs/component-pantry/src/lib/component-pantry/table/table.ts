@@ -34,6 +34,7 @@ import {
   TableStyle,
 } from './table.types';
 
+//Components
 const components = [Button, ColumnFilter, Popover];
 
 @Component({
@@ -59,7 +60,7 @@ export class Table implements AfterViewInit {
   data = input<any[]>([]);
   tableStyle = input<TableStyle>({});
   columnDraggable = input<boolean>(false);
-  expandableColumn = input<boolean>(false);
+  // expandableColumn = input<boolean>(false);
   expandableRows = input<boolean>(false);
   defaultMinWidth = input<number>(100);
   defaultMaxWidth = input<number>(400);
@@ -69,10 +70,13 @@ export class Table implements AfterViewInit {
   hasIndex = input<boolean>(false);
   // Optional: Allow external control of column management
   externalColumnControl = input<boolean>(false);
-  // Optional: Enable filtering functionality
   filterEnabled = input<boolean>(false);
   // Optional: Enable checkbox selection
   hasCheckBox = input<boolean>(false);
+  // Optional: Enable localStorage persistence for column visibility
+  persistColumnVisibility = input<boolean>(true);
+  // Optional: Custom localStorage key for column visibility
+  storageKey = input<string>('ntv-table-columns');
 
   // Modern Angular outputs using output() function with better typing
   dataChange = output<any[]>();
@@ -115,6 +119,9 @@ export class Table implements AfterViewInit {
   // Column search state management
   private _columnSearchTerm = signal<string>('');
 
+  // Column expand/shrink state management
+  private _columnsShrunk = signal<boolean>(false);
+
   // Public getter for sort order
   get sortOrder() {
     return this._sortOrder();
@@ -156,6 +163,8 @@ export class Table implements AfterViewInit {
   /** SVG */
   public readonly settingsIcon: SafeHtml;
   public readonly filtersIcon: SafeHtml;
+  public readonly rightArrow: SafeHtml;
+  public readonly downArrow: SafeHtml;
 
   constructor() {
     this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
@@ -164,6 +173,14 @@ export class Table implements AfterViewInit {
 
     this.settingsIcon = this.sanitizer.bypassSecurityTrustHtml(
       FILE_ICONS['SETTINGS']
+    );
+
+    this.rightArrow = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['RIGHT_ARROW']
+    );
+
+    this.downArrow = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['DOWN_ARROW']
     );
 
     // Initialize internal columns from input - only run once during initialization
@@ -178,7 +195,11 @@ export class Table implements AfterViewInit {
           currentCols.length === 0 &&
           !this.externalColumnControl()
         ) {
-          this._columns.set([...initialCols]);
+          // Load column visibility from localStorage if enabled
+          const columnsWithVisibility = this.persistColumnVisibility()
+            ? this.loadColumnVisibilityFromStorage([...initialCols])
+            : [...initialCols];
+          this._columns.set(columnsWithVisibility);
         }
       },
       { allowSignalWrites: true }
@@ -306,6 +327,14 @@ export class Table implements AfterViewInit {
         );
       this._selectAll.set(allSelected);
     });
+
+    // Effect to automatically enable expandable columns when columns are shrunk
+    effect(() => {
+      const shrunkState = this._columnsShrunk();
+      // When columns are shrunk, expandable columns should be automatically enabled
+      // This effect just tracks the state - the template will use shouldAutoEnableExpandableColumns()
+      console.log('Columns shrunk state changed:', shrunkState);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -424,6 +453,9 @@ export class Table implements AfterViewInit {
   // Public getter for column search term
   columnSearchTerm = computed(() => this._columnSearchTerm());
 
+  // Public getter for columns shrunk state
+  columnsShrunk = computed(() => this._columnsShrunk());
+
   toggleColumnSelector(): void {
     this.showColumnSelector.update((value) => !value);
   }
@@ -454,12 +486,93 @@ export class Table implements AfterViewInit {
         : col
     );
     this._columns.set(newColumns);
+    
+    // Save to localStorage if persistence is enabled
+    if (this.persistColumnVisibility()) {
+      this.saveColumnVisibilityToStorage(newColumns);
+    }
   }
 
   // Column search functionality
   onColumnSearch(event: Event): void {
     const target = event.target as HTMLInputElement;
     this._columnSearchTerm.set(target.value);
+  }
+
+  // Toggle expand/shrink columns
+  toggleExpandShrinkColumns(): void {
+    const currentShrunkState = this._columnsShrunk();
+    this._columnsShrunk.set(!currentShrunkState);
+
+    if (this.externalColumnControl()) {
+      // For external control, emit events for each column
+      this._columns().forEach((column) => {
+        const updatedColumn = {
+          ...column,
+          shrunk: !currentShrunkState,
+        };
+        this.columnVisibilityChange.emit({
+          column: updatedColumn,
+          visible: column.visible !== false,
+        });
+      });
+    } else {
+      // Handle internally
+      const currentColumns = this._columns();
+      const newColumns = currentColumns.map((col) => ({
+        ...col,
+        shrunk: !currentShrunkState,
+      }));
+      this._columns.set(newColumns);
+    }
+  }
+
+  // Get column width based on shrunk state
+  getColumnWidth(column: TableColumn): string {
+    if (this._columnsShrunk() || column.shrunk) {
+      // Calculate dynamic width based on table width and column count
+      const visibleCols = this.visibleColumns();
+      const dataColumns = visibleCols.filter(
+        (col) => !this.isSpecialColumn(col.field)
+      );
+
+      // Set a fixed table width and divide by number of data columns
+      const tableWidth = 800; // Fixed table width in pixels
+      const specialColumnsWidth = this.calculateSpecialColumnsWidth();
+      const availableWidth = tableWidth - specialColumnsWidth;
+      const columnWidth = Math.floor(availableWidth / dataColumns.length);
+
+      return `${Math.max(columnWidth, 60)}px`; // Minimum 60px per column
+    }
+    return column.width || '100px'; // Use better default width when expanded
+  }
+
+  private isSpecialColumn(field: string): boolean {
+    // Check if this is a special column (checkbox, index, expand, actions)
+    return (
+      field === 'checkbox' ||
+      field === 'index' ||
+      field === 'expand' ||
+      field === 'actions'
+    );
+  }
+
+  private calculateSpecialColumnsWidth(): number {
+    let width = 0;
+    if (this.hasCheckBox()) width += 60; // Checkbox column
+    if (this.hasIndex()) width += 60; // Index column
+    if (this.expandableRows()) width += 50; // Expand column
+    // Add action column width if present
+    const hasActionColumn = this.visibleColumns().some(
+      (col) => col.field === 'actions'
+    );
+    if (hasActionColumn) width += 100; // Action column
+    return width;
+  }
+
+  // Check if expandable columns should be automatically enabled
+  shouldAutoEnableExpandableColumns(): boolean {
+    return this._columnsShrunk();
   }
 
   // Show all columns
@@ -479,6 +592,11 @@ export class Table implements AfterViewInit {
         visible: true,
       }));
       this._columns.set(newColumns);
+      
+      // Save to localStorage if persistence is enabled
+      if (this.persistColumnVisibility()) {
+        this.saveColumnVisibilityToStorage(newColumns);
+      }
     }
   }
 
@@ -497,9 +615,15 @@ export class Table implements AfterViewInit {
       // Handle internally - reset to original columns from input
       const originalColumns = this.columns();
       this._columns.set([...originalColumns]);
+      
+      // Clear localStorage if persistence is enabled
+      if (this.persistColumnVisibility()) {
+        this.clearColumnVisibilityFromStorage();
+      }
     }
-    // Clear search term
+    // Clear search term and reset shrunk state
     this._columnSearchTerm.set('');
+    this._columnsShrunk.set(false);
   }
 
   onClickOutside(event: Event): void {
@@ -522,7 +646,11 @@ export class Table implements AfterViewInit {
 
   // Filtered data based on current filters
   filteredData = computed(() => {
-    if (!this.filterEnabled()) {
+    // Check if any column has filtering enabled
+    const hasFilterEnabledColumns = this.displayColumns().some(
+      (col) => col.filter === true
+    );
+    if (!hasFilterEnabledColumns && !this.filterEnabled()) {
       return this._data();
     }
 
@@ -537,7 +665,7 @@ export class Table implements AfterViewInit {
         const itemValue = item[field];
         const column = this.displayColumns().find((col) => col.field === field);
 
-        if (!column) return true;
+        if (!column || !column.filter) return true;
 
         switch (column.filterType) {
           case 'text':
@@ -978,8 +1106,8 @@ export class Table implements AfterViewInit {
     this.animateCollapseExpandedRows();
   }
 
-  getExpandIcon(rowData: any): string {
-    return this.isRowExpanded(rowData) ? '▼' : '▶';
+  getExpandIcon(rowData: any): SafeHtml {
+    return this.isRowExpanded(rowData) ? this.downArrow : this.rightArrow;
   }
 
   getExpandedContentColspan(): number {
@@ -1077,5 +1205,46 @@ export class Table implements AfterViewInit {
       const identifier = row[this.lockIdentifierField()];
       return selectedIdentifiers.has(identifier);
     });
+  }
+
+  // LocalStorage utility methods for column visibility persistence
+  private saveColumnVisibilityToStorage(columns: TableColumn[]): void {
+    try {
+      const visibilityMap: Record<string, boolean> = {};
+      columns.forEach((col) => {
+        visibilityMap[col.field] = col.visible !== false;
+      });
+      localStorage.setItem(this.storageKey(), JSON.stringify(visibilityMap));
+    } catch (error) {
+      console.warn('Failed to save column visibility to localStorage:', error);
+    }
+  }
+
+  private loadColumnVisibilityFromStorage(columns: TableColumn[]): TableColumn[] {
+    try {
+      const stored = localStorage.getItem(this.storageKey());
+      if (!stored) {
+        return columns;
+      }
+
+      const visibilityMap: Record<string, boolean> = JSON.parse(stored);
+      return columns.map((col) => ({
+        ...col,
+        visible: Object.prototype.hasOwnProperty.call(visibilityMap, col.field)
+          ? visibilityMap[col.field]
+          : col.visible !== false,
+      }));
+    } catch (error) {
+      console.warn('Failed to load column visibility from localStorage:', error);
+      return columns;
+    }
+  }
+
+  private clearColumnVisibilityFromStorage(): void {
+    try {
+      localStorage.removeItem(this.storageKey());
+    } catch (error) {
+      console.warn('Failed to clear column visibility from localStorage:', error);
+    }
   }
 }

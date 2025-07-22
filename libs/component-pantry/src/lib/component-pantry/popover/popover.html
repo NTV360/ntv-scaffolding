@@ -1,43 +1,14 @@
-<div class="popover-container" [attr.id]="'popover-container-' + popoverId()">
-  <!-- Trigger Element -->
-  <div 
-    #triggerElement
-    class="popover__trigger"
-    [class.popover__trigger--disabled]="mergedDisabled()"
-    (click)="onTriggerEvent($event)"
-    (mouseenter)="onTriggerEvent($event)"
-    (mouseleave)="onTriggerEvent($event)"
-    (focus)="onTriggerEvent($event)"
-    (blur)="onTriggerEvent($event)"
-    [attr.aria-describedby]="isVisible() ? 'popover-content-' + popoverId() : null"
-    [attr.aria-expanded]="isVisible()"
-    role="button"
-    [attr.tabindex]="mergedDisabled() ? -1 : 0">
-    <ng-content select="[slot=trigger]"></ng-content>
+<div 
+  #popoverContent
+  [class]="popoverClasses()"
+  [ngStyle]="popoverStyles()"
+  [attr.data-placement]="mergedPlacement()"
+  role="tooltip"
+  [attr.aria-hidden]="!isVisible()">
+  
+  
+  <!-- Popover content -->
+  <div class="ntv-popover__content">
+    <ng-content></ng-content>
   </div>
-
-  <!-- Popover Content -->
-  @if (isVisible()) {
-    <div 
-      #popoverElement
-      [class]="popoverClasses()"
-      [style.top.px]="position().top"
-      [style.left.px]="position().left"
-      [attr.id]="'popover-content-' + popoverId()"
-      role="tooltip"
-      [attr.aria-hidden]="!isVisible()"
-      (mouseenter)="mergedTrigger() === 'hover' ? onTriggerEvent($event) : null"
-      (mouseleave)="mergedTrigger() === 'hover' ? onTriggerEvent($event) : null">
-      
-      <!-- Arrow -->
-      @if (mergedShowArrow()) {
-        <div [class]="arrowClasses()"></div>
-      }
-      
-      <!-- Content Body -->
-      <div class="popover__content">
-        <ng-content select="[slot=content]"></ng-content>
-      </div>
-    </div>
-  }
 </div>
