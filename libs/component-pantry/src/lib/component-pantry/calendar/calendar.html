@@ -1,0 +1,754 @@
+<div class="calendar">
+  <!-- Calendar Header -->
+  <div class="calendar__header">
+    <div class="calendar__controls">
+      <button
+        class="calendar__btn calendar__btn--today"
+        (click)="goToToday()"
+        (keyup.enter)="goToToday()"
+        (keyup.space)="goToToday()"
+      >
+        <span>Today: <span [style]="{ display: 'inline-block', 'margin-inline-start': '3px' }"></span>{{ today.toLocaleDateString('en-US', { month: 'long' }) }}</span>
+   
+        <span>{{ today.toLocaleDateString('en-US', { day: 'numeric' }) }}</span>
+      </button>
+    </div>
+
+    <div class="calendar__navigation">
+      <button
+        class="calendar__nav-btn"
+        (click)="goPrev()"
+        (keyup.enter)="goPrev()"
+        (keyup.space)="goPrev()"
+        aria-label="Previous"
+      >
+        <svg
+          class="calendar__nav-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+      </button>
+
+      <div class="calendar__title">
+        @switch (view()) { @case ('day') {
+        <h2 class="calendar__title-text w-[300px]">
+          {{ formatDate(currentDate()) }}
+        </h2>
+        } @case ('week') {
+        <h2 class="calendar__title-text w-[250px]">
+          {{
+            currentWeekStart().toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric'
+            })
+          }}
+          -
+          {{
+            addDays(currentWeekStart(), 6).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            })
+          }}
+        </h2>
+        } @default {
+        <h2 class="calendar__title-text w-[170px]">
+          {{ currentMonthName() }} {{ currentYear() }}
+        </h2>
+        } }
+      </div>
+
+      <button
+        class="calendar__nav-btn"
+        (click)="goNext()"
+        (keyup.enter)="goNext()"
+        (keyup.space)="goNext()"
+        aria-label="Next"
+      >
+        <svg
+          class="calendar__nav-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="calendar__view-controls">
+      <div class="calendar__year-picker-container">
+        <ntv-button
+          (click)="toggleYearPicker()"
+          (keyup.enter)="toggleYearPicker()"
+          (keyup.space)="toggleYearPicker()"
+          [attr.aria-label]="'Select year, currently ' + currentYear()"
+          [rounded]="'md'"
+        >
+          <svg
+            class="w-5 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+              <path
+                d="M22 14V12C22 8.22876 22 6.34315 20.8284 5.17157C19.6569 4 17.7712 4 14 4H10C6.22876 4 4.34315 4 3.17157 5.17157C2 6.34315 2 8.22876 2 12V14C2 17.7712 2 19.6569 3.17157 20.8284C4.34315 22 6.22876 22 10 22H14"
+                stroke="#ffffff"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              ></path>
+              <path
+                opacity="0.5"
+                d="M7 4V2.5"
+                stroke="#ffffff"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              ></path>
+              <path
+                opacity="0.5"
+                d="M17 4V2.5"
+                stroke="#ffffff"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              ></path>
+              <path
+                opacity="0.5"
+                d="M2 9H22"
+                stroke="#ffffff"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              ></path>
+              <circle
+                cx="18"
+                cy="18"
+                r="3"
+                stroke="#ffffff"
+                stroke-width="1.5"
+              ></circle>
+              <path
+                d="M20.5 20.5L22 22"
+                stroke="#ffffff"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              ></path>
+            </g>
+          </svg>
+        </ntv-button>
+
+        <!-- Year Picker Dropdown -->
+        @if (showYearPicker()) {
+        <div class="calendar__year-picker">
+          <div
+            class="calendar__year-picker-header"
+            role="button"
+            tabindex="0"
+            (click)="toggleYearPicker()"
+            (keyup.enter)="toggleYearPicker()"
+            (keyup.space)="toggleYearPicker()"
+            aria-label="Toggle year picker"
+          >
+            <h3>Select Year</h3>
+            <div class="calendar__year-picker-controls-wrapper">
+              <button 
+                data-control-prev 
+                class="calendar__year-picker-controls" 
+                (click)="goPrevYears($event)">
+                <svg
+                  class="calendar__nav-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  ></path>
+                </svg>
+              </button>
+              <button 
+                data-control-next 
+                class="calendar__year-picker-controls next" 
+                (click)="goNextYears($event)">
+                   <svg
+                      class="calendar__nav-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      ></path>
+                  </svg>
+              </button>
+            </div>
+            <button
+              class="calendar__year-picker-close"
+              (click)="closeYearPicker($event)"
+              (keyup.enter)="closeYearPicker()"
+              (keyup.space)="closeYearPicker()"
+              aria-label="Close year picker"
+            >
+              ×
+            </button>
+          
+          </div>
+
+          <div class="calendar__year-picker-list" #yearPickerList>
+            @for (year of availableYears(); track year) {
+            <button
+              class="calendar__year-picker-item"
+              [class.calendar__year-picker-item--current]="
+                year === currentYear()
+              "
+              (click)="selectYear(year)"
+              (keyup.enter)="selectYear(year)"
+              (keyup.space)="selectYear(year)"
+              [attr.aria-label]="'Select year ' + year"
+            >
+              {{ year }}
+            </button>
+            }
+          </div>
+        </div>
+
+        }
+      </div>
+
+      <div class="calendar__view-select">
+        <button class="calendar__view-select-trigger" [class.isPopoverOpen]="viewPopover.isVisible()" (click)="viewPopover.toggle($event)">
+            <span>{{ view() | capitalize }}</span>
+            <span data-icon>
+                <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="-13 -13 78.00 78.00" enable-background="new 0 0 52 52" xml:space="preserve" transform="rotate(90)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.4,34.2l20.5-20.7c0.6-0.6,1.6-0.6,2.2,0l20.5,20.7c0.6,0.6,0.6,1.6,0,2.2l-2.2,2.2 c-0.6,0.6-1.6,0.6-2.2,0L27.1,22.2c-0.6-0.6-1.6-0.6-2.2,0L8.8,38.5c-0.6,0.6-1.6,0.6-2.2,0l-2.2-2.2C3.9,35.7,3.9,34.8,4.4,34.2z"></path> </g></svg>
+            </span>
+        </button>
+       <ntv-popover #viewPopover placement="bottom-end">
+        <div class="calendar__view-select-options-container">
+            @for(view of views(); track $index) {
+                <button (click)="setView($any(view), $event)">{{ view | capitalize }}</button>
+            }
+        </div>
+       </ntv-popover>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Content -->
+  <div class="calendar__content">
+    @switch (view()) {
+    <!-- Month View -->
+    @case ('month') {
+    <div class="calendar__month-view">
+      <!-- Weekday Headers -->
+      <div class="calendar__weekdays">
+        @for (day of weekDays; track day) {
+        <div class="calendar__weekday">
+          <span>{{ day }}</span>
+        </div>
+        }
+      </div>
+
+      <!-- Month Grid -->
+      <div class="calendar__month-grid">
+        @for (week of monthWeeks(); track $index) { @for (day of week; track
+        day.date.toISOString()) {
+        <!-- In the month view section, update the calendar__day div -->
+        <div
+          class="calendar__day"
+          [class.calendar__day--other-month]="!day.isCurrentMonth"
+          [class.calendar__day--today]="day.isToday"
+          [class.calendar__day--selected]="day.isSelected"
+          [class.calendar__day--past]="day.isPast"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="
+            day.isPast
+              ? 'View past date ' +
+                day.date.toLocaleDateString() +
+                ' (read-only)'
+              : 'Select date ' + day.date.toLocaleDateString()
+          "
+          (click)="selectDate(day.date)"
+          (keyup.enter)="selectDate(day.date)"
+          (keyup.space)="selectDate(day.date)"
+        >
+          <div class="calendar__day-header">
+            <span class="calendar__day-number">{{ day.date.getDate() }}</span>
+          </div>
+
+          <div class="calendar__day-events">
+            @for (event of day.events.slice(0, 2); track event.id) {
+            <div
+              class="calendar__event calendar__event--month"
+              [style.background-color]="event.bgColor"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="'Edit event: ' + event.title"
+              (click)="startEditEvent(event); $event.stopPropagation()"
+              (keyup.enter)="startEditEvent(event); $event.stopPropagation()"
+              (keyup.space)="startEditEvent(event); $event.stopPropagation()"
+              [title]="event.title"
+            >
+              @if (event.isAllDay) {
+              <span class="calendar__event-title">{{ event.title }}</span>
+              } @else {
+              <span class="calendar__event-time">{{
+                formatTime(event.startTime!)
+              }}</span>
+              <span class="calendar__event-title">{{ event.title }}</span>
+              }
+            </div>
+            } @if (day.events.length > 2) {
+            <div
+              class="calendar__more-events"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="
+                'View ' +
+                (day.events.length - 2) +
+                ' more events on ' +
+                day.date.toLocaleDateString()
+              "
+              (click)="startViewEvents(day.date); $event.stopPropagation()"
+              (keyup.enter)="
+                startViewEvents(day.date); $event.stopPropagation()
+              "
+              (keyup.space)="
+                startViewEvents(day.date); $event.stopPropagation()
+              "
+            >
+              +{{ day.events.length - 2 }} more
+            </div>
+            }
+          </div>
+
+          @if (!day.isPast) {
+          <div class="calendar__day-footer">
+            <button
+              class="calendar__add-event-btn"
+              tabindex="0"
+              (click)="startAddEvent(day.date); $event.stopPropagation()"
+              (keyup.enter)="startAddEvent(day.date); $event.stopPropagation()"
+              (keyup.space)="startAddEvent(day.date); $event.stopPropagation()"
+              [attr.aria-label]="
+                'Add event on ' + day.date.toLocaleDateString()
+              "
+            >
+              <svg
+                class="calendar__add-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          }
+        </div>
+
+        } }
+      </div>
+    </div>
+    }
+
+    <!-- Week View -->
+    @case ('week') {
+    <div class="calendar__week-view">
+      <!-- Week Header -->
+      <div class="calendar__week-header">
+        @for (day of currentWeekDays(); track day.date.toISOString()) {
+        <div
+          class="calendar__week-day-header"
+          [class.calendar__week-day-header--today]="day.isToday"
+          [class.calendar__week-day-header--selected]="day.isSelected"
+          [class.calendar__week-day-header--past]="day.isPast"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="
+            day.isPast
+              ? 'View past date ' +
+                day.date.toLocaleDateString() +
+                ' (read-only)'
+              : 'Select ' + day.date.toLocaleDateString()
+          "
+          (click)="selectDate(day.date)"
+          (keyup.enter)="selectDate(day.date)"
+          (keyup.space)="selectDate(day.date)"
+        >
+          <div class="calendar__week-day-name">
+            {{ weekDays[day.date.getDay()] }}
+          </div>
+          <div
+            class="calendar__week-day-number"
+            [class.calendar__week-day-number--today]="day.isToday"
+          >
+            {{ day.date.getDate() }}
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Week Grid -->
+      <div class="calendar__week-grid">
+        @for (day of currentWeekDays(); track day.date.toISOString()) {
+        <div
+          class="calendar__week-day"
+          [class.calendar__week-day--today]="day.isToday"
+          [class.calendar__week-day--selected]="day.isSelected"
+          [class.calendar__week-day--past]="day.isPast"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="
+            day.isPast
+              ? 'View past date ' +
+                day.date.toLocaleDateString() +
+                ' (cannot add events)'
+              : 'Add event on ' + day.date.toLocaleDateString()
+          "
+          (click)="day.isPast ? selectDate(day.date) : startAddEvent(day.date)"
+          (keyup.enter)="
+            day.isPast ? selectDate(day.date) : startAddEvent(day.date)
+          "
+          (keyup.space)="
+            day.isPast ? selectDate(day.date) : startAddEvent(day.date)
+          "
+        >
+          @for (event of day.events; track event.id) {
+          <div
+            class="calendar__event calendar__event--week"
+            [style.background-color]="event.bgColor"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Edit event: ' + event.title"
+            (click)="startEditEvent(event); $event.stopPropagation()"
+            (keyup.enter)="startEditEvent(event); $event.stopPropagation()"
+            (keyup.space)="startEditEvent(event); $event.stopPropagation()"
+          >
+            @if (!event.isAllDay) {
+            <div class="calendar__event-time">
+              {{ formatTime(event.startTime!) }}
+            </div>
+            }
+            <div class="calendar__event-title">
+              {{ event.title }}
+            </div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Day View -->
+    @case ('day') {
+    <div class="calendar__day-view">
+      <div class="calendar__day-view-header">
+        <h3 class="calendar__day-view-title">
+          {{
+            currentDate().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric'
+            })
+          }}
+        </h3>
+      </div>
+
+      <div class="calendar__day-events-container">
+        @if (currentDayEvents().length === 0) {
+        <div class="calendar__no-events">
+          <p>No events scheduled for this day</p>
+        </div>
+        } @else { @for (event of currentDayEvents(); track event.id) {
+        <div
+          class="calendar__event calendar__event--day"
+          [style.background-color]="event.bgColor"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="'Edit event: ' + event.title"
+          (click)="startEditEvent(event)"
+          (keyup.enter)="startEditEvent(event)"
+          (keyup.space)="startEditEvent(event)"
+        >
+          <div class="calendar__event-header">
+            <h4 class="calendar__event-title">{{ event.title }}</h4>
+            @if (!event.isAllDay) {
+            <span class="calendar__event-time">
+              {{ formatTime(event.startTime!) }} -
+              {{ formatTime(event.endTime!) }}
+            </span>
+            } @else {
+            <span class="calendar__event-all-day">All Day</span>
+            }
+          </div>
+          @if (event.description) {
+          <p class="calendar__event-description">{{ event.description }}</p>
+          }
+        </div>
+        } }
+      </div>
+    </div>
+    } }
+  </div>
+
+  <!-- Modal -->
+  @if (showModal()) {
+  <div
+    class="calendar__modal-backdrop"
+    tabindex="-1"
+    (click)="closeModal()"
+    (keyup.escape)="closeModal()"
+    (keydown.escape)="closeModal()"
+    (keyup.enter)="closeModal()"
+    (keyup.space)="closeModal()"
+    aria-label="Close modal"
+  >
+    <div
+      class="calendar__modal"
+      tabindex="-1"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="
+        editingEvent() || selectedDate() ? 'modal-title' : 'events-title'
+      "
+      (click)="$event.stopPropagation()"
+      (keyup)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+    >
+      @if (editingEvent() || selectedDate()) {
+      <!-- Add/Edit Event Form -->
+      <div class="calendar__modal-content">
+        <h3 class="calendar__modal-title" id="modal-title">
+          {{ editingEvent() ? 'Edit Event' : 'Add Event' }}
+          @if (selectedDate()) {
+          <span class="calendar__modal-date">
+            starting {{ selectedDate()!.toLocaleDateString() }}
+          </span>
+          }
+        </h3>
+
+        <form class="calendar__form" (ngSubmit)="addEvent()">
+          <div class="calendar__form-group">
+            <label class="calendar__label" for="eventTitle"
+              >Event Title *</label
+            >
+            <input
+              id="eventTitle"
+              class="calendar__input"
+              type="text"
+              placeholder="Enter event title"
+              [(ngModel)]="newEventTitle"
+              name="eventTitle"
+              required
+            />
+          </div>
+
+          <div class="calendar__form-group">
+            <label class="calendar__label" for="eventDescription"
+              >Description</label
+            >
+            <textarea
+              id="eventDescription"
+              class="calendar__input calendar__textarea"
+              placeholder="Enter event description (optional)"
+              [(ngModel)]="newEventDescription"
+              name="eventDescription"
+            >
+            </textarea>
+          </div>
+
+          <div class="calendar__form-group">
+            <label class="calendar__label" for="eventDate">Date *</label>
+            <input
+              id="eventDate"
+              class="calendar__input"
+              type="date"
+              [(ngModel)]="newEventDate"
+              name="eventDate"
+              required
+            />
+          </div>
+
+          <div class="calendar__form-group">
+            <div class="calendar__checkbox-group">
+              <input
+                id="allDayEvent"
+                type="checkbox"
+                [(ngModel)]="newEventIsAllDay"
+                name="isAllDay"
+                class="calendar__checkbox"
+              />
+              <label for="allDayEvent" class="calendar__checkbox-label"
+                >All Day Event</label
+              >
+            </div>
+          </div>
+
+          @if (!newEventIsAllDay) {
+          <div class="calendar__form-row">
+            <div class="calendar__form-group">
+              <label class="calendar__label" for="startTime">Start Time</label>
+              <input
+                id="startTime"
+                class="calendar__input"
+                type="time"
+                [(ngModel)]="newEventStartTime"
+                name="startTime"
+              />
+            </div>
+            <div class="calendar__form-group">
+              <label class="calendar__label" for="endTime">End Time</label>
+              <input
+                id="endTime"
+                class="calendar__input"
+                type="time"
+                [(ngModel)]="newEventEndTime"
+                name="endTime"
+              />
+            </div>
+          </div>
+          }
+
+          <div class="calendar__form-group">
+            <div class="calendar__color-picker">
+              @for (color of pastelColors; track color) {
+              <button
+                type="button"
+                class="calendar__color-option"
+                [class.calendar__color-option--selected]="
+                  newEventColor === color
+                "
+                [style.background-color]="color"
+                (click)="newEventColor = color"
+                (keyup.enter)="newEventColor = color"
+                (keyup.space)="newEventColor = color"
+                [attr.aria-label]="'Select color ' + color"
+                [attr.aria-pressed]="newEventColor === color"
+              ></button>
+              }
+            </div>
+          </div>
+
+          <div class="calendar__modal-actions">
+            @if (editingEvent()) {
+            <button
+              type="button"
+              class="calendar__btn calendar__btn--danger"
+              (click)="deleteEvent(editingEvent()!.id)"
+              (keyup.enter)="deleteEvent(editingEvent()!.id)"
+              (keyup.space)="deleteEvent(editingEvent()!.id)"
+            >
+              Delete
+            </button>
+            }
+            <div class="calendar__modal-actions-right">
+              <button
+                type="button"
+                class="calendar__btn calendar__btn--secondary"
+                (click)="closeModal()"
+                (keyup.enter)="closeModal()"
+                (keyup.space)="closeModal()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="calendar__btn calendar__view-btn--active"
+                [disabled]="!newEventTitle.trim() || !newEventDate"
+              >
+                {{ editingEvent() ? 'Update' : 'Create' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      } @else if (viewingEventsFor()) {
+      <!-- View Events List -->
+      <div class="calendar__modal-content">
+        <h3 class="calendar__modal-title" id="events-title">
+          Events on {{ viewingEventsFor()!.toLocaleDateString() }}
+        </h3>
+
+        <div class="calendar__events-list">
+          @for (event of eventsOnSelectedDay(); track event.id) {
+          <div
+            class="calendar__event-item"
+            [style.border-left-color]="event.bgColor"
+          >
+            <div class="calendar__event-item-header">
+              <h4 class="calendar__event-item-title">{{ event.title }}</h4>
+              <button
+                type="button"
+                class="calendar__btn calendar__btn--small"
+                (click)="startEditEvent(event)"
+                (keyup.enter)="startEditEvent(event)"
+                (keyup.space)="startEditEvent(event)"
+                [attr.aria-label]="'Edit event: ' + event.title"
+              >
+                Edit
+              </button>
+            </div>
+            @if (!event.isAllDay) {
+            <div class="calendar__event-item-time">
+              {{ formatTime(event.startTime!) }} -
+              {{ formatTime(event.endTime!) }}
+            </div>
+            } @else {
+            <div class="calendar__event-item-time">All Day</div>
+            } @if (event.description) {
+            <p class="calendar__event-item-description">
+              {{ event.description }}
+            </p>
+            }
+          </div>
+          }
+        </div>
+
+        <div class="calendar__modal-actions">
+          <button
+            class="calendar__btn calendar__btn--secondary"
+            (click)="closeModal()"
+            (keyup.enter)="closeModal()"
+            (keyup.space)="closeModal()"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>
+
