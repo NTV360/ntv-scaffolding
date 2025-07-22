@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.zone {
+  @apply w-full h-full shadow-[0_1px_4px_rgba(0,0,0,0.08)];
+}
+
+.zone-media {
+  @apply w-full h-full object-cover block;
+}
+
+.screen-zone {
+  @apply absolute w-full h-full box-border;
+
+  &.show-hover-effects {
+    &:hover,
+    &.selected {
+      &::before {
+        @apply absolute top-0 left-0 right-0 bottom-0 border-2 border-lime-400 pointer-events-none;
+        content: '';
+        background: linear-gradient(
+          135deg,
+          rgba(142, 203, 44, 0.479) 0%,
+          rgba(142, 203, 44, 0.151) 100%
+        );
+        animation: borderDash 20s linear infinite;
+      }
+    }
+  }
+
+  // Playing animation
+  &.is-playing {
+    .playlist-indicator {
+      animation: pulse 2s infinite;
+    }
+  }
+
+  &__content {
+    @apply w-full h-full relative;
+  }
+
+  &.fullscreen {
+    @apply fixed w-full h-full z-50 top-0 left-0 bg-black;
+  }
+}
+
+// Playlist preview styles
+.playlist-preview {
+  @apply w-full h-full relative;
+}
+
+.playlist-indicator {
+  @apply absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs z-10 text-[10px];
+}
+
+// Content container with transitions
+.content-container {
+  @apply w-full h-full relative;
+}
+
+// Fade in animation
+.fade-in {
+  @apply animate-[fadeIn_0.5s_ease-in-out];
+}
+
+@keyframes fadeIn {
+  from {
+    @apply opacity-0 scale-95;
+  }
+  to {
+    @apply opacity-100 scale-100;
+  }
+}
+
+// Pulse animation for playing indicator
+@keyframes pulse {
+  0%,
+  100% {
+    @apply opacity-100;
+  }
+  50% {
+    @apply opacity-70;
+  }
+}
+
+.zone-text-content {
+  @apply w-full h-full flex items-center justify-center p-4 bg-black/80 text-white;
+
+  pre {
+    @apply text-center whitespace-pre-wrap text-sm leading-[1.4];
+    font-family: inherit;
+  }
+}
+
+.zone-placeholder {
+  @apply w-full h-full flex flex-col items-center justify-center text-gray-400;
+
+  .zone-name {
+    @apply font-semibold text-sm mb-1;
+  }
+
+  .zone-prompt {
+    @apply text-xs opacity-75;
+  }
+}
+
+// Existing styles...
+.size-overlay {
+  @apply absolute top-1/2 left-1/2 bg-black/70 text-white px-1 py-0.5 rounded text-xs pointer-events-none opacity-0 -translate-x-1/2 -translate-y-1/2 scale-90;
+  .screen-zone:hover & {
+    @apply animate-[fadeInScale_0.2s_forwards_ease-in-out];
+  }
+}
+
+.tooltip-parent {
+  @apply absolute right-0 top-0 z-10;
+}
+
+.tooltip-background-size {
+  @apply w-10 h-10 bg-[#091635] rounded-bl-lg opacity-50 transition-opacity duration-300 ease-in-out flex items-center justify-center;
+  &:hover {
+    @apply opacity-100;
+  }
+}
+
+.zone-list-popover {
+  @apply absolute right-0 mt-2 w-48 rounded-lg shadow-lg border z-50 flex flex-col transition-all duration-200 ease-out overflow-hidden bg-[#091635];
+}
+
+.zone-list-item {
+  @apply px-4 py-2 text-left text-xs cursor-pointer transition-colors duration-150 rounded-none text-white;
+}
+.zone-list-item:hover {
+  @apply bg-blue-900;
+}
+.zone-list-item.selected {
+  @apply bg-lime-200 font-bold text-[#091635];
+}
+.zone-list-item.selected:hover {
+  @apply bg-lime-300;
+}
+
+.zone-dimensions-tooltip {
+  @apply absolute top-1/2 left-[-8px] -translate-x-full -translate-y-1/2 bg-black/80 text-white px-2 py-1 rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.15)] text-sm whitespace-nowrap z-50 animate-[fadeIn_0.2s_ease];
+}
+
+@keyframes fadeInScale {
+  0% {
+    @apply opacity-0 -translate-x-1/2 -translate-y-1/2 scale-90;
+  }
+  100% {
+    @apply opacity-100 -translate-x-1/2 -translate-y-1/2 scale-100;
+  }
+}
+
+@keyframes borderDash {
+  to {
+    background-position: 100% 100%;
+  }
+}

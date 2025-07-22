@@ -1,0 +1,159 @@
+<div>
+  <!-- Existing tooltip and controls -->
+  <div class="tooltip-parent" tabindex="0">
+    @if (showSizeToggle()) {
+    <button
+      class="tooltip-background-size"
+      (click)="onZoneListToggle()"
+      (keyup.enter)="onZoneListToggle()"
+      (keyup.space)="onZoneListToggle()"
+      aria-label="Show zone list"
+      type="button"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        style="margin: 8px"
+      >
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g
+          id="SVGRepo_tracerCarrier"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+            d="M20 10L12 5L4 10L12 15L20 10Z"
+            stroke="#8dcb2c"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+          <path
+            d="M20 14L12 19L4 14"
+            stroke="#8dcb2c"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </g>
+      </svg>
+    </button>
+
+    @if (showZoneTooltip) {
+    <div
+      class="zone-dimensions-tooltip"
+      (mouseenter)="onZoneTooltipEnter()"
+      (mouseleave)="onZoneTooltipLeave()"
+      (focusin)="onZoneTooltipEnter()"
+      (focusout)="onZoneTooltipLeave()"
+    >
+      {{ zoneData().name }} - {{ zoneData().width }} x {{ zoneData().height }}
+    </div>
+    } } @if (popoverOpen) {
+    <div class="zone-list-popover">
+      @for (zone of zones(); track zone.name) {
+      <button
+        class="zone-list-item"
+        [ngClass]="{ selected: selectedZoneName() === zone.name }"
+        (click)="onZoneSelect(zone)"
+        (keyup.enter)="onZoneSelect(zone)"
+        (keyup.space)="onZoneSelect(zone)"
+        tabindex="0"
+        [attr.aria-label]="'Select ' + zone.name"
+      >
+        {{ zone.name }} ({{ zone.width }} x {{ zone.height }})
+      </button>
+      }
+    </div>
+    }
+  </div>
+
+  @if (zoneData()) {
+  <div
+    class="screen-zone"
+    [ngClass]="{
+      fullscreen: fullscreen() && zoneData().zIndex === 1,
+      'show-hover-effects': showSizeToggle(),
+      selected: selected(),
+      'has-playlist': hasPlaylist(),
+      'is-playing': isPlaying()
+    }"
+    [ngStyle]="{
+        background: zoneData().backgroundColor,
+        'width.%': (zoneData().width / 1920) * 100,
+        'height.%': (zoneData().height / 1080) * 100,
+        'left.%': (zoneData().xPos / 1920) * 100,
+        'top.%': (zoneData().yPos / 1080) * 100,
+        'z-index': zoneData().zIndex,
+      }"
+    (mouseenter)="onZoneTooltipEnter()"
+    (mouseleave)="onZoneTooltipLeave()"
+    (focusin)="onZoneTooltipEnter()"
+    (focusout)="onZoneTooltipLeave()"
+    (click)="onZoneClick()"
+    (keyup.enter)="onZoneClick()"
+    (keyup.space)="onZoneClick()"
+    tabindex="0"
+    [attr.aria-label]="'Select zone ' + zoneData().name"
+    role="button"
+    [attr.aria-pressed]="selected()"
+  >
+    <div class="screen-zone__content">
+      @if (hasPlaylist() && playlistContent() && currentContent()) {
+      <!-- Simple playlist content display -->
+      <div class="playlist-preview">
+        <!-- Simple playlist indicator -->
+        <div class="playlist-indicator">{{ playlistContent()!.name }}</div>
+
+        <!-- Content display with smooth transitions -->
+        <div class="content-container fade-in">
+          @switch (currentContent()!.type) { @case ('IMAGE') {
+          <img
+            [src]="currentContent()!.src"
+            [alt]="currentContent()!.title"
+            class="zone-media"
+            loading="lazy"
+          />
+          } @case ('VIDEO') {
+          <video
+            [src]="currentContent()!.src"
+            autoplay
+            muted
+            loop
+            playsinline
+            class="zone-media"
+            [attr.aria-label]="'Video: ' + currentContent()!.title"
+          ></video>
+          } @case ('TEXT') {
+          <div class="zone-text-content" role="article">
+            <pre
+              [attr.aria-label]="'Text content: ' + currentContent()!.title"
+              >{{ currentContent()!.content }}</pre
+            >
+          </div>
+          } }
+        </div>
+      </div>
+      } @else if(showZoneInfo()) {
+      <!-- Default placeholder when no playlist assigned -->
+      <div
+        class="zone-placeholder"
+        role="region"
+        [attr.aria-label]="'Zone: ' + zoneData().name"
+      >
+        <div class="zone-name">{{ zoneData().name }}</div>
+        @if (!hasPlaylist()) {
+        <div class="zone-prompt">Click to assign playlist</div>
+        }
+      </div>
+      }
+
+      <ng-content></ng-content>
+    </div>
+  </div>
+  }
+</div>
