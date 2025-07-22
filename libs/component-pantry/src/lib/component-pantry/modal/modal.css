@@ -138,12 +138,24 @@
 
 /* Alert Modal Styles */
 .modal__alert-animation {
-  @apply mx-auto mb-6 flex items-center justify-center relative;
+  @apply mx-auto mb-6 flex items-center justify-center relative w-[200px] h-[200px];
 }
 
 /* Alert Animation Container */
 .modal__alert-animation iframe {
-  @apply border-none bg-transparent;
+  @apply border-none bg-transparent w-[200px];
+}
+
+.modal__alert-animation--error {
+  @apply mb-6;
+}
+
+.modal__alert-animation--error iframe {
+  @apply h-[200px];
+}
+
+.modal__alert-animation--success iframe {
+  @apply h-[300px];
 }
 
 /* Success Alert Styles */
