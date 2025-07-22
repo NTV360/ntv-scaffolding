@@ -15,6 +15,45 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
+/* Drag and Drop Flex Layout */
+.thumbnail-drop-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px;
+  border: solid 1px #ccc;
+  min-height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Size variants for drag container */
+.thumbnail-drop-list.thumbnail-gallery--sm {
+  --thumbnail-size: 120px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--md {
+  --thumbnail-size: 160px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--lg {
+  --thumbnail-size: 200px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--xl {
+  --thumbnail-size: 240px;
+}
+
+.thumbnail-drag-item {
+  display: inline-block;
+  box-sizing: border-box;
+  cursor: move;
+  flex: 0 0 auto;
+  width: var(--thumbnail-size, 160px);
+  height: var(--thumbnail-size, 160px);
+}
+
 /* List Layout */
 .thumbnail-gallery--list {
   @apply flex flex-col gap-2 p-4;
@@ -277,24 +316,40 @@
   .context-menu-title {
     @apply text-gray-100;
   }
+}
 
-  .context-menu-item {
-    @apply text-gray-300;
-  }
+/* CDK Drag and Drop Styles */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  width: var(--thumbnail-size, 160px) !important;
+  height: var(--thumbnail-size, 160px) !important;
+}
 
-  .context-menu-item:hover {
-    @apply bg-gray-700;
-  }
+.cdk-drag-placeholder {
+  opacity: 0;
+  width: var(--thumbnail-size, 160px);
+  height: var(--thumbnail-size, 160px);
+}
 
-  .context-menu-item:active {
-    @apply bg-gray-600;
-  }
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
 
-  .context-menu-divider {
-    @apply bg-white/10;
-  }
+.context-menu-item:hover {
+  @apply bg-gray-700;
+}
 
-  .context-submenu {
-    @apply bg-gray-800 border-white/10;
-  }
+.context-menu-item:active {
+  @apply bg-gray-600;
+}
+
+.context-menu-divider {
+  @apply bg-white/10;
+}
+
+.context-submenu {
+  @apply bg-gray-800 border-white/10;
 }

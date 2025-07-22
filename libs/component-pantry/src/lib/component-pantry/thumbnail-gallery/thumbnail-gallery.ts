@@ -11,6 +11,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ThumbnailItemComponent } from '../thumbnail-item/thumbnail-item';
 import {
   ThumbnailItem,
@@ -30,7 +31,7 @@ import {
 @Component({
   selector: 'ntv-thumbnail-gallery',
   standalone: true,
-  imports: [CommonModule, ThumbnailItemComponent],
+  imports: [CommonModule, ThumbnailItemComponent, CdkDropList, CdkDrag],
   templateUrl: './thumbnail-gallery.html',
   styleUrls: ['./thumbnail-gallery.css'],
 })
@@ -56,12 +57,14 @@ export class ThumbnailGalleryComponent {
   contextMenuActions = input<ThumbnailAction[]>(DEFAULT_THUMBNAIL_ACTIONS);
   showContextMenu = input<boolean>(true);
   showActionButtons = input<boolean>(true);
+  draggable = input<boolean>(false);
 
   // Signal outputs
   itemClick = output<ThumbnailClickEvent>();
   selectionChange = output<ThumbnailSelectionEvent>();
   actionClick = output<ThumbnailActionEvent>();
   contextMenu = output<ThumbnailContextMenuEvent>();
+  itemsReorder = output<ThumbnailItem[]>();
 
   // Internal state
   private selectedItems = signal<Set<string>>(new Set());
@@ -301,5 +304,12 @@ export class ThumbnailGalleryComponent {
   getSelectedItems(): ThumbnailItem[] {
     const selectedSet = this.selectedItems();
     return this.items().filter(item => selectedSet.has(item.id));
+  }
+
+  onDrop(event: CdkDragDrop<ThumbnailItem[]>) {
+    const items = [...this.items()];
+    moveItemInArray(items, event.previousIndex, event.currentIndex);
+    // Emit the reordered items to the parent component
+    this.itemsReorder.emit(items);
   }
 }

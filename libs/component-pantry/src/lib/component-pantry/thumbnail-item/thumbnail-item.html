@@ -11,12 +11,10 @@
   (keydown.enter)="onItemClick($event)"
   (keydown.space)="onItemClick($event)">
 
-  <!-- Selection Checkbox (for selectable items) -->
-  @if (selectable()) {
-    <div class="selection-checkbox" 
-         [class.selected]="item().selected"
-         [attr.aria-hidden]="true"
-         (click)="onCheckboxClick($event)">
+  <!-- Selection Checkbox (only when selected) -->
+  @if (selectable() && item().selected) {
+    <div class="selection-checkbox selected"
+         [attr.aria-hidden]="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="20,6 9,17 4,12"></polyline>
       </svg>
@@ -54,10 +52,8 @@
       </div>
     }
 
-    <!-- File Type Badge -->
-    @if (item().type !== 'image' && item().type !== 'video') {
-      <div class="file-type-badge">{{ item().type.toUpperCase() }}</div>
-    }
+    <!-- File Type Badge (positioned at bottom left) -->
+    <div class="file-type-badge">{{ item().type.toUpperCase() }}</div>
   </div>
 
   <!-- Action Buttons Overlay (for hovered items) -->

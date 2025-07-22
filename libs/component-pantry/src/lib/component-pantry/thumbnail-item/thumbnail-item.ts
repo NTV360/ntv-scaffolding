@@ -84,21 +84,18 @@ export class ThumbnailItemComponent {
   });
 
   onItemClick(event: Event): void {
-    if (!this.clickable()) return;
-    
-    const thumbnailEvent: ThumbnailClickEvent = {
-      item: this.item(),
-      index: this.index(),
-      event
-    };
-    
-    this.itemClick.emit(thumbnailEvent);
-  }
-
-  onCheckboxClick(event: Event): void {
-    event.stopPropagation();
     if (this.selectable()) {
+      // Handle selection when item is clicked
       this.selectionToggle.emit(this.item());
+    } else if (this.clickable()) {
+      // Handle regular click when not selectable
+      const thumbnailEvent: ThumbnailClickEvent = {
+        item: this.item(),
+        index: this.index(),
+        event
+      };
+      
+      this.itemClick.emit(thumbnailEvent);
     }
   }
 
@@ -125,11 +122,11 @@ export class ThumbnailItemComponent {
 
   getFileIcon(): string {
     const item = this.item();
-    return item.icon || FILE_TYPE_ICONS[item.type] || FILE_TYPE_ICONS.unknown;
+    return item.icon || FILE_TYPE_ICONS[item.type] || FILE_TYPE_ICONS['unknown'];
   }
 
   getFileTypeColor(): string {
-    return FILE_TYPE_COLORS[this.item().type] || FILE_TYPE_COLORS.unknown;
+    return FILE_TYPE_COLORS[this.item().type] || FILE_TYPE_COLORS['unknown'];
   }
 
   formatFileSize(size: string | undefined): string {

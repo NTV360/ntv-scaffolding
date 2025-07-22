@@ -7,6 +7,7 @@ export interface ThumbnailItem {
   src?: string;
   size?: string;
   modified?: Date;
+  icon?: string;
   metadata?: {
     dimensions?: string;
     duration?: string;

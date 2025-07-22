@@ -1,42 +1,80 @@
-<div 
-  [class]="containerClasses()"
-  [ngStyle]="containerStyles()"
-  role="grid"
-  [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
-  
-  @if (items().length === 0) {
-    <!-- Empty State -->
-    <div class="empty-state">
-      <div class="empty-icon">📁</div>
-      <div class="empty-message">No items to display</div>
-      <div class="empty-description">Add some files to see them here</div>
+@if (items().length === 0) {
+  <!-- Empty State -->
+  <div class="empty-state">
+    <div class="empty-icon">📁</div>
+    <div class="empty-message">No items to display</div>
+    <div class="empty-description">Add some files to see them here</div>
+  </div>
+} @else {
+  @if (draggable()) {
+    <!-- Draggable Thumbnail Gallery -->
+    <div 
+      cdkDropList 
+      cdkDropListOrientation="mixed"
+      class="thumbnail-drop-list"
+      [ngStyle]="containerStyles()"
+      (cdkDropListDropped)="onDrop($event)"
+      role="grid"
+      [attr.aria-label]="'Draggable thumbnail gallery with ' + items().length + ' items'">
+      
+      @for (item of itemsWithSelection(); track item.id; let i = $index) {
+        <div class="thumbnail-drag-item" cdkDrag [cdkDragData]="item">
+          <ntv-thumbnail-item
+            [item]="item"
+            [index]="i"
+            [size]="mergedConfig().size"
+            [variant]="mergedConfig().variant"
+            [layout]="mergedConfig().layout"
+            [selectable]="mergedConfig().selectable"
+            [showLabels]="mergedConfig().showLabels"
+            [showMetadata]="mergedConfig().showMetadata"
+            [showFileSize]="mergedConfig().showFileSize"
+            [showModified]="mergedConfig().showModified"
+            [hoverEffects]="mergedConfig().hoverEffects"
+            [clickable]="mergedConfig().clickable"
+            [showActionButtons]="mergedConfig().showActionButtons"
+            (itemClick)="onItemClick($event)"
+            (selectionToggle)="onSelectionToggle($event)"
+            (contextMenuRequest)="onContextMenuRequest($event)"
+            (mouseEnter)="onMouseEnter($event)"
+            (mouseLeave)="onMouseLeave()">
+          </ntv-thumbnail-item>
+        </div>
+      }
     </div>
   } @else {
-    <!-- Thumbnail Items -->
-    @for (item of itemsWithSelection(); track item.id; let i = $index) {
-      <ntv-thumbnail-item
-        [item]="item"
-        [index]="i"
-        [size]="mergedConfig().size"
-        [variant]="mergedConfig().variant"
-        [layout]="mergedConfig().layout"
-        [selectable]="mergedConfig().selectable"
-        [showLabels]="mergedConfig().showLabels"
-        [showMetadata]="mergedConfig().showMetadata"
-        [showFileSize]="mergedConfig().showFileSize"
-        [showModified]="mergedConfig().showModified"
-        [hoverEffects]="mergedConfig().hoverEffects"
-        [clickable]="mergedConfig().clickable"
-        [showActionButtons]="mergedConfig().showActionButtons"
-        (itemClick)="onItemClick($event)"
-        (selectionToggle)="onSelectionToggle($event)"
-        (contextMenuRequest)="onContextMenuRequest($event)"
-        (mouseEnter)="onMouseEnter($event)"
-        (mouseLeave)="onMouseLeave()">
-      </ntv-thumbnail-item>
-    }
+    <!-- Static Thumbnail Gallery -->
+    <div 
+      [class]="containerClasses()"
+      [ngStyle]="containerStyles()"
+      role="grid"
+      [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
+      
+      @for (item of itemsWithSelection(); track item.id; let i = $index) {
+        <ntv-thumbnail-item
+          [item]="item"
+          [index]="i"
+          [size]="mergedConfig().size"
+          [variant]="mergedConfig().variant"
+          [layout]="mergedConfig().layout"
+          [selectable]="mergedConfig().selectable"
+          [showLabels]="mergedConfig().showLabels"
+          [showMetadata]="mergedConfig().showMetadata"
+          [showFileSize]="mergedConfig().showFileSize"
+          [showModified]="mergedConfig().showModified"
+          [hoverEffects]="mergedConfig().hoverEffects"
+          [clickable]="mergedConfig().clickable"
+          [showActionButtons]="mergedConfig().showActionButtons"
+          (itemClick)="onItemClick($event)"
+          (selectionToggle)="onSelectionToggle($event)"
+          (contextMenuRequest)="onContextMenuRequest($event)"
+          (mouseEnter)="onMouseEnter($event)"
+          (mouseLeave)="onMouseLeave()">
+        </ntv-thumbnail-item>
+      }
+    </div>
   }
-</div>
+}
 
 <!-- Context Menu -->
 @if (contextMenuVisible() && showContextMenu()) {
@@ -61,7 +99,11 @@
             <!-- Menu item with submenu -->
             <div class="context-menu-item has-submenu"
                  [class.disabled]="action.disabled"
-                 (click)="toggleSubmenu(action.type, $event)">
+                 tabindex="0"
+                 role="menuitem"
+                 [attr.aria-expanded]="activeSubmenu() === action.type"
+                 (click)="toggleSubmenu(action.type, $event)"
+                 (keydown)="$event.key === 'Enter' || $event.key === ' ' ? toggleSubmenu(action.type, $event) : null">
               <div class="menu-item-icon" [innerHTML]="action.icon"></div>
               <div class="menu-item-label">{{ action.label }}</div>
               <div class="menu-item-arrow">▶</div>
@@ -69,11 +111,14 @@
             
             <!-- Submenu -->
             @if (activeSubmenu() === action.type) {
-              <div class="context-submenu">
+              <div class="context-submenu" role="menu">
                 @for (subAction of action.submenu; track subAction.type) {
                   <div class="context-menu-item submenu-item"
                        [class.disabled]="subAction.disabled"
-                       (click)="onActionClick(subAction, contextMenuItem()!, $event)">
+                       tabindex="0"
+                       role="menuitem"
+                       (click)="onActionClick(subAction, contextMenuItem()!, $event)"
+                       (keydown)="$event.key === 'Enter' || $event.key === ' ' ? onActionClick(subAction, contextMenuItem()!, $event) : null">
                     <div class="menu-item-icon" [innerHTML]="subAction.icon"></div>
                     <div class="menu-item-label">{{ subAction.label }}</div>
                   </div>
@@ -87,7 +132,10 @@
             <!-- Regular menu item -->
             <div class="context-menu-item"
                  [class.disabled]="action.disabled"
-                 (click)="onActionClick(action, contextMenuItem()!, $event)">
+                 tabindex="0"
+                 role="menuitem"
+                 (click)="onActionClick(action, contextMenuItem()!, $event)"
+                 (keydown)="$event.key === 'Enter' || $event.key === ' ' ? onActionClick(action, contextMenuItem()!, $event) : null">
               <div class="menu-item-icon" [innerHTML]="action.icon"></div>
               <div class="menu-item-label">{{ action.label }}</div>
             </div>
