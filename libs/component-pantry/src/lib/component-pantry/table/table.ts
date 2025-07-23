@@ -53,6 +53,7 @@ const components = [Button, ColumnFilter, Popover];
 export class Table implements AfterViewInit {
   // Used to sanitize potentially unsafe HTML content for safe binding
   private sanitizer = inject(DomSanitizer);
+  private el = inject(ElementRef);
 
   // Modern Angular inputs using input() function with better typing
   columns = input<TableColumn[]>([]);
@@ -60,7 +61,6 @@ export class Table implements AfterViewInit {
   data = input<any[]>([]);
   tableStyle = input<TableStyle>({});
   columnDraggable = input<boolean>(false);
-  // expandableColumn = input<boolean>(false);
   expandableRows = input<boolean>(false);
   defaultMinWidth = input<number>(100);
   defaultMaxWidth = input<number>(400);
@@ -73,8 +73,8 @@ export class Table implements AfterViewInit {
   filterEnabled = input<boolean>(false);
   // Optional: Enable checkbox selection
   hasCheckBox = input<boolean>(false);
-  // Optional: Enable localStorage persistence for column visibility
-  persistColumnVisibility = input<boolean>(true);
+  // localStorage persistence for column visibility is always enabled
+  private persistColumnVisibility = true;
   // Optional: Custom localStorage key for column visibility
   storageKey = input<string>('ntv-table-columns');
 
@@ -88,6 +88,12 @@ export class Table implements AfterViewInit {
   columnsChange = output<TableColumn[]>();
   // Checkbox selection outputs
   selectedRowsChange = output<any[]>();
+
+  // Sets the background color of the table body
+  public readonly tableBGColor = input<string>('#ffffff');
+
+  // Sets the background color of the table header
+  public readonly tableHeaderBGColor = input<string>('#F9FAFB');
 
   // Internal state management using signals
   private _columns = signal<TableColumn[]>([]);
@@ -196,7 +202,7 @@ export class Table implements AfterViewInit {
           !this.externalColumnControl()
         ) {
           // Load column visibility from localStorage if enabled
-          const columnsWithVisibility = this.persistColumnVisibility()
+          const columnsWithVisibility = this.persistColumnVisibility
             ? this.loadColumnVisibilityFromStorage([...initialCols])
             : [...initialCols];
           this._columns.set(columnsWithVisibility);
@@ -266,8 +272,8 @@ export class Table implements AfterViewInit {
 
     // Effect to emit selected rows changes
     effect(() => {
-      const selected = this.selectedRows();
-      this.selectedRowsChange.emit([...selected]);
+      const selectedData = this.getSelectedRowsData();
+      this.selectedRowsChange.emit([...selectedData]);
     });
 
     // Effect to log when locked items change (for debugging)
@@ -295,6 +301,18 @@ export class Table implements AfterViewInit {
       },
       { allowSignalWrites: true }
     );
+
+    effect(() => {
+      this.el.nativeElement.style.setProperty(
+        '--header-bg-color',
+        this.tableHeaderBGColor()
+      );
+
+      this.el.nativeElement.style.setProperty(
+        '--body-bg-color',
+        this.tableBGColor()
+      );
+    });
 
     // Track if this is the initial data load
     let isInitialLoad = true;
@@ -486,9 +504,9 @@ export class Table implements AfterViewInit {
         : col
     );
     this._columns.set(newColumns);
-    
+
     // Save to localStorage if persistence is enabled
-    if (this.persistColumnVisibility()) {
+    if (this.persistColumnVisibility) {
       this.saveColumnVisibilityToStorage(newColumns);
     }
   }
@@ -592,9 +610,9 @@ export class Table implements AfterViewInit {
         visible: true,
       }));
       this._columns.set(newColumns);
-      
+
       // Save to localStorage if persistence is enabled
-      if (this.persistColumnVisibility()) {
+      if (this.persistColumnVisibility) {
         this.saveColumnVisibilityToStorage(newColumns);
       }
     }
@@ -615,9 +633,9 @@ export class Table implements AfterViewInit {
       // Handle internally - reset to original columns from input
       const originalColumns = this.columns();
       this._columns.set([...originalColumns]);
-      
+
       // Clear localStorage if persistence is enabled
-      if (this.persistColumnVisibility()) {
+      if (this.persistColumnVisibility) {
         this.clearColumnVisibilityFromStorage();
       }
     }
@@ -1172,7 +1190,11 @@ export class Table implements AfterViewInit {
     this._selectedRows.set(selectedRows);
   }
 
-  toggleSelectAll(): void {
+  /**
+   * Toggles the selection state of all rows on the current page.
+   * If all rows are currently selected, they will be deselected; otherwise, all will be selected.
+   */
+  public toggleSelectAll(): void {
     const currentData = this.sortedData();
     const selectedRows = new Set(this._selectedRows());
     const allSelected = this._selectAll();
@@ -1194,11 +1216,12 @@ export class Table implements AfterViewInit {
     this._selectedRows.set(selectedRows);
   }
 
-  clearSelection(): void {
-    this._selectedRows.set(new Set());
-  }
-
-  getSelectedRowsData(): any[] {
+  /**
+   * Retrieves the data for rows that are currently selected.
+   *
+   * @returns An array of selected row data objects.
+   */
+  private getSelectedRowsData(): any[] {
     const selectedIdentifiers = this._selectedRows();
     const allData = this._data();
     return allData.filter((row) => {
@@ -1207,7 +1230,13 @@ export class Table implements AfterViewInit {
     });
   }
 
-  // LocalStorage utility methods for column visibility persistence
+  /**
+   * Saves the visibility state of each table column to localStorage.
+   * This allows restoring user preferences for column visibility on future visits.
+   *
+   * @param columns - The array of table columns to persist visibility for.
+   * @private
+   */
   private saveColumnVisibilityToStorage(columns: TableColumn[]): void {
     try {
       const visibilityMap: Record<string, boolean> = {};
@@ -1220,7 +1249,16 @@ export class Table implements AfterViewInit {
     }
   }
 
-  private loadColumnVisibilityFromStorage(columns: TableColumn[]): TableColumn[] {
+  /**
+   * Loads column visibility settings from localStorage and applies them to the provided columns.
+   *
+   * @param columns - The default array of table columns.
+   * @returns The updated array of columns with visibility flags set according to stored preferences.
+   * @private
+   */
+  private loadColumnVisibilityFromStorage(
+    columns: TableColumn[]
+  ): TableColumn[] {
     try {
       const stored = localStorage.getItem(this.storageKey());
       if (!stored) {
@@ -1235,16 +1273,28 @@ export class Table implements AfterViewInit {
           : col.visible !== false,
       }));
     } catch (error) {
-      console.warn('Failed to load column visibility from localStorage:', error);
+      console.warn(
+        'Failed to load column visibility from localStorage:',
+        error
+      );
       return columns;
     }
   }
 
+  /**
+   * Clears the saved column visibility settings from localStorage.
+   * Useful when resetting table view preferences to default.
+   *
+   * @private
+   */
   private clearColumnVisibilityFromStorage(): void {
     try {
       localStorage.removeItem(this.storageKey());
     } catch (error) {
-      console.warn('Failed to clear column visibility from localStorage:', error);
+      console.warn(
+        'Failed to clear column visibility from localStorage:',
+        error
+      );
     }
   }
 }

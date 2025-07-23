@@ -80,6 +80,7 @@
   }
 
   <div class="table-wrapper" (scroll)="onTableScroll($event)">
+    @if (sortedData().length > 0) {
     <table
       [ngStyle]="tableStyle()"
       class="table"
@@ -155,122 +156,18 @@
               ></ng-container>
               @if (column.filter && column.field !== 'action' && column.field
               !== 'actions') {
-              <!-- <div class="filter-icon-container">
-                <button
-                  class="filter-icon-btn"
-                  (click)="toggleFilterPopup(column.field, $event)"
-                  [class.active]="isFilterPopupOpen(column.field)"
-                  title="Filter {{ column.header }}"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <path
-                        d="M21 6H19M21 12H16M21 18H16M7 20V13.5612C7 13.3532 7 13.2492 6.97958 13.1497C6.96147 13.0615 6.93151 12.9761 6.89052 12.8958C6.84431 12.8054 6.77934 12.7242 6.64939 12.5617L3.35061 8.43826C3.22066 8.27583 3.15569 8.19461 3.10948 8.10417C3.06849 8.02393 3.03853 7.93852 3.02042 7.85026C3 7.75078 3 7.64677 3 7.43875V5.6C3 5.03995 3 4.75992 3.10899 4.54601C3.20487 4.35785 3.35785 4.20487 3.54601 4.10899C3.75992 4 4.03995 4 4.6 4H13.4C13.9601 4 14.2401 4 14.454 4.10899C14.6422 4.20487 14.7951 4.35785 14.891 4.54601C15 4.75992 15 5.03995 15 5.6V7.43875C15 7.64677 15 7.75078 14.9796 7.85026C14.9615 7.93852 14.9315 8.02393 14.8905 8.10417C14.8443 8.19461 14.7793 8.27583 14.6494 8.43826L11.3506 12.5617C11.2207 12.7242 11.1557 12.8054 11.1095 12.8958C11.0685 12.9761 11.0385 13.0615 11.0204 13.1497C11 13.2492 11 13.3532 11 13.5612V17L7 20Z"
-                        stroke="#091635"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>
-                    </g>
-                  </svg>
-                </button>
-                @if (isFilterPopupOpen(column.field)) {
-                <div
-                  class="filter-popup"
-                  (click)="$event.stopPropagation()"
-                  (keydown)="$event.stopPropagation()"
-                  (keyup)="$event.stopPropagation()"
-                  tabindex="0"
-                  role="dialog"
-                  aria-label="Filter popup"
-                >
-                  <div class="filter-popup-content">
-                    <div class="filter-popup-header">
-                      <span>Filter {{ column.header }}</span>
-                      <button
-                        class="close-popup-btn"
-                        (click)="closeFilterPopup()"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <div class="filter-popup-body">
-                      @if (column.filterType === 'date') {
-                      <div class="date-filter-controls">
-                        <p class="filter-info">
-                          Date columns support sorting only:
-                        </p>
-                        <button
-                          class="sort-btn-popup"
-                          (click)="onSort(column.field)"
-                          title="Sort {{ column.header }}"
-                        >
-                          {{ getSortIcon(column.field) }} Sort {{ sortOrder ===
-                          "asc" ? "Ascending" : "Descending" }}
-                        </button>
-                      </div>
-                      } @else if (column.filterType === 'select') {
-                      <select
-                        class="filter-popup-select"
-                        [value]="getFilterValue(column.field)"
-                        (change)="onFilterSelectChange(column.field, $event)"
-                      >
-                        <option value="">All {{ column.header }}</option>
-                        @for (option of getUniqueValues(column.field); track
-                        option) {
-                        <option [value]="option">{{ option }}</option>
-                        }
-                      </select>
-                      } @else if (column.filterType === 'number') {
-                      <input
-                        type="number"
-                        class="filter-popup-input"
-                        [value]="getFilterValue(column.field)"
-                        (input)="onFilterInputChange(column.field, $event)"
-                        [placeholder]="'Enter ' + column.header.toLowerCase()"
-                      />
-                      } @else {
-                      <input
-                        type="text"
-                        class="filter-popup-input"
-                        [value]="getFilterValue(column.field)"
-                        (input)="onFilterInputChange(column.field, $event)"
-                        [placeholder]="'Search ' + column.header.toLowerCase()"
-                      />
-                      <div class="text-filter-controls">
-                        <button
-                          class="sort-btn-popup"
-                          (click)="onSort(column.field)"
-                          title="Sort {{ column.header }}"
-                        >
-                          {{ getSortIcon(column.field) }} Sort {{ sortOrder ===
-                          "asc" ? "Ascending" : "Descending" }}
-                        </button>
-                      </div>
-                      } @if (getFilterValue(column.field)) {
-                      <button
-                        class="clear-filter-btn"
-                        (click)="onFilterChange(column.field, '')"
-                      >
-                        Clear Filter
-                      </button>
-                      }
-                    </div>
-                  </div>
-                </div>
-                }
-              </div> -->
+              <ntv-column-filter
+                [column]="column"
+                [data]="filteredData()"
+                [filterValue]="getFilterValue(column.field)"
+                [sortField]="sortField()"
+                [sortOrder]="_sortOrder()"
+                [isPopupOpen]="isFilterPopupOpen(column.field)"
+                (filterChange)="onFilterChange($event.field, $event.value)"
+                (sortChange)="onSort($event)"
+                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
+                (closePopup)="closeFilterPopup()"
+              ></ntv-column-filter>
               }
             </div>
           </th>
@@ -405,7 +302,10 @@
             onToggleExpansion: expandableRows()
               ? toggleRowExpansion.bind(this)
               : undefined,
-            expandIcon: expandableRows() ? getExpandIcon(rowData) : undefined
+            expandIcon: expandableRows() ? getExpandIcon(rowData) : undefined,
+            hasCheckBox: hasCheckBox(),
+            isRowSelected: isRowSelected.bind(this),
+            onToggleRowSelection: toggleRowSelection.bind(this)
           }"
         ></ng-container>
         <!-- Expandable Content Row for Custom Template -->
@@ -522,17 +422,34 @@
         } } }
       </tbody>
     </table>
+    } @else {
+    <div class="no-data-row">
+      <div class="no-data-content">
+        <div class="no-data-icon">
+          <iframe
+            src="https://lottie.host/embed/06452cb8-66f8-47d8-8c70-277079486b86/BSviPOAH23.lottie"
+            width="400"
+            height="400"
+          ></iframe>
+        </div>
+        <div class="no-data-message">No Data Found</div>
+        <div class="no-data-description">
+          Whoopss... There are no records to display at the moment
+        </div>
+      </div>
+    </div>
+    }
   </div>
 
   <!-- Pagination: Show More  -->
   <div class="pagination">
     <p class="pagination-text">
-      Showing <span class="font-medium">{{ currentlyShowing() }}</span> of
-      <span class="font-medium">{{ totalItems() }}</span>
+      Showing <span class="font-bold">{{ currentlyShowing() }}</span> of
+      <span class="font-bold">{{ totalItems() }}</span>
     </p>
 
     @if (hasMoreItems()) {
-    <button (click)="showMore()">Show More</button>
+    <button (click)="showMore()" class="pagination-text">Show More</button>
     }
   </div>
 

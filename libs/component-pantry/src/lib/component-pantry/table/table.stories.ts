@@ -64,13 +64,12 @@ const meta: Meta<Table> = {
 A highly configurable table component that supports multiple features and customization options.
 
 ## Features
-- 8 placement options (top, bottom, left, right with start/end variants)
-- Click, hover, and manual trigger modes
-- Customizable arrow indicator
-- Click outside and escape key closing
-- Responsive design with viewport boundary detection
-- Dark mode support
-- Accessibility features
+ - With Filtering in each column
+ - Draggable Columns
+ - Expandable Rows
+ - Lockable Rows
+ - With Checkboxs
+ - With Pagination
 
 ## Usage
 
@@ -79,8 +78,94 @@ A highly configurable table component that supports multiple features and custom
 <ntv-table #table [columns]="columns" [data]="data" [tableStyle]="tableStyle"></ntv-table>
 
 // Configuration pattern
-<ntv-table [config]="{ placement: 'bottom-start', arrow: false }">
-  Custom content
+<ntv-table>
+
+//Table Head
+   <ng-template #header let-column>
+      <span>{{ column.header }}</span>
+    </ng-template>
+
+//Table Body
+       <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-onToggleExpansion="onToggleExpansion"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
 </ntv-table>
 \`\`\`
         `,
@@ -112,14 +197,24 @@ A highly configurable table component that supports multiple features and custom
       control: 'boolean',
       description: 'Show column settings button',
     },
-    persistColumnVisibility: {
-      control: 'boolean',
-      description: 'Enable localStorage persistence for column visibility',
-    },
     storageKey: {
       control: 'text',
       description:
         'Custom localStorage key for column visibility (default: "ntv-table-columns")',
+    },
+    tableBGColor: {
+      control: 'text',
+      description: 'Background color (hex code or Tailwind color class)',
+      table: {
+        defaultValue: { summary: '#ffffff' },
+      },
+    },
+    tableHeaderBGColor: {
+      control: 'text',
+      description: 'Header background color (hex code or Tailwind color class)',
+      table: {
+        defaultValue: { summary: '#f3f4f6' },
+      },
     },
   },
 };
@@ -136,7 +231,7 @@ export const Default: Story = {
     columnDraggable: false,
     expandableRows: false,
     hasIndex: true,
-    hasCheckBox: false,
+    hasCheckBox: true,
     maxLockedRows: 3,
     lockIdentifierField: 'licenseKey',
     showColumnSettings: true,
@@ -158,8 +253,6 @@ export const Default: Story = {
         [data]="data"
         [tableStyle]="tableStyle"
         [columnDraggable]="columnDraggable" 
-        [expandableColumn]="expandableColumn"
-        [expandableRows]="expandableRows"
         [hasIndex]="hasIndex"
         [maxLockedRows]="maxLockedRows"
         [lockIdentifierField]="lockIdentifierField"
@@ -179,7 +272,6 @@ export const Default: Story = {
             let-hasIndex="hasIndex"
             let-rowIndex="rowIndex"
             let-stickyTop="stickyTop"
-            let-expandableRows="expandableRows"
             let-onToggleExpansion="onToggleExpansion"
         >
           <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
@@ -294,31 +386,29 @@ export const WithFiltering: Story = {
             [data]="data"
             [tableStyle]="tableStyle"
             [columnDraggable]="columnDraggable"
-            [expandableColumn]="expandableColumn"
             [expandableRows]="expandableRows"
             [hasIndex]="hasIndex"
-            
             [maxLockedRows]="maxLockedRows"
             [lockIdentifierField]="lockIdentifierField"
             [showColumnSettings]="showColumnSettings">
             <ng-template #header let-column>
-              {{ column.header }}
+              <span>{{ column.header }}</span>
             </ng-template>
 
             <ng-template
-            #body
-            let-rowData
-            let-columns="columns"
-            let-isLocked="isLocked"
-            let-onLockRow="onLockRow"
-            let-onUnlockRow="onUnlockRow"
-            let-canLockMoreRows="canLockMoreRows"
-            let-hasIndex="hasIndex"
-            let-rowIndex="rowIndex"
-            let-stickyTop="stickyTop"
-            let-expandableRows="expandableRows"
-            let-onToggleExpansion="onToggleExpansion"
-        >
+              #body
+              let-rowData
+              let-columns="columns"
+              let-isLocked="isLocked"
+              let-onLockRow="onLockRow"
+              let-onUnlockRow="onUnlockRow"
+              let-canLockMoreRows="canLockMoreRows"
+              let-hasIndex="hasIndex"
+              let-rowIndex="rowIndex"
+              let-stickyTop="stickyTop"
+              let-expandableRows="expandableRows"
+              let-onToggleExpansion="onToggleExpansion"
+            >
           <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
             @if (hasIndex) {
               <td class="index-column">{{ rowIndex }}</td>
@@ -425,14 +515,13 @@ export const WithDraggableColumns: Story = {
         [data]="data"
         [tableStyle]="tableStyle"
         [columnDraggable]="columnDraggable"
-        [expandableColumn]="expandableColumn"
         [expandableRows]="expandableRows"
         [hasIndex]="hasIndex"
         [maxLockedRows]="maxLockedRows"
         [lockIdentifierField]="lockIdentifierField"
         [showColumnSettings]="showColumnSettings">
         <ng-template #header let-column>
-          {{ column.header }}
+          <span>{{ column.header }}</span>
         </ng-template>
       </ntv-table>
       </div>
@@ -465,14 +554,19 @@ export const WithExpandableRows: Story = {
     showColumnSettings: true,
   },
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      ...globalHandlers,
+    },
+    moduleMetadata: {
+      imports: [Card, TruncatePipe],
+    },
     template: `
       <ntv-table 
         [columns]="columns"
         [data]="data"
         [tableStyle]="tableStyle"
         [columnDraggable]="columnDraggable"
-        [expandableColumn]="expandableColumn"
         [expandableRows]="expandableRows"
         [hasIndex]="hasIndex"
         [hasCheckBox]="hasCheckBox"
@@ -480,8 +574,104 @@ export const WithExpandableRows: Story = {
         [lockIdentifierField]="lockIdentifierField"
         [showColumnSettings]="showColumnSettings">
         <ng-template #header let-column>
-          {{ column.header }}
+          <span>{{ column.header }}</span>
         </ng-template>
+
+         <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-onToggleExpansion="onToggleExpansion"
+            let-expandableRows="expandableRows"
+            let-isRowExpanded="isRowExpanded"
+            let-expandIcon="expandIcon"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+                 @if (expandableRows) {
+              <td class="expand-column">
+                <button 
+                  class="expand-btn" 
+                  title="Toggle row expansion"
+                  (click)="onToggleExpansion(rowData)"
+                  [innerHTML]="expandIcon"
+                >
+                </button>
+              </td>
+            }
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
+
         <ng-template #expandedContent let-rowData>
           <div class="p-4">
             <h4 class="font-semibold mb-2">Expanded Details for {{ rowData.dealer }}</h4>
@@ -524,9 +714,9 @@ export const WithCheckboxes: Story = {
   render: (args) => ({
     props: {
       ...args,
-      onSelectedRowsChange: (selectedRows: Set<any>) => {
+      onSelectedRowsChange: (selectedRows: any[]) => {
         console.log('Selected rows:', selectedRows);
-        console.log('Selected count:', selectedRows.size);
+        console.log('Selected count:', selectedRows.length);
       },
     },
     template: `
@@ -539,7 +729,6 @@ export const WithCheckboxes: Story = {
           [data]="data"
           [tableStyle]="tableStyle"
           [columnDraggable]="columnDraggable"
-          [expandableColumn]="expandableColumn"
           [expandableRows]="expandableRows"
           [hasIndex]="hasIndex"
           [hasCheckBox]="hasCheckBox"
@@ -548,7 +737,7 @@ export const WithCheckboxes: Story = {
           [showColumnSettings]="showColumnSettings"
           (selectedRowsChange)="onSelectedRowsChange($event)">
           <ng-template #header let-column>
-            {{ column.header }}
+            <span>{{ column.header }}</span>
           </ng-template>
         </ntv-table>
       </div>
@@ -581,36 +770,155 @@ export const FullFeatured: Story = {
   render: (args) => ({
     props: {
       ...args,
-      onSelectedRowsChange: (selectedRows: Set<any>) => {
+      ...globalHandlers,
+      onSelectedRowsChange: (selectedRows: any[]) => {
         console.log('Selected rows:', selectedRows);
       },
     },
+    moduleMetadata: {
+      imports: [Card, TruncatePipe],
+    },
     template: `
-
-    <div class="m-4">
-      <ntv-card [variant]="'elevated'" [rounded]="'lg'">
-      <div class="p-4">
       <ntv-table 
         [columns]="columns"
         [data]="data"
         [tableStyle]="tableStyle"
         [columnDraggable]="columnDraggable"
-        [expandableColumn]="expandableColumn"
         [expandableRows]="expandableRows"
         [hasIndex]="hasIndex"
         [hasCheckBox]="hasCheckBox"
-        
         [maxLockedRows]="maxLockedRows"
         [lockIdentifierField]="lockIdentifierField"
         [showColumnSettings]="showColumnSettings"
-        (selectedRowsChange)="onSelectedRowsChange($event)">
+        (selectedRowsChange)="onSelectedRowsChange($event)"
+        >
+
         <ng-template #header let-column>
-          {{ column.header }}
+          <span>{{ column.header }}</span>
+        </ng-template>
+
+         <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-onToggleExpansion="onToggleExpansion"
+            let-expandableRows="expandableRows"
+            let-isRowExpanded="isRowExpanded"
+            let-expandIcon="expandIcon"
+            let-hasCheckBox="hasCheckBox"
+            let-isRowSelected="isRowSelected"
+            let-onToggleRowSelection="onToggleRowSelection"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+           @if (hasCheckBox) {
+              <td class="checkbox-column">
+                <input
+                  type="checkbox"
+                  class="checkbox-input row-checkbox"
+                  [checked]="isRowSelected(rowData)"
+                  (change)="onToggleRowSelection(rowData)"
+                  [title]="isRowSelected(rowData) ? 'Deselect row' : 'Select row'"
+                />
+              </td>
+              }
+
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+                 @if (expandableRows) {
+              <td class="expand-column">
+                <button 
+                  class="expand-btn" 
+                  title="Toggle row expansion"
+                  (click)="onToggleExpansion(rowData)"
+                  [innerHTML]="expandIcon"
+                >
+                </button>
+              </td>
+            }
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
+
+        <ng-template #expandedContent let-rowData>
+          <div class="p-4">
+            <h4 class="font-semibold mb-2">Expanded Details for {{ rowData.dealer }}</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div><strong>License Key:</strong> {{ rowData.licenseKey }}</div>
+              <div><strong>Host:</strong> {{ rowData.host }}</div>
+              <div><strong>Last Updated:</strong> {{ rowData.lastUpdated }}</div>
+              <div><strong>Installation Date:</strong> {{ rowData.installationDate }}</div>
+            </div>
+          </div>
         </ng-template>
       </ntv-table>
-      </div>
-      </ntv-card>
-    </div>
     `,
   }),
   parameters: {
@@ -623,8 +931,280 @@ export const FullFeatured: Story = {
   },
 };
 
-// 7. Table with LocalStorage Persistence
-export const WithLocalStoragePersistence: Story = {
+// 7. Table with Header
+export const WithHeaderTable: Story = {
+  render: (args) => {
+    const mockData = sampleData();
+    const component = {
+      ...args,
+      ...globalHandlers,
+      selectedRows: [] as any[],
+      searchTerm: '',
+      originalData: [...mockData],
+      currentData: [...mockData],
+
+      filterData() {
+        if (!this.searchTerm) {
+          return [...this.originalData];
+        } else {
+          return this.originalData.filter((row: any) =>
+            Object.values(row).some((value) =>
+              String(value)
+                .toLowerCase()
+                .includes(this.searchTerm.toLowerCase())
+            )
+          );
+        }
+      },
+      onSearchChange(searchTerm: string) {
+        console.log('Search term:', searchTerm);
+        this.searchTerm = searchTerm;
+        this.currentData = this.filterData();
+      },
+
+      onSelectedRowsChange(selected: any[]) {
+        this.selectedRows = selected;
+      },
+
+      onDeleteMultiple() {
+        if (this.selectedRows.length === 0) {
+          alert('Please select rows to delete');
+          return;
+        }
+
+        const selectedIds = this.selectedRows.map((row) => row.licenseKey);
+        this.currentData = this.currentData.filter(
+          (row) => !selectedIds.includes(row.licenseKey)
+        );
+        this.originalData = this.originalData.filter(
+          (row) => !selectedIds.includes(row.licenseKey)
+        );
+        this.selectedRows = [];
+
+        console.log(`Deleted ${selectedIds.length} rows`);
+        console.log('Remaining data:', this.currentData);
+      },
+
+      onDeleteRow1: function (item: any) {
+        // Show confirmation dialog
+        const confirmed = confirm(
+          `Are you sure you want to delete ${item.licenseKey}?`
+        );
+
+        if (confirmed) {
+          console.log('Delete row:', item);
+          // Remove item from data array
+          const currentData = (this as any)['currentData'];
+          const updatedData = currentData.filter(
+            (row: any) => row.licenseKey !== item.licenseKey
+          );
+          (this as any)['currentData'] = updatedData;
+        }
+      },
+      onExportAll: function () {
+        // Get column headers for CSV
+        const headers = this.columns.map((col: any) => col.header).join(',');
+
+        // Convert all current data to CSV format
+        const csvRows = this.currentData.map((row: any) => {
+          return this.columns
+            .map((col: any) => {
+              const value = row[col.field];
+              // Escape commas and quotes in CSV values
+              if (
+                typeof value === 'string' &&
+                (value.includes(',') || value.includes('"'))
+              ) {
+                return `"${value.replace(/"/g, '""')}"`;
+              }
+              return value || '';
+            })
+            .join(',');
+        });
+
+        // Combine headers and data
+        const csvContent = [headers, ...csvRows].join('\n');
+
+        // Create and download the file
+        const blob = new Blob([csvContent], {
+          type: 'text/csv;charset=utf-8;',
+        });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute(
+          'download',
+          `all_data_export_${new Date().toISOString().split('T')[0]}.csv`
+        );
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log(`Exported all ${this.currentData.length} rows to CSV`);
+      },
+    };
+
+    return {
+      props: component,
+      moduleMetadata: {
+        imports: [Card, TruncatePipe],
+      },
+      template: `
+       <div class="m-4">
+        <ntv-card [variant]="'default'" [rounded]="'lg'">
+        <div class="p-4">
+            <div class="flex items-center justify-between">
+              <p>Selected Rows: {{ selectedRows.length }}</p>
+
+            <div class="mb-2 flex  items-center justify-end gap-3">
+              @if (selectedRows.length > 1) {
+              <button 
+                class="bg-red-600 p-2 rounded-md text-white font-semibold hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                [disabled]="selectedRows.length === 0"
+                (click)="onDeleteMultiple()"
+              >
+                Delete Multiple ({{selectedRows.length}})
+              </button>
+              }
+
+              
+              <button 
+                class="bg-green-600 p-2 rounded-md text-white font-semibold hover:bg-green-700"
+                (click)="onExportAll()"
+              >
+                Export All Data
+              </button>
+
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  class="border px-3 py-2 rounded-lg w-[300px]"
+                  (input)="onSearchChange($event.target.value)"
+                />
+              </div>
+            </div>
+
+          <ntv-table 
+            [columns]="columns"
+            [data]="currentData"
+            [tableStyle]="tableStyle"
+            [columnDraggable]="columnDraggable"
+            [expandableRows]="expandableRows"
+            [hasIndex]="hasIndex"
+            [hasCheckBox]="hasCheckBox"
+            [maxLockedRows]="maxLockedRows"
+            [lockIdentifierField]="lockIdentifierField"
+            [showColumnSettings]="showColumnSettings"
+            [storageKey]="storageKey"
+            (selectedRowsChange)="onSelectedRowsChange($event)">
+
+            <ng-template #header let-column>
+              <span>{{ column.header }}</span>
+            </ng-template>
+
+             <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-expandableRows="expandableRows"
+            let-onToggleExpansion="onToggleExpansion"
+            let-hasCheckBox="hasCheckBox"
+            let-isRowSelected="isRowSelected"
+            let-onToggleRowSelection="onToggleRowSelection"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+            @if (hasCheckBox) {
+              <td class="checkbox-column">
+                <input
+                  type="checkbox"
+                  class="checkbox-input row-checkbox"
+                  [checked]="isRowSelected(rowData)"
+                  (change)="onToggleRowSelection(rowData)"
+                  [title]="isRowSelected(rowData) ? 'Deselect row' : 'Select row'"
+                />
+              </td>
+            }
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow1(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
+          </ntv-table>
+        </div>
+        </ntv-card>
+        </div>
+      `,
+    };
+  },
   args: {
     columns: sampleColumns(),
     data: sampleData(),
@@ -632,59 +1212,297 @@ export const WithLocalStoragePersistence: Story = {
     columnDraggable: false,
     expandableRows: false,
     hasIndex: true,
-    hasCheckBox: false,
+    hasCheckBox: true,
     maxLockedRows: 3,
     lockIdentifierField: 'licenseKey',
     showColumnSettings: true,
-    persistColumnVisibility: true,
-    storageKey: 'demo-table-columns',
+    storageKey: 'demo-tableHeaders-columns',
   },
-  render: (args) => ({
-    props: args,
-    template: `
-      <div>
-        <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <h4 class="font-semibold mb-2 text-blue-800 dark:text-blue-200">LocalStorage Persistence Demo</h4>
-          <p class="text-sm text-blue-700 dark:text-blue-300 mb-2">
-            This table saves column visibility to localStorage with key: <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">{{ storageKey }}</code>
-          </p>
-          <p class="text-sm text-blue-700 dark:text-blue-300">
-            Try hiding/showing columns using the column settings, then refresh the page to see the state persist.
-          </p>
-        </div>
-        <ntv-table 
-          [columns]="columns"
-          [data]="data"
-          [tableStyle]="tableStyle"
-          [columnDraggable]="columnDraggable"
-          [expandableColumn]="expandableColumn"
-          [expandableRows]="expandableRows"
-          [hasIndex]="hasIndex"
-          [hasCheckBox]="hasCheckBox"
-          [maxLockedRows]="maxLockedRows"
-          [lockIdentifierField]="lockIdentifierField"
-          [showColumnSettings]="showColumnSettings"
-          [persistColumnVisibility]="persistColumnVisibility"
-          [storageKey]="storageKey">
-          <ng-template #header let-column>
-            {{ column.header }}
-          </ng-template>
-        </ntv-table>
-      </div>
-    `,
-  }),
   parameters: {
     docs: {
       description: {
         story:
-          'Table with localStorage persistence enabled. Column visibility changes are automatically saved to localStorage and restored on page refresh. Use a custom storage key to avoid conflicts with other tables.',
+          'Table with external search functionality. The search box filters the data before passing it to the table component. Column visibility changes are saved to localStorage.',
       },
     },
   },
 };
 
-// 8. Table with Header
-export const WithHeaderTable: Story = {
+// 8. Custom Style
+export const CustomStyle: Story = {
+  render: (args) => {
+    const mockData = sampleData();
+    const component = {
+      ...args,
+      ...globalHandlers,
+      selectedRows: [] as any[],
+      searchTerm: '',
+      originalData: [...mockData],
+      currentData: [...mockData],
+
+      filterData() {
+        if (!this.searchTerm) {
+          return [...this.originalData];
+        } else {
+          return this.originalData.filter((row: any) =>
+            Object.values(row).some((value) =>
+              String(value)
+                .toLowerCase()
+                .includes(this.searchTerm.toLowerCase())
+            )
+          );
+        }
+      },
+      onSearchChange(searchTerm: string) {
+        console.log('Search term:', searchTerm);
+        this.searchTerm = searchTerm;
+        this.currentData = this.filterData();
+      },
+
+      onSelectedRowsChange(selected: any[]) {
+        this.selectedRows = selected;
+      },
+
+      onDeleteMultiple() {
+        if (this.selectedRows.length === 0) {
+          alert('Please select rows to delete');
+          return;
+        }
+
+        const selectedIds = this.selectedRows.map((row) => row.licenseKey);
+        this.currentData = this.currentData.filter(
+          (row) => !selectedIds.includes(row.licenseKey)
+        );
+        this.originalData = this.originalData.filter(
+          (row) => !selectedIds.includes(row.licenseKey)
+        );
+        this.selectedRows = [];
+
+        console.log(`Deleted ${selectedIds.length} rows`);
+        console.log('Remaining data:', this.currentData);
+      },
+
+      onDeleteRow1: function (item: any) {
+        // Show confirmation dialog
+        const confirmed = confirm(
+          `Are you sure you want to delete ${item.licenseKey}?`
+        );
+
+        if (confirmed) {
+          console.log('Delete row:', item);
+          // Remove item from data array
+          const currentData = (this as any)['currentData'];
+          const updatedData = currentData.filter(
+            (row: any) => row.licenseKey !== item.licenseKey
+          );
+          (this as any)['currentData'] = updatedData;
+        }
+      },
+      onExportAll: function () {
+        // Get column headers for CSV
+        const headers = this.columns.map((col: any) => col.header).join(',');
+
+        // Convert all current data to CSV format
+        const csvRows = this.currentData.map((row: any) => {
+          return this.columns
+            .map((col: any) => {
+              const value = row[col.field];
+              // Escape commas and quotes in CSV values
+              if (
+                typeof value === 'string' &&
+                (value.includes(',') || value.includes('"'))
+              ) {
+                return `"${value.replace(/"/g, '""')}"`;
+              }
+              return value || '';
+            })
+            .join(',');
+        });
+
+        // Combine headers and data
+        const csvContent = [headers, ...csvRows].join('\n');
+
+        // Create and download the file
+        const blob = new Blob([csvContent], {
+          type: 'text/csv;charset=utf-8;',
+        });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute(
+          'download',
+          `all_data_export_${new Date().toISOString().split('T')[0]}.csv`
+        );
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log(`Exported all ${this.currentData.length} rows to CSV`);
+      },
+    };
+
+    return {
+      props: component,
+      moduleMetadata: {
+        imports: [Card, TruncatePipe],
+      },
+      template: `
+       <div class="m-4">
+        <ntv-card [variant]="'default'" [rounded]="'lg'">
+        <div class="p-4">
+            <div class="flex items-center justify-between">
+              <p>Selected Rows: {{ selectedRows.length }}</p>
+
+            <div class="mb-2 flex  items-center justify-end gap-3">
+              @if (selectedRows.length > 1) {
+              <button 
+                class="bg-red-600 p-2 rounded-md text-white font-semibold hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                [disabled]="selectedRows.length === 0"
+                (click)="onDeleteMultiple()"
+              >
+                Delete Multiple ({{selectedRows.length}})
+              </button>
+              }
+
+              
+              <button 
+                class="bg-green-600 p-2 rounded-md text-white font-semibold hover:bg-green-700"
+                (click)="onExportAll()"
+              >
+                Export All Data
+              </button>
+
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  class="border px-3 py-2 rounded-lg w-[300px]"
+                  (input)="onSearchChange($event.target.value)"
+                />
+              </div>
+            </div>
+
+          <ntv-table 
+            [columns]="columns"
+            [data]="currentData"
+            [tableHeaderBGColor]="tableHeaderBGColor"
+            [tableStyle]="tableStyle"
+            [columnDraggable]="columnDraggable"
+            [expandableRows]="expandableRows"
+            [hasIndex]="hasIndex"
+            [hasCheckBox]="hasCheckBox"
+            [maxLockedRows]="maxLockedRows"
+            [lockIdentifierField]="lockIdentifierField"
+            [showColumnSettings]="showColumnSettings"
+            [storageKey]="storageKey"
+            (selectedRowsChange)="onSelectedRowsChange($event)">
+
+            <ng-template #header let-column>
+              <span >{{ column.header }}</span>
+            </ng-template>
+
+             <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-expandableRows="expandableRows"
+            let-onToggleExpansion="onToggleExpansion"
+            let-hasCheckBox="hasCheckBox"
+            let-isRowSelected="isRowSelected"
+            let-onToggleRowSelection="onToggleRowSelection"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop" class="text-red-700">
+            @if (hasCheckBox) {
+              <td class="checkbox-column">
+                <input
+                  type="checkbox"
+                  class="checkbox-input row-checkbox"
+                  [checked]="isRowSelected(rowData)"
+                  (change)="onToggleRowSelection(rowData)"
+                  [title]="isRowSelected(rowData) ? 'Deselect row' : 'Select row'"
+                />
+              </td>
+            }
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow1(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
+          </ntv-table>
+        </div>
+        </ntv-card>
+        </div>
+      `,
+    };
+  },
   args: {
     columns: sampleColumns(),
     data: sampleData(),
@@ -692,50 +1510,18 @@ export const WithHeaderTable: Story = {
     columnDraggable: false,
     expandableRows: false,
     hasIndex: true,
-    hasCheckBox: false,
+    hasCheckBox: true,
     maxLockedRows: 3,
     lockIdentifierField: 'licenseKey',
     showColumnSettings: true,
-    persistColumnVisibility: true,
     storageKey: 'demo-tableHeaders-columns',
+    tableHeaderBGColor: '#FAF6FF',
   },
-  render: (args) => ({
-    props: args,
-    template: `
-      <div class="outline outline-1 outline-gray-400 rounded-lg p-4 m-4">
-     <div class="">
-     - searchbar here
-
-    - when multiple items selected show the multiple delete here
-     
-     </div>
-      
-        <ntv-table 
-          [columns]="columns"
-          [data]="data"
-          [tableStyle]="tableStyle"
-          [columnDraggable]="columnDraggable"
-          [expandableColumn]="expandableColumn"
-          [expandableRows]="expandableRows"
-          [hasIndex]="hasIndex"
-          [hasCheckBox]="hasCheckBox"
-          [maxLockedRows]="maxLockedRows"
-          [lockIdentifierField]="lockIdentifierField"
-          [showColumnSettings]="showColumnSettings"
-          [persistColumnVisibility]="persistColumnVisibility"
-          [storageKey]="storageKey">
-          <ng-template #header let-column>
-            {{ column.header }}
-          </ng-template>
-        </ntv-table>
-      </div>
-    `,
-  }),
   parameters: {
     docs: {
       description: {
         story:
-          'Table with localStorage persistence enabled. Column visibility changes are automatically saved to localStorage and restored on page refresh. Use a custom storage key to avoid conflicts with other tables.',
+          'Table with external search functionality. The search box filters the data before passing it to the table component. Column visibility changes are saved to localStorage.',
       },
     },
   },
