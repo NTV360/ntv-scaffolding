@@ -7,67 +7,80 @@ import {
   HostListener,
   viewChild,
   ElementRef,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-//Components
+// Components
 import { Button } from '../button/button';
 import { Popover } from '../popover/popover';
-import { Capitalize } from '../../pipes';
+import { CapitalizePipe, TruncatePipe } from '../../pipes';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { FILE_ICONS } from '../../utils';
 
 const components = [Button];
+
+/**
+ * Calendar Component
+ *
+ * This component displays a calendar with support for multiple views (month, week, day),
+ * event management (create, edit, delete), and year navigation.
+ */
 @Component({
   standalone: true,
   selector: 'ntv-calendar',
   templateUrl: './calendar.html',
   styleUrl: './calendar.css',
-  imports: [FormsModule, components, Popover, Capitalize],
+  imports: [FormsModule, components, Popover, CapitalizePipe, TruncatePipe],
 })
 export class Calendar {
-  // Element reference of the yearPickerList div
+  /** Used to sanitize potentially unsafe HTML content for safe binding */
+  private sanitizer = inject(DomSanitizer);
+
+  /** Reference to the yearPickerList DOM element */
   private _yearPickerList =
     viewChild<ElementRef<HTMLDivElement>>('yearPickerList');
 
-  // Popover reference
+  /** Popover reference for switching calendar views */
   private _viewPopover = viewChild.required<Popover>('viewPopover');
 
-  // Number of years (in the date year picker) to show
-  private readonly _numberOfYearsToShow = 50;
+  /** Number of years to display in the year picker */
+  private readonly _numberOfYearsToShow = 20;
 
-  // Today's date
+  /** Today's date */
   public today = new Date();
 
-  // Reactive signal for the current date
+  /** Current date signal */
   public currentDate = signal(this.today);
 
-  // Current calendar view mode
+  /** Current view mode of the calendar */
   public view = signal<'day' | 'week' | 'month'>('month');
 
-  // Calendar view modes
+  /** Available calendar views */
   public views = signal(['month', 'week', 'day']);
 
-  // Date selected for UI highlight
+  /** Currently selected date for highlight */
   public selectedDateForHighlight = signal<Date | null>(null);
 
-  // Emits selected date to parent components
+  /** Emits selected date to parent component */
   public selectedDateData = output<Date>();
 
-  // Accepts selected date from parent components
+  /** Accepts selected date from parent component */
   public savedSelectedDate = input<Date>();
 
-  // Tracks the currently selected date
+  /** The selected date for event creation/editing */
   public selectedDate = signal<Date | null>(null);
 
-  // Controls visibility of the modal
+  /** Modal visibility state */
   public showModal = signal(false);
 
-  // Controls visibility of the year picker
+  /** Year picker visibility state */
   public showYearPicker = signal(false);
 
-  // Tracks the date currently being viewed for events
+  /** Date for which events are being viewed */
   public viewingEventsFor = signal<Date | null>(null);
 
-  // Holds the event currently being edited
+  /** Currently editing event */
   public editingEvent = signal<{
     id: string;
     title: string;
@@ -79,28 +92,29 @@ export class Calendar {
     endTime?: string;
   } | null>(null);
 
-  // New event input: title
+  /** New event title */
   public newEventTitle = '';
 
-  // New event input: description
+  /** New event description */
   public newEventDescription = '';
 
-  // New event input: background color
+  /** New event background color */
   public newEventColor = '#3B82F6';
 
-  // New event input: all-day toggle
+  /** Flag to indicate if new event is all-day */
   public newEventIsAllDay = true;
 
-  // New event input: start time
+  /** New event start time */
   public newEventStartTime = '09:00';
 
-  // New event input: end time
+  /** New event end time */
   public newEventEndTime = '10:00';
 
-  // New event input: selected date
+  /** New event date */
   public newEventDate = '';
 
-  // Color palette for event backgrounds
+  /** Available pastel colors for event backgrounds */
+
   public pastelColors = [
     '#3B82F6', // Blue
     '#EF4444', // Red
@@ -124,10 +138,31 @@ export class Calendar {
     '#A5A5A5', // Medium Gray
   ];
 
-  // Current year value
+  /** SVG icons (sanitized HTML) */
+  public readonly goPrevIcon: SafeHtml;
+  public readonly goNextIcon: SafeHtml;
+  public readonly downArrow: SafeHtml;
+  public readonly calendar: SafeHtml;
+
+  constructor() {
+    this.goPrevIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['CHEVRON_LEFT']
+    );
+    this.goNextIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['CHEVRON_RIGHT']
+    );
+    this.downArrow = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['CHEVRON_DOWN']
+    );
+    this.calendar = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['CALENDAR']
+    );
+  }
+
+  /** Current year */
   public year = this.today.getFullYear();
 
-  // Reactive list of all calendar events
+  /** Reactive list of events */
   public events = signal<
     {
       id: string;
@@ -141,7 +176,7 @@ export class Calendar {
     }[]
   >([]);
 
-  // List of month names
+  /** List of month names */
   public months = [
     'January',
     'February',
@@ -157,28 +192,28 @@ export class Calendar {
     'December',
   ];
 
-  // Abbreviated day names for weekly view
+  /** Abbreviated weekday names */
   public weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Computed name of the current month
+  /** Current month name (computed) */
   public currentMonthName = computed(() =>
     this.currentDate().toLocaleString('default', { month: 'long' })
   );
 
-  // Computed value of the current year
+  /** Current year (computed) */
   public currentYear = computed(() => this.currentDate().getFullYear());
 
-  // List of years for year picker (current year ± 50 years)
+  /** Available years for the year picker */
   public availableYears = signal<number[]>(
-    this.generateYears(this.currentYear()) // Returns 50 years ago until currentYear as default list
+    this.generateYears(this.currentYear())
   );
 
-  // Week view computed properties
-  public currentWeekStart = computed(() => {
-    const date = this.currentDate();
-    return this.startOfWeek(date);
-  });
+  /** Start date of the current week */
+  public currentWeekStart = computed(() =>
+    this.startOfWeek(this.currentDate())
+  );
 
+  /** Computed days of the current week */
   public currentWeekDays = computed(() => {
     const start = this.currentWeekStart();
     const days = [];
@@ -200,7 +235,7 @@ export class Calendar {
 
   /**
    * Computes the weeks for the current month view, including days from adjacent months
-   * to fill complete weeks. Each week contains 7 days with associated metadata.
+   * to fill complete weeks. Each week contains 7 days with associated metadata
    *
    * @returns {Array<Array<{date: Date, events: any[], isToday: boolean, isCurrentMonth: boolean, isSelected: boolean, isPast: boolean}>>}
    *   Array of weeks, where each week is an array of day objects containing:
@@ -239,82 +274,80 @@ export class Calendar {
         currentDate.setDate(currentDate.getDate() + 1);
       }
       weeks.push(week);
-
-      console.log(week, 'week');
     }
     return weeks;
   });
 
-  // Day view computed properties
-  public currentDayEvents = computed(() => {
-    return this.getEventsForDate(this.currentDate());
-  });
+  /** Events for the current day */
+  public currentDayEvents = computed(() =>
+    this.getEventsForDate(this.currentDate())
+  );
 
+  /** Events for the selected day */
   public eventsOnSelectedDay = computed(() => {
     const target = this.viewingEventsFor();
     return target ? this.getEventsForDate(target) : [];
   });
 
+  /**
+   * Retrieve events for a specific date.
+   * @param date Date to check.
+   */
   public getEventsForDate(date: Date) {
     return this.events().filter((event) => this.isSameDay(date, event.date));
   }
 
+  /** Check if two dates are the same day */
   public isSameDay(date1: Date, date2: Date): boolean {
     return date1.toDateString() === date2.toDateString();
   }
 
-  // Check if a date is in the past (before today)
+  /** Check if a date is in the past */
   public isPastDate(date: Date): boolean {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    today.setHours(0, 0, 0, 0);
     const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    checkDate.setHours(0, 0, 0, 0);
     return checkDate < today;
   }
 
-  // Navigation methods
+  /** Navigate forward by day/week/month */
   public goNext = () => {
     const view = this.view();
     const current = this.currentDate();
-
-    if (view === 'day') {
-      this.currentDate.set(this.addDays(current, 1));
-    } else if (view === 'week') {
-      this.currentDate.set(this.addDays(current, 7));
-    } else if (view === 'month') {
-      this.currentDate.set(this.addMonths(current, 1));
-    }
+    if (view === 'day') this.currentDate.set(this.addDays(current, 1));
+    else if (view === 'week') this.currentDate.set(this.addDays(current, 7));
+    else if (view === 'month') this.currentDate.set(this.addMonths(current, 1));
   };
 
+  /** Navigate backward by day/week/month */
   public goPrev = () => {
     const view = this.view();
     const current = this.currentDate();
-
-    if (view === 'day') {
-      this.currentDate.set(this.addDays(current, -1));
-    } else if (view === 'week') {
-      this.currentDate.set(this.addDays(current, -7));
-    } else if (view === 'month') {
+    if (view === 'day') this.currentDate.set(this.addDays(current, -1));
+    else if (view === 'week') this.currentDate.set(this.addDays(current, -7));
+    else if (view === 'month')
       this.currentDate.set(this.addMonths(current, -1));
-    }
   };
 
+  /** Reset to today's date */
   public goToToday = () => {
     this.currentDate.set(new Date(this.today));
     this.selectedDateForHighlight.set(new Date(this.today));
   };
 
+  /** Set calendar view (day, week, month) */
   public setView(newView: 'day' | 'week' | 'month', event?: MouseEvent) {
     this.view.set(newView);
-
     this._viewPopover().toggle(event as MouseEvent);
   }
 
-  // Year picker methods
+  /** Toggle year picker */
   public toggleYearPicker = () => {
     this.showYearPicker.set(!this.showYearPicker());
   };
 
+  /** Select a year */
   public selectYear = (year: number) => {
     const currentDate = this.currentDate();
     const newDate = new Date(
@@ -326,65 +359,61 @@ export class Calendar {
     this.showYearPicker.set(false);
   };
 
-  // Go back 50 years
+  /** Show previous 50 years in the picker */
   public goPrevYears = (event: Event) => {
     event.stopPropagation();
     const firstElementYear = this.availableYears()[0];
-    // Subtract 1 since the first element year was already visible / displayed in the avialableYears array
     this.availableYears.set(this.generateYears(firstElementYear - 1));
-
     this.scrollToTop();
   };
 
-  // Go next 50 years
+  /** Show next 50 years in the picker */
   public goNextYears = (event: Event) => {
     event.stopPropagation();
     const lastElementYear =
       this.availableYears()[this.availableYears().length - 1];
     this.availableYears.set(this.generateYears(lastElementYear + 1, 'forward'));
-
     this.scrollToTop();
   };
 
+  /** Close year picker */
   public closeYearPicker = (event?: Event) => {
     event?.stopPropagation();
     this.showYearPicker.set(false);
   };
 
-  // Close year picker when clicking outside
+  /** Close year picker when clicking outside */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
     const yearPickerContainer = target.closest(
       '.calendar__year-picker-container'
     );
-
     if (!yearPickerContainer && this.showYearPicker()) {
       this.closeYearPicker();
     }
   }
 
-  // Enhanced selectDate method with better feedback
+  /** Enhanced selectDate method with better feedback */
   public selectDate(date: Date) {
     // Allow selection of past dates for viewing, but don't highlight them
     // Only set highlighting for non-past dates
     if (!this.isPastDate(date)) {
       this.selectedDateForHighlight.set(new Date(date));
     }
-
     this.selectedDateData.emit(new Date(date));
-
-    // Set current date to the selected date
     this.currentDate.set(new Date(date));
-
-    // Switch to day view to show the selected date details
-    // this.view.set('day');
-
-    // Optional: Add visual feedback
     this.announceSelection(date);
   }
 
-  // Method to provide accessibility announcement
+  // STOP HERE
+
+  /**
+   * Provides an accessibility announcement for screen readers
+   * when a date is selected.
+   *
+   * @param date - The date that was selected.
+   */
   private announceSelection(date: Date) {
     const announcement = `Selected ${date.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -406,6 +435,11 @@ export class Calendar {
     }, 1000);
   }
 
+  /**
+   * Opens the event creation modal for the given date.
+   *
+   * @param date - Optional date to preselect for the event. Defaults to the current date.
+   */
   public startAddEvent(date?: Date) {
     const selectedDate = date || this.currentDate();
 
@@ -427,15 +461,25 @@ export class Calendar {
     this.showModal.set(true);
   }
 
+  /**
+   * Opens the event view modal for a specific date.
+   *
+   * @param date - The date whose events will be displayed.
+   */
   public startViewEvents(date: Date) {
     this.viewingEventsFor.set(date);
     this.showModal.set(true);
   }
 
+  /**
+   * Opens the edit modal for an existing event.
+   * If the event is in the past, it opens in view-only mode.
+   *
+   * @param event - The event object to edit.
+   */
   public startEditEvent(event: any) {
     // Prevent editing events on past dates
     if (this.isPastDate(event.date)) {
-      // Just view the event details without allowing editing
       this.startViewEvents(event.date);
       return;
     }
@@ -452,6 +496,9 @@ export class Calendar {
     this.showModal.set(true);
   }
 
+  /**
+   * Adds a new event or updates an existing one if in edit mode.
+   */
   public addEvent() {
     if (!this.newEventTitle.trim() || !this.newEventDate) return;
 
@@ -481,16 +528,26 @@ export class Calendar {
       this.events.update((events) =>
         events.map((e) => (e.id === this.editingEvent()?.id ? newEvent : e))
       );
-    } else this.events.update((events) => [...events, newEvent]);
+    } else {
+      this.events.update((events) => [...events, newEvent]);
+    }
 
     this.closeModal();
   }
 
+  /**
+   * Deletes an event by its ID.
+   *
+   * @param eventId - The ID of the event to delete.
+   */
   public deleteEvent(eventId: string) {
     this.events.update((events) => events.filter((e) => e.id !== eventId));
     this.closeModal();
   }
 
+  /**
+   * Closes the event modal and resets related states.
+   */
   public closeModal() {
     this.showModal.set(false);
     this.editingEvent.set(null);
@@ -498,47 +555,95 @@ export class Calendar {
     this.viewingEventsFor.set(null);
   }
 
+  /**
+   * Generates a random ID for new events.
+   *
+   * @returns A randomly generated string ID.
+   */
   private generateId(): string {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  // Utility methods
+  // ------------------- Utility methods -------------------
+
+  /**
+   * Returns the first day of the given month.
+   *
+   * @param date - Date within the target month.
+   * @returns The first day of the month.
+   */
   private startOfMonth(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
+  /**
+   * Returns the last day of the given month.
+   *
+   * @param date - Date within the target month.
+   * @returns The last day of the month.
+   */
   private endOfMonth(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0);
   }
 
+  /**
+   * Gets the start of the week (Sunday) for the given date.
+   *
+   * @param date - The date to calculate from.
+   * @returns The starting date of the week.
+   */
   private startOfWeek(date: Date): Date {
     const result = new Date(date);
     const day = result.getDay();
-    const diff = result.getDate() - day;
-    result.setDate(diff);
+    result.setDate(result.getDate() - day);
     return result;
   }
 
+  /**
+   * Gets the end of the week (Saturday) for the given date.
+   *
+   * @param date - The date to calculate from.
+   * @returns The ending date of the week.
+   */
   private endOfWeek(date: Date): Date {
     const result = new Date(date);
     const day = result.getDay();
-    const diff = result.getDate() + (6 - day);
-    result.setDate(diff);
+    result.setDate(result.getDate() + (6 - day));
     return result;
   }
 
+  /**
+   * Adds or subtracts days from a given date.
+   *
+   * @param date - The starting date.
+   * @param n - Number of days to add (negative to subtract).
+   * @returns A new date object with the added days.
+   */
   public addDays(date: Date, n: number): Date {
     const result = new Date(date);
     result.setDate(date.getDate() + n);
     return result;
   }
 
+  /**
+   * Adds or subtracts months from a given date.
+   *
+   * @param date - The starting date.
+   * @param n - Number of months to add (negative to subtract).
+   * @returns A new date object with the added months.
+   */
   private addMonths(date: Date, n: number): Date {
     const result = new Date(date);
     result.setMonth(date.getMonth() + n);
     return result;
   }
 
+  /**
+   * Formats a date into a human-readable string.
+   *
+   * @param date - Date to format.
+   * @returns A formatted string, e.g., "Monday, January 1, 2025".
+   */
   public formatDate(date: Date): string {
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -548,6 +653,12 @@ export class Calendar {
     });
   }
 
+  /**
+   * Formats a date into `YYYY-MM-DD` format for `<input type="date">`.
+   *
+   * @param date - Date to format.
+   * @returns A formatted date string in `YYYY-MM-DD`.
+   */
   private formatDateForInput(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -555,11 +666,23 @@ export class Calendar {
     return `${year}-${month}-${day}`;
   }
 
+  /**
+   * Creates a Date object from a `YYYY-MM-DD` string.
+   *
+   * @param dateString - The date string.
+   * @returns A Date object.
+   */
   private createLocalDate(dateString: string): Date {
     const [year, month, day] = dateString.split('-').map(Number);
     return new Date(year, month - 1, day);
   }
 
+  /**
+   * Formats time (HH:mm) into a 12-hour format with AM/PM.
+   *
+   * @param time - Time string (e.g., "14:30").
+   * @returns A formatted time string (e.g., "2:30 PM").
+   */
   public formatTime(time: string): string {
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
@@ -569,45 +692,40 @@ export class Calendar {
   }
 
   /**
-   * Generate 50 years based on the provided baseYear and direction
+   * Generates a list of 50 years based on the base year and direction.
    *
-   * @param baseYear - Starting date you want to generate from
-   * @param direction - (`forward` | `backward`) - Either go 50 years ahead or go 50 years back. `Default: 'backward'`
-   * @returns {number[]} `Length: 50` Array of years generated in ascending order
+   * @param baseYear - The starting year.
+   * @param direction - 'forward' for future years or 'backward' for past years. Default is 'backward'.
+   * @returns An array of 50 years.
    */
   private generateYears(
     baseYear: number,
     direction: 'forward' | 'backward' = 'backward'
   ): number[] {
     const years: number[] = [];
-
-    switch (direction) {
-      case 'forward':
-        // From baseYear+1 to baseYear+50
-        for (
-          let i = baseYear;
-          i <= baseYear + (this._numberOfYearsToShow - 1);
-          i++
-        ) {
-          years.push(i);
-        }
-        break;
-
-      default:
-        // Previous years from baseYear-49 to baseYear (ascending)
-        for (
-          let i = baseYear - (this._numberOfYearsToShow - 1);
-          i <= baseYear;
-          i++
-        ) {
-          years.push(i);
-        }
+    if (direction === 'forward') {
+      for (
+        let i = baseYear;
+        i <= baseYear + (this._numberOfYearsToShow - 1);
+        i++
+      ) {
+        years.push(i);
+      }
+    } else {
+      for (
+        let i = baseYear - (this._numberOfYearsToShow - 1);
+        i <= baseYear;
+        i++
+      ) {
+        years.push(i);
+      }
     }
-
     return years;
   }
 
-  // Scroll to the top of the list when year picker navigation is clicked
+  /**
+   * Scrolls the year picker to the top when navigating between year sets.
+   */
   private scrollToTop = (): void => {
     const yearPickerList = this._yearPickerList();
     if (yearPickerList) {

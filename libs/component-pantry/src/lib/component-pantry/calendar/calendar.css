@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* NOTE: change later to w-full*/
 .calendar {
-  @apply w-full max-w-7xl mx-auto bg-white rounded-lg shadow-sm font-sans min-h-[800px];
+  @apply flex flex-col w-[900px] max-w-7xl bg-white rounded-lg border-2 shadow-sm font-sans h-[800px];
 }
 
 .calendar__header {
@@ -53,7 +54,7 @@
 }
 
 .calendar__navigation {
-  @apply flex items-center gap-1;
+  @apply flex items-center gap-6;
 }
 
 .calendar__nav-btn {
@@ -93,11 +94,11 @@
 }
 
 .calendar__view-select-trigger > *[data-icon] {
-    @apply transition-all duration-100 inline-block rotate-180;
+    @apply transition-all duration-100 inline-block rotate-90;
 }
 
 .calendar__view-select-trigger.isPopoverOpen > *[data-icon] {
-    @apply rotate-0;
+    @apply -rotate-90;
 }
 
 .calendar__view-select-options-container {
@@ -105,7 +106,11 @@
 }
 
 .calendar__view-select-options-container > * {
-    @apply text-start p-1.5;
+    @apply text-start p-1.5 transition-colors duration-200 rounded;
+}
+
+.calendar__view-select-options-container > *:hover {
+  @apply bg-gray-100;
 }
 
 .calendar__select {
@@ -211,7 +216,7 @@
 }
 
 .calendar__month-grid {
-  @apply grid grid-cols-7 flex-1 bg-gray-200 gap-[1px] relative border border-[#eee];
+  @apply grid grid-cols-7 flex-1 bg-gray-200 relative border border-[#eee];
 }
 
 .calendar__day {
@@ -234,7 +239,6 @@
 
 .calendar__day--past:hover {
   @apply bg-gray-200;
-  transform: scale(1.02);
   border: 1px solid #9ca3af;
 }
 
@@ -259,12 +263,20 @@
 }
 
 .calendar__day:hover:not(.calendar__day--selected) {
-  @apply bg-porcelain border border-platinum scale-105 z-[9];
+  @apply bg-porcelain border border-platinum z-[9];
 }
 
 /* Week Day */
 .calendar__week-day {
-  @apply bg-white p-2 min-h-[400px] cursor-pointer hover:bg-porcelain transition-colors duration-200;
+  @apply bg-white p-2 cursor-pointer hover:bg-porcelain transition-colors duration-200;
+}
+
+.calendar__week-day:first-child {
+  @apply border-l;
+}
+
+.calendar__week-day:last-child {
+  @apply border-r;
 }
 
 .calendar__week-day:focus {
@@ -276,11 +288,11 @@
 }
 
 .calendar__week-day--past {
-  @apply bg-platinum cursor-pointer text-gray-500;
+  @apply bg-gray-100 cursor-pointer text-gray-500;
 }
 
 .calendar__week-day--past:hover {
-  @apply bg-gray-200;
+  @apply bg-gray-100;
 }
 
 .calendar__week-day--past:focus {
@@ -299,6 +311,14 @@
 .calendar__week-day-header {
   @apply bg-white p-4 text-center cursor-pointer hover:bg-porcelain transition-colors duration-200 border-y border-[#eee];
 }
+.calendar__week-day-header:first-child {
+  @apply border-l;
+}
+.calendar__week-day-header:last-child {
+  @apply border-r;
+}
+
+.calendar__week-day-header
 
 .calendar__week-day-header:focus {
   @apply outline-none bg-accent-500;
@@ -495,7 +515,7 @@
 }
 
 .calendar__week-grid {
-  @apply grid grid-cols-7 gap-px flex-1 bg-gray-200;
+  @apply  grid grid-cols-7 gap-px flex-1 bg-gray-200;
 }
 
 /* Day View */

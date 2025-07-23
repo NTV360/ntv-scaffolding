@@ -22,19 +22,7 @@
         (keyup.space)="goPrev()"
         aria-label="Previous"
       >
-        <svg
-          class="calendar__nav-icon"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          ></path>
-        </svg>
+        <span [innerHTML]="goPrevIcon"></span>
       </button>
 
       <div class="calendar__title">
@@ -73,19 +61,7 @@
         (keyup.space)="goNext()"
         aria-label="Next"
       >
-        <svg
-          class="calendar__nav-icon"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          ></path>
-        </svg>
+        <span [innerHTML]="goNextIcon"></span>
       </button>
     </div>
 
@@ -98,61 +74,7 @@
           [attr.aria-label]="'Select year, currently ' + currentYear()"
           [rounded]="'md'"
         >
-          <svg
-            class="w-5 h-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-              id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M22 14V12C22 8.22876 22 6.34315 20.8284 5.17157C19.6569 4 17.7712 4 14 4H10C6.22876 4 4.34315 4 3.17157 5.17157C2 6.34315 2 8.22876 2 12V14C2 17.7712 2 19.6569 3.17157 20.8284C4.34315 22 6.22876 22 10 22H14"
-                stroke="#ffffff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              ></path>
-              <path
-                opacity="0.5"
-                d="M7 4V2.5"
-                stroke="#ffffff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              ></path>
-              <path
-                opacity="0.5"
-                d="M17 4V2.5"
-                stroke="#ffffff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              ></path>
-              <path
-                opacity="0.5"
-                d="M2 9H22"
-                stroke="#ffffff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              ></path>
-              <circle
-                cx="18"
-                cy="18"
-                r="3"
-                stroke="#ffffff"
-                stroke-width="1.5"
-              ></circle>
-              <path
-                d="M20.5 20.5L22 22"
-                stroke="#ffffff"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              ></path>
-            </g>
-          </svg>
+         <span [innerHTML]="calendar"></span>
         </ntv-button>
 
         <!-- Year Picker Dropdown -->
@@ -173,37 +95,13 @@
                 data-control-prev 
                 class="calendar__year-picker-controls" 
                 (click)="goPrevYears($event)">
-                <svg
-                  class="calendar__nav-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 19l-7-7 7-7"
-                  ></path>
-                </svg>
+                <span [innerHTML]="goPrevIcon"></span>
               </button>
               <button 
                 data-control-next 
                 class="calendar__year-picker-controls next" 
                 (click)="goNextYears($event)">
-                   <svg
-                      class="calendar__nav-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      ></path>
-                  </svg>
+                   <span [innerHTML]="goNextIcon"></span>
               </button>
             </div>
             <button
@@ -242,9 +140,7 @@
       <div class="calendar__view-select">
         <button class="calendar__view-select-trigger" [class.isPopoverOpen]="viewPopover.isVisible()" (click)="viewPopover.toggle($event)">
             <span>{{ view() | capitalize }}</span>
-            <span data-icon>
-                <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="-13 -13 78.00 78.00" enable-background="new 0 0 52 52" xml:space="preserve" transform="rotate(90)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.4,34.2l20.5-20.7c0.6-0.6,1.6-0.6,2.2,0l20.5,20.7c0.6,0.6,0.6,1.6,0,2.2l-2.2,2.2 c-0.6,0.6-1.6,0.6-2.2,0L27.1,22.2c-0.6-0.6-1.6-0.6-2.2,0L8.8,38.5c-0.6,0.6-1.6,0.6-2.2,0l-2.2-2.2C3.9,35.7,3.9,34.8,4.4,34.2z"></path> </g></svg>
-            </span>
+            <span data-icon [innerHTML]="downArrow"></span>
         </button>
        <ntv-popover #viewPopover placement="bottom-end">
         <div class="calendar__view-select-options-container">
@@ -314,12 +210,12 @@
               [title]="event.title"
             >
               @if (event.isAllDay) {
-              <span class="calendar__event-title">{{ event.title }}</span>
+              <span class="calendar__event-title">{{ event.title | truncate:10 }}</span>
               } @else {
               <span class="calendar__event-time">{{
                 formatTime(event.startTime!)
               }}</span>
-              <span class="calendar__event-title">{{ event.title }}</span>
+              <span class="calendar__event-title">{{ event.title | truncate:10 }}</span>
               }
             </div>
             } @if (day.events.length > 2) {
@@ -460,7 +356,7 @@
             </div>
             }
             <div class="calendar__event-title">
-              {{ event.title }}
+              {{ event.title | truncate:10 }}
             </div>
           </div>
           }

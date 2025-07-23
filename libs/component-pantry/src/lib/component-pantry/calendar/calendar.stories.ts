@@ -31,3 +31,14 @@ export const Default: Story = {
     template: `<ntv-calendar />`,
   }),
 };
+
+export const WithCard: Story = {
+  render: () => ({
+    args: {},
+    template: `
+      <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 300px;">
+          <ntv-calendar />
+      </div>
+    `,
+  }),
+};
