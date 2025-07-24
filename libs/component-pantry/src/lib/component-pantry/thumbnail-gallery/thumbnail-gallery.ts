@@ -70,6 +70,7 @@ export class ThumbnailGalleryComponent {
   private selectedItems = signal<Set<string>>(new Set());
   hoveredItem = signal<ThumbnailItem | null>(null);
   contextMenuVisible = signal<boolean>(false);
+  contextMenuClosing = signal<boolean>(false);
   contextMenuPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
   contextMenuItem = signal<ThumbnailItem | null>(null);
   activeSubmenu = signal<string | null>(null);
@@ -171,13 +172,39 @@ export class ThumbnailGalleryComponent {
     event.preventDefault();
     
     this.contextMenuItem.set(data.item);
-    this.contextMenuPosition.set({ x: event.clientX, y: event.clientY });
+    
+    // Smart positioning to prevent menu from going off-screen
+    // Note: Context menu uses position: fixed, so we work with viewport coordinates
+    const menuWidth = 220; // Actual min-width from CSS
+    const menuHeight = 200; // Estimated height for typical menu
+    const margin = 20; // Margin from viewport edges
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let x = event.clientX;
+    let y = event.clientY;
+    
+    // Adjust horizontal position if menu would go off right edge
+    if (x + menuWidth + margin > viewportWidth) {
+      x = Math.max(margin, viewportWidth - menuWidth - margin);
+    }
+    
+    // Adjust vertical position if menu would go off bottom edge
+    if (y + menuHeight + margin > viewportHeight) {
+      y = Math.max(margin, viewportHeight - menuHeight - margin);
+    }
+    
+    // Ensure menu doesn't go off left or top edges
+    x = Math.max(margin, x);
+    y = Math.max(margin, y);
+    
+    this.contextMenuPosition.set({ x, y });
     this.contextMenuVisible.set(true);
     
     this.contextMenu.emit({
       item: data.item,
-      x: event.clientX,
-      y: event.clientY,
+      x,
+      y,
       event
     });
   }
@@ -203,8 +230,14 @@ export class ThumbnailGalleryComponent {
   }
 
   hideContextMenu(): void {
-    this.contextMenuVisible.set(false);
-    this.activeSubmenu.set(null);
+    this.contextMenuClosing.set(true);
+    
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+      this.contextMenuVisible.set(false);
+      this.contextMenuClosing.set(false);
+      this.activeSubmenu.set(null);
+    }, 150); // Match animation duration
   }
 
   toggleSubmenu(actionType: string, event?: Event): void {

@@ -201,12 +201,35 @@
   }
 }
 
+@keyframes contextMenuFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+}
+
+.thumbnail-context-menu.closing {
+  animation: contextMenuFadeOut 0.15s ease-in forwards;
+}
+
 .context-menu-header {
-  @apply px-4 pt-3 pb-2 border-b border-gray-200 bg-gray-50;
+  @apply px-4 pt-3 pb-2 border-b border-gray-200 bg-gray-50 flex items-center justify-between;
 }
 
 .context-menu-title {
-  @apply text-sm font-semibold text-gray-700 block whitespace-nowrap overflow-hidden text-ellipsis;
+  @apply text-sm font-semibold text-gray-700 block whitespace-nowrap overflow-hidden text-ellipsis flex-1;
+}
+
+.context-menu-close {
+  @apply ml-2 p-1 rounded-md hover:bg-gray-200 transition-colors duration-150 flex items-center justify-center text-gray-500 hover:text-gray-700;
+}
+
+.context-menu-close:focus {
+  @apply outline-none ring-2 ring-accent-500 ring-offset-1;
 }
 
 .context-menu-content {
@@ -297,6 +320,35 @@
 
 .action-button {
   @apply flex items-center justify-center w-8 h-8 border-0 bg-transparent cursor-pointer transition-all duration-150 text-gray-600 text-sm hover:bg-gray-100 hover:text-gray-800 active:bg-gray-200 rounded;
+}
+
+.action-button--more {
+  @apply w-7 h-7 p-1.5;
+}
+
+.action-button--more svg {
+  @apply w-4 h-4;
+}
+
+/* List Item Checkbox */
+.list-item-checkbox {
+  @apply flex items-center mr-3;
+}
+
+.list-item-checkbox input[type="checkbox"] {
+  @apply w-4 h-4 text-accent-600 bg-gray-100 border-gray-300 rounded focus:ring-accent-500 focus:ring-2 cursor-pointer;
+}
+
+.list-item-checkbox input[type="checkbox"]:checked {
+  @apply bg-accent-600 border-accent-600;
+}
+
+.list-item-checkbox input[type="checkbox"]:hover {
+  @apply border-accent-400;
+}
+
+.list-item-checkbox input[type="checkbox"]:focus {
+  @apply ring-2 ring-accent-500 ring-offset-1;
 }
 
 .action-button.disabled {

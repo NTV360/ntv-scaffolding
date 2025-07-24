@@ -198,6 +198,27 @@ export const WithActionButtons: Story = {
   },
 };
 
+export const ListWithCheckboxes: Story = {
+  ...Template,
+  args: {
+    ...Default.args,
+    layout: 'list',
+    selectable: true,
+    multiSelect: true,
+    showActionButtons: true,
+    showMetadata: true,
+    showFileSize: true,
+    showModified: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'List layout with checkboxes for selection and more options button instead of individual action buttons.'
+      }
+    }
+  }
+};
+
 export const GridSizes: Story = {
   ...Template,
   args: {

@@ -25,11 +25,22 @@
     tabindex="0"
     role="button"
     [attr.aria-label]="'Drag to reorder ' + item.name"
-    (click)="mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})"
-    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})); $event.preventDefault()"
+    (click)="!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null"
+    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null); $event.preventDefault()"
     (contextmenu)="onContextMenuRequest({item, event: $event})"
   >
     <div class="list-item-content">
+      @if (mergedConfig().selectable) {
+      <div class="list-item-checkbox">
+        <input
+          type="checkbox"
+          [checked]="item.selected"
+          (change)="onSelectionToggle(item)"
+          (click)="$event.stopPropagation()"
+          [attr.aria-label]="'Select ' + item.name"
+        />
+      </div>
+      }
       <div class="list-item-icon">
         @if (item.src && item.type === 'image') {
         <img [src]="item.src" [alt]="item.name" class="list-thumbnail" />
@@ -54,18 +65,15 @@
       @if (mergedConfig().showActionButtons) {
       <div class="list-item-actions">
         <button
-          class="action-button"
-          (click)="onActionClick({type: 'view', label: 'View'}, item, $event)"
-          title="View"
+          class="action-button action-button--more"
+          (click)="onContextMenuRequest({item, event: $event}); $event.stopPropagation()"
+          title="More options"
         >
-          👁️
-        </button>
-        <button
-          class="action-button"
-          (click)="onActionClick({type: 'download', label: 'Download'}, item, $event)"
-          title="Download"
-        >
-          ⬇️
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="5" r="2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <circle cx="12" cy="19" r="2" fill="currentColor"/>
+          </svg>
         </button>
       </div>
       }
@@ -88,11 +96,22 @@
     tabindex="0"
     role="button"
     [attr.aria-label]="'Select ' + item.name"
-    (click)="mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})"
-    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})); $event.preventDefault()"
+    (click)="!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null"
+    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null); $event.preventDefault()"
     (contextmenu)="onContextMenuRequest({item, event: $event})"
   >
     <div class="list-item-content">
+      @if (mergedConfig().selectable) {
+      <div class="list-item-checkbox">
+        <input
+          type="checkbox"
+          [checked]="item.selected"
+          (change)="onSelectionToggle(item)"
+          (click)="$event.stopPropagation()"
+          [attr.aria-label]="'Select ' + item.name"
+        />
+      </div>
+      }
       <div class="list-item-icon">
         @if (item.src && item.type === 'image') {
         <img [src]="item.src" [alt]="item.name" class="list-thumbnail" />
@@ -117,18 +136,15 @@
       @if (mergedConfig().showActionButtons) {
       <div class="list-item-actions">
         <button
-          class="action-button"
-          (click)="onActionClick({type: 'view', label: 'View'}, item, $event)"
-          title="View"
+          class="action-button action-button--more"
+          (click)="onContextMenuRequest({item, event: $event}); $event.stopPropagation()"
+          title="More options"
         >
-          👁️
-        </button>
-        <button
-          class="action-button"
-          (click)="onActionClick({type: 'download', label: 'Download'}, item, $event)"
-          title="Download"
-        >
-          ⬇️
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="5" r="2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <circle cx="12" cy="19" r="2" fill="currentColor"/>
+          </svg>
         </button>
       </div>
       }
@@ -213,6 +229,7 @@
 @if (contextMenuVisible() && showContextMenu()) {
 <div
   class="thumbnail-context-menu"
+  [class.closing]="contextMenuClosing()"
   [style.left.px]="contextMenuPosition().x"
   [style.top.px]="contextMenuPosition().y"
 >
@@ -222,6 +239,15 @@
     <div class="context-menu-title" [title]="contextMenuItem()!.name">
       {{ contextMenuItem()!.name }}
     </div>
+    <button 
+      class="context-menu-close"
+      (click)="hideContextMenu()"
+      aria-label="Close menu"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
   </div>
   }
 
