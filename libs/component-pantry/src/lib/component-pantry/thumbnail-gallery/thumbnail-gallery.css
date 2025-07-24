@@ -11,8 +11,9 @@
 
 /* Grid Layout */
 .thumbnail-gallery--grid {
-  @apply grid gap-4 p-4;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  @apply grid p-4;
+  gap: var(--gap, 1rem);
+  grid-template-columns: repeat(var(--columns, 4), 1fr);
 }
 
 /* Drag and Drop Flex Layout */
@@ -54,27 +55,115 @@
   height: var(--thumbnail-size, 160px);
 }
 
-/* List Layout */
-.thumbnail-gallery--list {
-  @apply flex flex-col gap-2 p-4;
+
+
+/* List Layout Styles */
+.thumbnail-list-draggable,
+.thumbnail-list-static {
+  @apply w-full border border-gray-300 rounded bg-white overflow-hidden;
+  min-height: 60px;
 }
 
-/* Size Variants for Grid */
-.thumbnail-gallery--grid.thumbnail-gallery--sm {
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+.thumbnail-list-item {
+  @apply border-b border-gray-200 bg-white transition-colors duration-150;
+  padding: 12px 16px;
+  cursor: pointer;
 }
 
-.thumbnail-gallery--grid.thumbnail-gallery--md {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+.thumbnail-list-item:last-child {
+  @apply border-b-0;
 }
 
-.thumbnail-gallery--grid.thumbnail-gallery--lg {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+.thumbnail-list-item:hover {
+  @apply bg-gray-50;
 }
 
-.thumbnail-gallery--grid.thumbnail-gallery--xl {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+.thumbnail-list-item:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
 }
+
+.thumbnail-list-item:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.thumbnail-list-item.selected {
+  @apply bg-blue-50 border-blue-200;
+}
+
+.thumbnail-gallery--list .thumbnail-list-item.cdk-drag-preview {
+  @apply rounded bg-white;
+  border: 2px solid #3b82f6;
+  transform: rotate(2deg);
+  opacity: 0.95;
+  width: 400px !important;
+  height: auto !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-height: none;
+}
+
+.thumbnail-list-item.cdk-drag-placeholder {
+  @apply opacity-0;
+}
+
+.thumbnail-list-item.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.thumbnail-list-draggable.cdk-drop-list-dragging .thumbnail-list-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.list-item-content {
+  @apply flex items-center justify-between w-full;
+}
+
+.list-item-icon {
+  @apply flex-shrink-0 mr-3;
+  width: 40px;
+  height: 40px;
+}
+
+.list-thumbnail {
+  @apply w-full h-full object-cover rounded;
+}
+
+.list-file-icon {
+  @apply w-full h-full flex items-center justify-center text-2xl bg-gray-100 rounded;
+}
+
+.list-item-details {
+  @apply flex-1 min-w-0;
+}
+
+.list-item-name {
+  @apply font-medium text-gray-900 truncate;
+  font-size: 14px;
+}
+
+.list-item-metadata {
+  @apply flex gap-4 mt-1 text-sm text-gray-500;
+}
+
+.list-item-size,
+.list-item-modified {
+  @apply flex-shrink-0;
+}
+
+.list-item-actions {
+  @apply flex gap-2 ml-4;
+}
+
+/* Draggable list specific styles */
+.thumbnail-list-draggable .thumbnail-list-item {
+  cursor: move;
+}
+
+.thumbnail-list-draggable .thumbnail-list-item .action-button {
+  cursor: pointer;
+}
+
+/* Size variants now only affect thumbnail item sizes, not grid columns */
 
 /* Empty State */
 .empty-state {
@@ -319,7 +408,7 @@
 }
 
 /* CDK Drag and Drop Styles */
-.cdk-drag-preview {
+.thumbnail-gallery--grid .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 0.5rem; /* Same as rounded-lg used in thumbnail items */
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),

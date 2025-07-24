@@ -206,16 +206,7 @@ export const GridSizes: Story = {
   },
 };
 
-export const ListLayout: Story = {
-  ...Template,
-  args: {
-    ...Default.args,
-    layout: 'list',
-    showMetadata: true,
-    showFileSize: true,
-    showModified: true,
-  },
-};
+
 
 export const WithMetadata: Story = {
   ...Template,
@@ -225,6 +216,43 @@ export const WithMetadata: Story = {
     showFileSize: true,
     showModified: true,
   },
+};
+
+export const ListLayout: Story = {
+  ...Template,
+  args: {
+    ...Default.args,
+    layout: 'list',
+    showMetadata: true,
+    showFileSize: true,
+    showModified: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'List layout displays items in a vertical list format, showing more details for each item.'
+      }
+    }
+  }
+};
+
+export const DraggableList: Story = {
+  ...Template,
+  args: {
+    ...Default.args,
+    layout: 'list',
+    draggable: true,
+    showMetadata: true,
+    showFileSize: true,
+    showModified: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Draggable list allows users to reorder items by dragging and dropping them.'
+      }
+    }
+  }
 };
 
 export const BorderedVariant: Story = {

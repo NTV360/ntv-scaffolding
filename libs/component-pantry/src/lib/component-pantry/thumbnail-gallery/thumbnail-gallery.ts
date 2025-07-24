@@ -10,7 +10,7 @@ import {
   DOCUMENT,
   DestroyRef,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ThumbnailItemComponent } from '../thumbnail-item/thumbnail-item';
 import {
@@ -31,7 +31,7 @@ import {
 @Component({
   selector: 'ntv-thumbnail-gallery',
   standalone: true,
-  imports: [CommonModule, ThumbnailItemComponent, CdkDropList, CdkDrag],
+  imports: [CommonModule, DatePipe, ThumbnailItemComponent, CdkDropList, CdkDrag],
   templateUrl: './thumbnail-gallery.html',
   styleUrls: ['./thumbnail-gallery.css'],
 })

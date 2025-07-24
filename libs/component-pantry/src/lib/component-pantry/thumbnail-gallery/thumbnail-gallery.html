@@ -6,19 +6,163 @@
     <div class="empty-description">Add some files to see them here</div>
   </div>
 } @else {
-  @if (draggable()) {
-    <!-- Draggable Thumbnail Gallery -->
-    <div 
-      cdkDropList 
-      cdkDropListOrientation="mixed"
-      class="thumbnail-drop-list"
-      [ngStyle]="containerStyles()"
-      (cdkDropListDropped)="onDrop($event)"
-      role="grid"
-      [attr.aria-label]="'Draggable thumbnail gallery with ' + items().length + ' items'">
-      
-      @for (item of itemsWithSelection(); track item.id; let i = $index) {
-        <div class="thumbnail-drag-item" cdkDrag [cdkDragData]="item">
+  @if (mergedConfig().layout === 'list') {
+    <!-- List Layout -->
+    @if (draggable()) {
+      <!-- Draggable List -->
+      <div 
+        cdkDropList 
+        class="thumbnail-list-draggable"
+        [ngStyle]="containerStyles()"
+        (cdkDropListDropped)="onDrop($event)"
+        role="list"
+        [attr.aria-label]="'Draggable list with ' + items().length + ' items'">
+        
+        @for (item of itemsWithSelection(); track item.id; let i = $index) {
+          <div class="thumbnail-list-item" 
+               cdkDrag 
+               [cdkDragData]="item"
+               tabindex="0"
+               role="button"
+               [attr.aria-label]="'Drag to reorder ' + item.name"
+               (click)="mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})"
+               (keydown)="($event.key === 'Enter' || $event.key === ' ') && (mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})); $event.preventDefault()"
+               (contextmenu)="onContextMenuRequest({item, event: $event})">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                @if (item.src && item.type === 'image') {
+                  <img [src]="item.src" [alt]="item.name" class="list-thumbnail">
+                } @else {
+                  <div class="list-file-icon">{{ item.icon || '📄' }}</div>
+                }
+              </div>
+              <div class="list-item-details">
+                <div class="list-item-name">{{ item.name }}</div>
+                @if (mergedConfig().showMetadata) {
+                  <div class="list-item-metadata">
+                    @if (mergedConfig().showFileSize && item.size) {
+                      <span class="list-item-size">{{ item.size }}</span>
+                    }
+                    @if (mergedConfig().showModified && item.modified) {
+                      <span class="list-item-modified">{{ item.modified | date:'short' }}</span>
+                    }
+                  </div>
+                }
+              </div>
+              @if (mergedConfig().showActionButtons) {
+                <div class="list-item-actions">
+                  <button class="action-button" (click)="onActionClick({type: 'view', label: 'View'}, item, $event)" title="View">
+                    👁️
+                  </button>
+                  <button class="action-button" (click)="onActionClick({type: 'download', label: 'Download'}, item, $event)" title="Download">
+                    ⬇️
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Static List -->
+      <div 
+        class="thumbnail-list-static"
+        [ngStyle]="containerStyles()"
+        role="list"
+        [attr.aria-label]="'List with ' + items().length + ' items'">
+        
+        @for (item of itemsWithSelection(); track item.id; let i = $index) {
+          <div class="thumbnail-list-item" 
+               [class.selected]="item.selected"
+               tabindex="0"
+               role="button"
+               [attr.aria-label]="'Select ' + item.name"
+               (click)="mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})"
+               (keydown)="($event.key === 'Enter' || $event.key === ' ') && (mergedConfig().selectable ? onSelectionToggle(item) : onItemClick({item, index: i, event: $event})); $event.preventDefault()"
+               (contextmenu)="onContextMenuRequest({item, event: $event})">
+            <div class="list-item-content">
+              <div class="list-item-icon">
+                @if (item.src && item.type === 'image') {
+                  <img [src]="item.src" [alt]="item.name" class="list-thumbnail">
+                } @else {
+                  <div class="list-file-icon">{{ item.icon || '📄' }}</div>
+                }
+              </div>
+              <div class="list-item-details">
+                <div class="list-item-name">{{ item.name }}</div>
+                @if (mergedConfig().showMetadata) {
+                  <div class="list-item-metadata">
+                    @if (mergedConfig().showFileSize && item.size) {
+                      <span class="list-item-size">{{ item.size }}</span>
+                    }
+                    @if (mergedConfig().showModified && item.modified) {
+                      <span class="list-item-modified">{{ item.modified | date:'short' }}</span>
+                    }
+                  </div>
+                }
+              </div>
+              @if (mergedConfig().showActionButtons) {
+                <div class="list-item-actions">
+                  <button class="action-button" (click)="onActionClick({type: 'view', label: 'View'}, item, $event)" title="View">
+                    👁️
+                  </button>
+                  <button class="action-button" (click)="onActionClick({type: 'download', label: 'Download'}, item, $event)" title="Download">
+                    ⬇️
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <!-- Grid Layout -->
+    @if (draggable()) {
+      <!-- Draggable Grid -->
+      <div 
+        cdkDropList 
+        cdkDropListOrientation="mixed"
+        class="thumbnail-drop-list"
+        [ngStyle]="containerStyles()"
+        (cdkDropListDropped)="onDrop($event)"
+        role="grid"
+        [attr.aria-label]="'Draggable thumbnail gallery with ' + items().length + ' items'">
+        
+        @for (item of itemsWithSelection(); track item.id; let i = $index) {
+          <div class="thumbnail-drag-item" cdkDrag [cdkDragData]="item">
+            <ntv-thumbnail-item
+              [item]="item"
+              [index]="i"
+              [size]="mergedConfig().size"
+              [variant]="mergedConfig().variant"
+              [layout]="mergedConfig().layout"
+              [selectable]="mergedConfig().selectable"
+              [showLabels]="mergedConfig().showLabels"
+              [showMetadata]="mergedConfig().showMetadata"
+              [showFileSize]="mergedConfig().showFileSize"
+              [showModified]="mergedConfig().showModified"
+              [hoverEffects]="mergedConfig().hoverEffects"
+              [clickable]="mergedConfig().clickable"
+              [showActionButtons]="mergedConfig().showActionButtons"
+              (itemClick)="onItemClick($event)"
+              (selectionToggle)="onSelectionToggle($event)"
+              (contextMenuRequest)="onContextMenuRequest($event)"
+              (mouseEnter)="onMouseEnter($event)"
+              (mouseLeave)="onMouseLeave()">
+            </ntv-thumbnail-item>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Static Grid -->
+      <div 
+        [class]="containerClasses()"
+        [ngStyle]="containerStyles()"
+        role="grid"
+        [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
+        
+        @for (item of itemsWithSelection(); track item.id; let i = $index) {
           <ntv-thumbnail-item
             [item]="item"
             [index]="i"
@@ -39,40 +183,9 @@
             (mouseEnter)="onMouseEnter($event)"
             (mouseLeave)="onMouseLeave()">
           </ntv-thumbnail-item>
-        </div>
-      }
-    </div>
-  } @else {
-    <!-- Static Thumbnail Gallery -->
-    <div 
-      [class]="containerClasses()"
-      [ngStyle]="containerStyles()"
-      role="grid"
-      [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'">
-      
-      @for (item of itemsWithSelection(); track item.id; let i = $index) {
-        <ntv-thumbnail-item
-          [item]="item"
-          [index]="i"
-          [size]="mergedConfig().size"
-          [variant]="mergedConfig().variant"
-          [layout]="mergedConfig().layout"
-          [selectable]="mergedConfig().selectable"
-          [showLabels]="mergedConfig().showLabels"
-          [showMetadata]="mergedConfig().showMetadata"
-          [showFileSize]="mergedConfig().showFileSize"
-          [showModified]="mergedConfig().showModified"
-          [hoverEffects]="mergedConfig().hoverEffects"
-          [clickable]="mergedConfig().clickable"
-          [showActionButtons]="mergedConfig().showActionButtons"
-          (itemClick)="onItemClick($event)"
-          (selectionToggle)="onSelectionToggle($event)"
-          (contextMenuRequest)="onContextMenuRequest($event)"
-          (mouseEnter)="onMouseEnter($event)"
-          (mouseLeave)="onMouseLeave()">
-        </ntv-thumbnail-item>
-      }
-    </div>
+        }
+      </div>
+    }
   }
 }
 
