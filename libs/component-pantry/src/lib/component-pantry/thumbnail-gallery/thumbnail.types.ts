@@ -3,7 +3,15 @@
 export interface ThumbnailItem {
   id: string;
   name: string;
-  type: 'image' | 'video' | 'document' | 'audio' | 'folder' | 'archive' | 'code' | 'unknown';
+  type:
+    | 'image'
+    | 'video'
+    | 'document'
+    | 'audio'
+    | 'folder'
+    | 'archive'
+    | 'code'
+    | 'unknown';
   src?: string;
   size?: string;
   modified?: Date;

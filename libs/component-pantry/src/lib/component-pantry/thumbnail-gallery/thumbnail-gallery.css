@@ -131,11 +131,11 @@
 }
 
 .context-menu-item:hover {
-  @apply bg-gray-100;
+  @apply bg-accent-500 text-white;
 }
 
 .context-menu-item:active {
-  @apply bg-gray-200;
+  @apply bg-accent-600 text-white;
 }
 
 .context-menu-item.disabled {
@@ -340,11 +340,11 @@
 }
 
 .context-menu-item:hover {
-  @apply bg-gray-700;
+  @apply bg-accent-500 text-white;
 }
 
 .context-menu-item:active {
-  @apply bg-gray-600;
+  @apply bg-accent-600 text-white;
 }
 
 .context-menu-divider {
