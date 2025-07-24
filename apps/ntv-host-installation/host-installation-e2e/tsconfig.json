@@ -4,7 +4,7 @@
     "allowJs": true,
     "outDir": "../../../dist/out-tsc",
     "module": "commonjs",
-    "types": ["cypress", "node"],
+    "types": ["@playwright/test", "node"],
     "sourceMap": false,
     "strict": true,
     "noImplicitOverride": true,
@@ -15,9 +15,9 @@
   "include": [
     "**/*.ts",
     "**/*.js",
-    "cypress.config.ts",
-    "**/*.cy.ts",
-    "**/*.cy.js",
+    "playwright.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
     "**/*.d.ts"
   ]
 }

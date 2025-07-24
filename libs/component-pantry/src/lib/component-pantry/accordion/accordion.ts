@@ -144,7 +144,7 @@ export class Accordion implements OnInit, AfterViewInit, OnDestroy {
   );
 
   /** Computed CSS classes for the accordion container */
-  accordionClasses = computed(() => {
+  readonly accordionClasses = computed(() => {
     const baseClasses = 'accordion';
     const variantClass = `accordion--${this.mergedVariant()}`;
     const sizeClass = `accordion--${this.mergedSize()}`;
@@ -157,10 +157,10 @@ export class Accordion implements OnInit, AfterViewInit, OnDestroy {
   });
 
   /** Computed property for the open state */
-  isOpen = computed(() => this._isOpen());
+  readonly isOpen = computed(() => this._isOpen());
   
   /** Computed property for the accordion ID */
-  accordionId = computed(() => this._accordionId());
+  readonly accordionId = computed(() => this._accordionId());
 
   /**
    * Toggles the open/closed state of the accordion

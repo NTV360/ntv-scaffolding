@@ -1,0 +1,87 @@
+<div class="{{ modalClasses() }}">
+  <div
+    class="{{ modalBackdropClasses() }}"
+    (click)="onBackdropClick($event)"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div
+      #modalContent
+      class="{{ modalContentClasses() }}"
+      [ngStyle]="modalContentStyle()"
+      tabindex="0"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="getShowHeader() ? 'modal-title' : null"
+      [attr.aria-describedby]="getShowHeader() ? 'modal-desc' : null"
+    >
+      <!-- Modal Header -->
+      @if (getShowHeader()) {
+      <header class="modal__header">
+        <div class="flex items-center justify-between w-full">
+          <div>
+            <h2 id="modal-title" class="modal__title">
+              {{ getHeaderTitle() }}
+            </h2>
+
+            @if (getHeaderSubtitle()) {
+            <p id="modal-desc" class="modal__subtitle">
+              {{ getHeaderSubtitle() }}
+            </p>
+            }
+          </div>
+
+          @if (getClosable()) {
+          <button
+            type="button"
+            class="modal__close"
+            aria-label="Close"
+            (click)="close()"
+          >
+            <svg
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5916L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z"
+                fill="#8DCB2C"
+              />
+            </svg>
+          </button>
+          }
+        </div>
+      </header>
+      }
+
+      <!-- Modal Body -->
+      <section class="modal__body">
+        @if (isAlertVariant() && (alertType() === 'success' || alertType() ===
+        'error')) {
+        <div
+          class="modal__alert-animation"
+          [class.modal__alert-animation--error]="alertType() === 'error'"
+          [class.modal__alert-animation--success]="alertType() === 'success'"
+        >
+          <iframe
+            [src]="lottieAnimationPath()"
+            class="modal__alert-animation-iframe"
+            [class.modal__alert-animation--error]="alertType() === 'error'"
+            [class.modal__alert-animation--success]="alertType() === 'success'"
+          ></iframe>
+        </div>
+        }
+
+        <ng-content></ng-content>
+      </section>
+
+      <!-- Modal Footer -->
+      @if (getShowFooter()) {
+      <footer class="modal__footer">
+        <ng-content select="[modal-footer]"></ng-content>
+      </footer>
+      }
+    </div>
+  </div>
+</div>
