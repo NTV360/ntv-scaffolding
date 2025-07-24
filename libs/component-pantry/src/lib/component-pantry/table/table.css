@@ -592,17 +592,33 @@ body.resizing * {
   @apply top-0 break-words;
 }
 
+.no-data-cell {
+  @apply p-0 border-0;
+}
+
 .no-data-row {
   @apply w-full h-full flex justify-center items-center text-center;
+}
+
+.no-data-content {
+  @apply flex flex-col items-center gap-4;
 }
 
 .no-data-message {
   @apply text-3xl font-bold mb-2;
 }
 
+.no-data-description {
+  @apply text-gray-600 text-lg;
+}
+
 /* Filter styles */
 .header-content {
   @apply flex items-center justify-between gap-2 text-sm font-bold whitespace-nowrap;
+}
+
+.column-filter {
+  height: 18px;
 }
 
 .sort-btn {

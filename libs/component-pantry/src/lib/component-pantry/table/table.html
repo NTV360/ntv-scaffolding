@@ -1,21 +1,18 @@
 <div
   class="table-container"
   [ngStyle]="tableStyle()"
-  (click)="onClickOutside($event)"
   tabindex="0"
   role="button"
-  (keyup.enter)="onClickOutside($event)"
-  (keyup.space)="onClickOutside($event)"
 >
   <!-- Column Settings -->
   @if (showColumnSettings()) {
   <div class="table-header-controls">
     <div class="column-settings">
-      <button (click)="topStart.toggle($event)">
+      <button (click)="columnSettingsPopover.toggle($event)">
         <span [innerHTML]="settingsIcon"></span>
       </button>
 
-      <ntv-popover #topStart placement="bottom-end">
+      <ntv-popover #columnSettingsPopover placement="bottom-end">
         <div class="w-[250px]">
           <h3 class="mb-4">Show/Hide Columns</h3>
 
@@ -80,7 +77,6 @@
   }
 
   <div class="table-wrapper" (scroll)="onTableScroll($event)">
-    @if (sortedData().length > 0) {
     <table
       [ngStyle]="tableStyle()"
       class="table"
@@ -148,7 +144,7 @@
             [class.filtered-column]="hasActiveFilter(column.field)"
             (columnReorder)="onColumnReorder($event)"
           >
-            <!-- Header content for custom header template with draggable columns (with commented filter code) -->
+            <!-- Header content for custom header template with draggable columns !! This is mainly the case when you have custom header templates with draggable columns -->
             <div class="header-content">
               <ng-container
                 [ngTemplateOutlet]="headerTemplate"
@@ -156,18 +152,26 @@
               ></ng-container>
               @if (column.filter && column.field !== 'action' && column.field
               !== 'actions') {
-              <ntv-column-filter
-                [column]="column"
-                [data]="filteredData()"
-                [filterValue]="getFilterValue(column.field)"
-                [sortField]="sortField()"
-                [sortOrder]="_sortOrder()"
-                [isPopupOpen]="isFilterPopupOpen(column.field)"
-                (filterChange)="onFilterChange($event.field, $event.value)"
-                (sortChange)="onSort($event)"
-                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
-                (closePopup)="closeFilterPopup()"
-              ></ntv-column-filter>
+              <div class="column-filter">
+                <button (click)="columnFilterPopover.toggle($event)">
+                  <span [innerHTML]="filtersIcon"></span>
+                </button>
+
+                <ntv-popover #columnFilterPopover placement="bottom-start">
+                  <div class="w-[220px]">
+                    <ntv-column-filter
+                      [column]="column"
+                      [data]="filteredData()"
+                      [filterValue]="getFilterValue(column.field)"
+                      [sortField]="sortField()"
+                      [sortOrder]="_sortOrder()"
+                      (filterChange)="onFilterChange($event.field, $event.value)"
+                      (sortChange)="onSort($event)"
+                    ></ntv-column-filter>
+                  </div>
+                </ntv-popover>
+              </div>
+
               }
             </div>
           </th>
@@ -186,18 +190,25 @@
             <div class="header-content">
               {{ column.header }} @if (column.filter && column.field !==
               'action' && column.field !== 'actions') {
-              <ntv-column-filter
-                [column]="column"
-                [data]="filteredData()"
-                [filterValue]="getFilterValue(column.field)"
-                [sortField]="sortField()"
-                [sortOrder]="_sortOrder()"
-                [isPopupOpen]="isFilterPopupOpen(column.field)"
-                (filterChange)="onFilterChange($event.field, $event.value)"
-                (sortChange)="onSort($event)"
-                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
-                (closePopup)="closeFilterPopup()"
-              ></ntv-column-filter>
+              <div class="column-filter">
+                <button (click)="columnFilterPopover2.toggle($event)">
+                  <span [innerHTML]="filtersIcon"></span>
+                </button>
+
+                <ntv-popover #columnFilterPopover2 placement="bottom-start">
+                  <div class="w-[220px]">
+                    <ntv-column-filter
+                      [column]="column"
+                      [data]="filteredData()"
+                      [filterValue]="getFilterValue(column.field)"
+                      [sortField]="sortField()"
+                      [sortOrder]="_sortOrder()"
+                      (filterChange)="onFilterChange($event.field, $event.value)"
+                      (sortChange)="onSort($event)"
+                    ></ntv-column-filter>
+                  </div>
+                </ntv-popover>
+              </div>
               }
             </div>
           </th>
@@ -234,21 +245,29 @@
             (columnReorder)="onColumnReorder($event)"
           >
             <!-- Header content for draggable columns with filter functionality (final case) -->
+
             <div class="header-content">
               {{ column.header }} @if (column.filter && column.field !==
               'action' && column.field !== 'actions') {
-              <ntv-column-filter
-                [column]="column"
-                [data]="filteredData()"
-                [filterValue]="getFilterValue(column.field)"
-                [sortField]="sortField()"
-                [sortOrder]="_sortOrder()"
-                [isPopupOpen]="isFilterPopupOpen(column.field)"
-                (filterChange)="onFilterChange($event.field, $event.value)"
-                (sortChange)="onSort($event)"
-                (togglePopup)="toggleFilterPopup($event.field, $event.event)"
-                (closePopup)="closeFilterPopup()"
-              ></ntv-column-filter>
+              <div class="column-filter">
+                <button (click)="columnFilterPopover3.toggle($event)">
+                  <span [innerHTML]="filtersIcon"></span>
+                </button>
+
+                <ntv-popover #columnFilterPopover3 placement="bottom-start">
+                  <div class="w-[220px]">
+                    <ntv-column-filter
+                      [column]="column"
+                      [data]="filteredData()"
+                      [filterValue]="getFilterValue(column.field)"
+                      [sortField]="sortField()"
+                      [sortOrder]="_sortOrder()"
+                      (filterChange)="onFilterChange($event.field, $event.value)"
+                      (sortChange)="onSort($event)"
+                    ></ntv-column-filter>
+                  </div>
+                </ntv-popover>
+              </div>
               }
             </div>
           </th>
@@ -421,24 +440,30 @@
         </tr>
         } } }
       </tbody>
+      @if (sortedData().length === 0) {
+      <tbody>
+        <tr>
+          <td [attr.colspan]="getTotalColumnCount()" class="no-data-cell">
+            <div class="no-data-row">
+              <div class="no-data-content">
+                <div class="no-data-icon">
+                  <iframe
+                    src="https://lottie.host/embed/06452cb8-66f8-47d8-8c70-277079486b86/BSviPOAH23.lottie"
+                    width="400"
+                    height="400"
+                  ></iframe>
+                </div>
+                <div class="no-data-message">No Data Found</div>
+                <div class="no-data-description">
+                  Whoopss... There are no records to display at the moment
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      }
     </table>
-    } @else {
-    <div class="no-data-row">
-      <div class="no-data-content">
-        <div class="no-data-icon">
-          <iframe
-            src="https://lottie.host/embed/06452cb8-66f8-47d8-8c70-277079486b86/BSviPOAH23.lottie"
-            width="400"
-            height="400"
-          ></iframe>
-        </div>
-        <div class="no-data-message">No Data Found</div>
-        <div class="no-data-description">
-          Whoopss... There are no records to display at the moment
-        </div>
-      </div>
-    </div>
-    }
   </div>
 
   <!-- Pagination: Show More  -->

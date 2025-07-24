@@ -1,9 +1,4 @@
 /* Filter popup styles */
-.filter-icon-container {
-  position: relative;
-  display: inline-block;
-  margin-left: 8px;
-}
 
 .filter-icon-btn {
   background: none;
@@ -26,20 +21,6 @@
   color: white;
 }
 
-.filter-popup {
-  position: fixed;
-  top: auto;
-  right: auto;
-  z-index: 9999;
-  margin-top: 4px;
-  min-width: 250px;
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.2s ease;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -59,8 +40,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background-color: #f8f9fa;
+  padding-block: 10px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #dee2e6;
   border-radius: 6px 6px 0 0;
 }
@@ -92,11 +73,10 @@
 }
 
 .filter-popup-body {
-  padding: 16px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .filter-popup-input,
@@ -123,7 +103,7 @@
 .date-filter-controls,
 .text-filter-controls {
   text-align: center;
-  margin-top: 8px;
+  width: 100%;
 }
 
 .filter-info {

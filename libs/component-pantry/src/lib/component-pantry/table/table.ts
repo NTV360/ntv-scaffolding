@@ -2,15 +2,15 @@ import {
   Component,
   ContentChild,
   TemplateRef,
-  ViewChild,
+  viewChild,
+  viewChildren,
   ElementRef,
-  AfterViewInit,
   computed,
   signal,
   input,
   output,
   effect,
-  HostListener,
+  untracked,
   ViewEncapsulation,
   inject,
 } from '@angular/core';
@@ -33,6 +33,8 @@ import {
   TableColumn,
   TableStyle,
 } from './table.types';
+import { TableService } from './services/table.service';
+import * as TableUtils from './utils/table.utils';
 
 //Components
 const components = [Button, ColumnFilter, Popover];
@@ -50,397 +52,279 @@ const components = [Button, ColumnFilter, Popover];
   styleUrl: './table.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class Table implements AfterViewInit {
-  // Used to sanitize potentially unsafe HTML content for safe binding
+export class Table {
+  // 🛡️ Services & DOM References
+  /** Used to sanitize potentially unsafe HTML content for safe binding */
   private sanitizer = inject(DomSanitizer);
+
+  /** Reference to the component's root element */
   private el = inject(ElementRef);
 
-  // Modern Angular inputs using input() function with better typing
-  columns = input<TableColumn[]>([]);
-  value = input<any[]>([]);
-  data = input<any[]>([]);
-  tableStyle = input<TableStyle>({});
-  columnDraggable = input<boolean>(false);
-  expandableRows = input<boolean>(false);
-  defaultMinWidth = input<number>(100);
-  defaultMaxWidth = input<number>(400);
-  showColumnSettings = input<boolean>(true);
-  maxLockedRows = input<number>(3);
-  lockIdentifierField = input<string>('licenseKey');
-  hasIndex = input<boolean>(false);
-  // Optional: Allow external control of column management
-  externalColumnControl = input<boolean>(false);
-  filterEnabled = input<boolean>(false);
-  // Optional: Enable checkbox selection
-  hasCheckBox = input<boolean>(false);
-  // localStorage persistence for column visibility is always enabled
-  private persistColumnVisibility = true;
-  // Optional: Custom localStorage key for column visibility
-  storageKey = input<string>('ntv-table-columns');
+  /** Table service for state management and complex operations */
+  private tableService = inject(TableService);
 
-  // Modern Angular outputs using output() function with better typing
-  dataChange = output<any[]>();
-  lockedItemsChange = output<any[]>();
-  // Optional outputs for external column management
-  columnReorder = output<ColumnReorderEvent>();
-  columnVisibilityChange = output<{ column: TableColumn; visible: boolean }>();
-  // New output for when columns change internally
-  columnsChange = output<TableColumn[]>();
-  // Checkbox selection outputs
-  selectedRowsChange = output<any[]>();
+  /** Reference to the table header element for dynamic layout calculation */
+  public tableHeader =
+    viewChild<ElementRef<HTMLTableSectionElement>>('tableHeader');
 
-  // Sets the background color of the table body
+  /** References to all popover components for closing on scroll */
+  public popovers = viewChildren(Popover);
+
+  /** Content projection slot for custom header template */
+  @ContentChild('header')
+  public headerTemplate!: TemplateRef<any>;
+
+  /** Content projection slot for custom body template */
+  @ContentChild('body')
+  public bodyTemplate!: TemplateRef<any>;
+
+  /** Content projection slot for custom expanded row template */
+  @ContentChild('expandedContent')
+  public expandedContentTemplate!: TemplateRef<any>;
+
+  // 🟩 INPUTS
+
+  /** Array of table column definitions */
+  public columns = input<TableColumn[]>([]);
+
+  /** Original unmodified input data */
+  public value = input<any[]>([]);
+
+  /** Working input data (can change internally) */
+  public data = input<any[]>([]);
+
+  /** Optional table styling configuration */
+  public tableStyle = input<TableStyle>({});
+
+  /** Enables dragging and reordering of columns */
+  public columnDraggable = input<boolean>(false);
+
+  /** Enables expandable rows with custom content */
+  public expandableRows = input<boolean>(false);
+
+  /** Default minimum column width (px) */
+  public defaultMinWidth = input<number>(100);
+
+  /** Default maximum column width (px) */
+  public defaultMaxWidth = input<number>(400);
+
+  /** Toggle to show or hide the column settings icon */
+  public showColumnSettings = input<boolean>(true);
+
+  /** Maximum number of rows that can be locked */
+  public maxLockedRows = input<number>(3);
+
+  /** Field used to uniquely identify each row for locking or selection */
+  public lockIdentifierField = input<string>('licenseKey');
+
+  /** Shows a row index as the first column */
+  public hasIndex = input<boolean>(false);
+
+  /** Enables external column management (reordering/visibility) */
+  public externalColumnControl = input<boolean>(false);
+
+  /** Enables filter input and logic in header cells */
+  public filterEnabled = input<boolean>(false);
+
+  /** Enables checkbox selection of rows */
+  public hasCheckBox = input<boolean>(false);
+
+  /** Custom localStorage key for storing column visibility */
+  public storageKey = input<string>('ntv-table-columns');
+
+  /** Sets the background color of the table body */
   public readonly tableBGColor = input<string>('#ffffff');
 
-  // Sets the background color of the table header
+  /** Sets the background color of the table header */
   public readonly tableHeaderBGColor = input<string>('#F9FAFB');
 
-  // Internal state management using signals
-  private _columns = signal<TableColumn[]>([]);
-  private _data = signal<any[]>([]);
-  private _lockedItems = signal<any[]>([]);
-  showColumnSelector = signal<boolean>(false);
+  // 🟦 OUTPUTS
 
-  // Filter state management
+  /** Emits whenever internal data changes */
+  public dataChange = output<any[]>();
+
+  /** Emits whenever locked items change */
+  public lockedItemsChange = output<any[]>();
+
+  /** Emits when a column is reordered */
+  public columnReorder = output<ColumnReorderEvent>();
+
+  /** Emits when column visibility is toggled */
+  public columnVisibilityChange = output<{
+    column: TableColumn;
+    visible: boolean;
+  }>();
+
+  /** Emits when internal column configuration changes */
+  public columnsChange = output<TableColumn[]>();
+
+  /** Emits when row selection changes via checkbox */
+  public selectedRowsChange = output<any[]>();
+
+  // 📦 Internal Constants & Flags
+
+  /** Flag to always persist column visibility in localStorage */
+  private readonly persistColumnVisibility = true;
+
+  /** Default table header height fallback */
+  private headerHeight = signal<number>(49);
+
+  // 📡 Signals — Internal State
+
+  /** Internal column state for managing column modifications */
+  private _internalColumnState = signal<TableColumn[]>([]);
+
+  /** Internal column configuration computed from input columns with localStorage persistence */
+  private _columns = computed(() => {
+    const inputColumns = this.columns();
+    const internalState = this._internalColumnState();
+
+    // If using external control, return empty array (displayColumns will use columns() directly)
+    if (this.externalColumnControl()) {
+      return [];
+    }
+
+    // If no input columns, return empty array
+    if (inputColumns.length === 0) {
+      return [];
+    }
+
+    // If we have internal state modifications, use them
+    if (internalState.length > 0) {
+      return internalState;
+    }
+
+    // Otherwise, apply localStorage persistence if enabled
+    return this.persistColumnVisibility
+      ? this.tableService.loadColumnVisibilityFromStorage(
+          [...inputColumns],
+          this.storageKey()
+        )
+      : [...inputColumns];
+  });
+
+  /** Internal computed signal for working table data */
+  private _data = computed(() => [...this.data()]);
+
+  /** Internal signal for currently locked rows */
+  private _lockedItems = signal<any[]>([]);
+
+  /** Active filters for each column */
   private _filters = signal<Record<string, any>>({});
+
+  /** Active sort field name */
   private _sortField = signal<string | null>(null);
+
+  /** Active sort direction */
   public _sortOrder = signal<'asc' | 'desc'>('asc');
 
-  // Expandable rows state management
+  /** Set of expanded row identifiers */
   private _expandedRows = signal<Set<any>>(new Set());
 
-  // Pagination state management
+  /** Number of items shown per page */
   private _itemsPerPage = signal<number>(15);
+
+  /** Currently active page index */
   private _currentPage = signal<number>(1);
+
+  /** Show all rows at once without pagination */
   private _showAllItems = signal<boolean>(false);
 
-  // Loading overlay state management
+  /** Whether to show a loading overlay */
   private _isProcessing = signal<boolean>(false);
+
+  /** Message shown inside the loading overlay */
   private _loadingMessage = signal<string>('Loading...');
 
-  // Checkbox selection state management
+  /** Set of selected row identifiers (for checkbox selection) */
   private _selectedRows = signal<Set<any>>(new Set());
-  private _selectAll = signal<boolean>(false);
 
-  // Column search state management
+  /** Whether the select-all checkbox is currently checked - computed from selected rows */
+  private _selectAllComputed = computed(() => {
+    const currentData = this.sortedData();
+    const selectedRows = this._selectedRows();
+    return (
+      currentData.length > 0 &&
+      currentData.every((row) =>
+        selectedRows.has(row[this.lockIdentifierField()])
+      )
+    );
+  });
+
+  /** Current search keyword for column filtering */
   private _columnSearchTerm = signal<string>('');
 
-  // Column expand/shrink state management
+  /** Whether columns are currently shrunk */
   private _columnsShrunk = signal<boolean>(false);
 
-  // Public getter for sort order
-  get sortOrder() {
-    return this._sortOrder();
-  }
-  private _activeFilterPopup = signal<string | null>(null);
+  // 🧠 Computed Signals — Public
 
-  // Public getters for loading state
-  isProcessing = computed(() => this._isProcessing());
-  loadingMessage = computed(() => this._loadingMessage());
+  /** Whether the component is currently processing */
+  public isProcessing = computed(() => this._isProcessing());
 
-  // Public getters for checkbox selection
-  selectedRows = computed(() => Array.from(this._selectedRows()));
-  selectAll = computed(() => this._selectAll());
-  isIndeterminate = computed(() => {
+  /** Message to show in the overlay while processing */
+  public loadingMessage = computed(() => this._loadingMessage());
+
+  /** Returns selected rows as an array */
+  public selectedRows = computed(() => Array.from(this._selectedRows()));
+
+  /** Whether all visible rows are selected */
+  public selectAll = computed(() => this._selectAllComputed());
+
+  /** Whether the selection checkbox is in an indeterminate state */
+  public isIndeterminate = computed(() => {
     const selected = this._selectedRows().size;
     const total = this.sortedData().length;
     return selected > 0 && selected < total;
   });
 
-  // Computed properties for internal state
-  displayColumns = computed(() => {
-    return this.externalColumnControl() ? this.columns() : this._columns();
-  });
+  /** Returns either the external or internal column config */
+  public displayColumns = computed(() =>
+    this.externalColumnControl() ? this.columns() : this._columns()
+  );
 
-  displayData = computed(() => this._data());
-  lockedItems = computed(() => this._lockedItems());
+  /** Table data after internal transformations */
+  public displayData = computed(() => this._data());
 
-  // Computed signals for better performance
-  hasLockedRows = computed(() => this.lockedItems().length > 0);
-  canLockAnyRows = computed(
+  /** Currently locked rows */
+  public lockedItems = computed(() => this._lockedItems());
+
+  /** Whether any rows are currently locked */
+  public hasLockedRows = computed(() => this.lockedItems().length > 0);
+
+  /** Whether the user can still lock more rows */
+  public canLockAnyRows = computed(
     () => this.lockedItems().length < this.maxLockedRows()
   );
-  lockedRowsCount = computed(() => this.lockedItems().length);
 
-  // Filter and sort computed signals
-  filters = computed(() => this._filters());
-  sortField = computed(() => this._sortField());
+  /** Count of locked rows */
+  public lockedRowsCount = computed(() => this.lockedItems().length);
 
-  /** SVG */
+  /** Active filter state */
+  public filters = computed(() => this._filters());
+
+  /** Currently selected sort field */
+  public sortField = computed(() => this._sortField());
+
+  /** Currently selected sort order */
+  public get sortOrder() {
+    return this._sortOrder();
+  }
+
+  // 🖼️ SVG ICONS
+  /** SVG icon for column settings */
   public readonly settingsIcon: SafeHtml;
+
+  /** SVG icon for filter button */
   public readonly filtersIcon: SafeHtml;
+
+  /** SVG icon for right-facing arrow (expand row) */
   public readonly rightArrow: SafeHtml;
+
+  /** SVG icon for downward-facing arrow (collapse row) */
   public readonly downArrow: SafeHtml;
 
-  constructor() {
-    this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
-      FILE_ICONS['FILTER']
-    );
-
-    this.settingsIcon = this.sanitizer.bypassSecurityTrustHtml(
-      FILE_ICONS['SETTINGS']
-    );
-
-    this.rightArrow = this.sanitizer.bypassSecurityTrustHtml(
-      FILE_ICONS['RIGHT_ARROW']
-    );
-
-    this.downArrow = this.sanitizer.bypassSecurityTrustHtml(
-      FILE_ICONS['DOWN_ARROW']
-    );
-
-    // Initialize internal columns from input - only run once during initialization
-    effect(
-      () => {
-        const initialCols = this.columns();
-        const currentCols = this._columns();
-
-        // Only initialize if we don't have internal columns yet and we're not using external control
-        if (
-          initialCols.length > 0 &&
-          currentCols.length === 0 &&
-          !this.externalColumnControl()
-        ) {
-          // Load column visibility from localStorage if enabled
-          const columnsWithVisibility = this.persistColumnVisibility
-            ? this.loadColumnVisibilityFromStorage([...initialCols])
-            : [...initialCols];
-          this._columns.set(columnsWithVisibility);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-
-    // Initialize internal data from input
-    effect(
-      () => {
-        const initialData = this.data();
-
-        // Always update internal data when input changes
-        // This ensures the table reflects external data changes
-        this._data.set([...initialData]);
-
-        // Update locked items to reflect changes in the data
-        // This ensures locked items stay in sync with updated data
-        const currentLocked = this._lockedItems();
-        const updatedLocked = currentLocked
-          .map((lockedItem) => {
-            const updatedItem = initialData.find(
-              (dataItem) =>
-                dataItem[this.lockIdentifierField()] ===
-                lockedItem[this.lockIdentifierField()]
-            );
-            return updatedItem || lockedItem; // Use updated item if found, otherwise keep original
-          })
-          .filter((item) =>
-            // Remove locked items that no longer exist in the data
-            initialData.some(
-              (dataItem) =>
-                dataItem[this.lockIdentifierField()] ===
-                item[this.lockIdentifierField()]
-            )
-          );
-
-        // Only update if there are actual changes
-        if (JSON.stringify(currentLocked) !== JSON.stringify(updatedLocked)) {
-          this._lockedItems.set(updatedLocked);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-
-    // Effect to emit column changes when internal columns change (optional for external tracking)
-    effect(() => {
-      if (!this.externalColumnControl()) {
-        const cols = this._columns();
-        if (cols.length > 0) {
-          // Only emit if there are listeners (optional feature)
-          this.columnsChange.emit([...cols]);
-        }
-      }
-    });
-
-    // Note: Removed automatic data change emission to prevent circular dependency
-    // Data changes should be emitted only when user actions modify the data
-    // (like locking/unlocking rows), not when external data updates flow in
-
-    // Effect to emit locked items changes
-    effect(() => {
-      const locked = this._lockedItems();
-      this.lockedItemsChange.emit([...locked]);
-    });
-
-    // Effect to emit selected rows changes
-    effect(() => {
-      const selectedData = this.getSelectedRowsData();
-      this.selectedRowsChange.emit([...selectedData]);
-    });
-
-    // Effect to log when locked items change (for debugging)
-    effect(() => {
-      const locked = this.lockedItems();
-      console.log(`Locked rows count: ${locked.length}`, locked);
-    });
-
-    // Effect to recalculate heights when data changes
-    effect(() => {
-      const data = this.displayData();
-      const locked = this.lockedItems();
-      // Recalculate heights after data changes (with a small delay for DOM updates)
-      if (data.length > 0 || locked.length > 0) {
-        setTimeout(() => this.updateHeaderHeight(), 100);
-      }
-    });
-
-    // Effect to reset pagination when data changes
-    effect(
-      () => {
-        const data = this._data();
-        // Reset pagination when data changes
-        this.resetPagination();
-      },
-      { allowSignalWrites: true }
-    );
-
-    effect(() => {
-      this.el.nativeElement.style.setProperty(
-        '--header-bg-color',
-        this.tableHeaderBGColor()
-      );
-
-      this.el.nativeElement.style.setProperty(
-        '--body-bg-color',
-        this.tableBGColor()
-      );
-    });
-
-    // Track if this is the initial data load
-    let isInitialLoad = true;
-
-    // Effect to show loading overlay when data changes (but not on initial load)
-    effect(
-      () => {
-        const data = this.data();
-        // Skip loading overlay on initial data load
-        if (isInitialLoad) {
-          isInitialLoad = false;
-          return;
-        }
-        // Show loading overlay briefly when external data changes after initial load
-        if (data.length > 0) {
-          this.withLoadingOverlay('Updating data...', 800);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-
-    // Effect to keep _selectAll in sync with selected rows
-    effect(() => {
-      const currentData = this.sortedData();
-      const selectedRows = this._selectedRows();
-      const allSelected =
-        currentData.length > 0 &&
-        currentData.every((row) =>
-          selectedRows.has(row[this.lockIdentifierField()])
-        );
-      this._selectAll.set(allSelected);
-    });
-
-    // Effect to automatically enable expandable columns when columns are shrunk
-    effect(() => {
-      const shrunkState = this._columnsShrunk();
-      // When columns are shrunk, expandable columns should be automatically enabled
-      // This effect just tracks the state - the template will use shouldAutoEnableExpandableColumns()
-      console.log('Columns shrunk state changed:', shrunkState);
-    });
-  }
-
-  ngAfterViewInit(): void {
-    // Calculate header height after view initialization
-    this.updateHeaderHeight();
-  }
-
-  private updateHeaderHeight(): void {
-    if (this.tableHeader?.nativeElement) {
-      const height = this.tableHeader.nativeElement.offsetHeight;
-      this.headerHeight.set(height);
-      console.log('Dynamic header height calculated:', height);
-    }
-  }
-
-  @ContentChild('header') headerTemplate!: TemplateRef<any>;
-  @ContentChild('body') bodyTemplate!: TemplateRef<any>;
-  @ContentChild('expandedContent') expandedContentTemplate!: TemplateRef<any>;
-  @ViewChild('tableHeader', { static: false })
-  tableHeader!: ElementRef<HTMLTableSectionElement>;
-
-  // Signal to store dynamic header height
-  private headerHeight = signal<number>(49); // Default fallback
-
-  onColumnReorder(event: ColumnReorderEvent): void {
-    console.log('Column reorder event received:', event);
-
-    const visibleCols = this.visibleColumns();
-    const currentColumns = this._columns(); // Use internal columns signal
-
-    // Validate indices
-    if (
-      event.from < 0 ||
-      event.from >= visibleCols.length ||
-      event.to < 0 ||
-      event.to >= visibleCols.length
-    ) {
-      console.warn('Invalid drag indices:', event);
-      return;
-    }
-
-    const fromColumn = visibleCols[event.from];
-    const toColumn = visibleCols[event.to];
-
-    console.log('Reordering columns:', {
-      from: { index: event.from, column: fromColumn },
-      to: { index: event.to, column: toColumn },
-    });
-
-    // Find the actual indices in the full columns array
-    const fromIndex = currentColumns.findIndex((col) => col === fromColumn);
-    const toIndex = currentColumns.findIndex((col) => col === toColumn);
-
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      const reorderEvent: ColumnReorderEvent = {
-        from: fromIndex,
-        to: toIndex,
-      };
-
-      if (this.externalColumnControl()) {
-        // Emit event for external handling
-        console.log(
-          'Emitting column reorder for external handling:',
-          reorderEvent
-        );
-        this.columnReorder.emit(reorderEvent);
-      } else {
-        // Handle internally
-        console.log('Handling column reorder internally:', reorderEvent);
-        this.handleColumnReorderInternal(reorderEvent);
-      }
-    } else {
-      console.warn('Could not find column indices or same column drag:', {
-        fromIndex,
-        toIndex,
-        fromColumn,
-        toColumn,
-      });
-    }
-  }
-
-  private handleColumnReorderInternal(event: ColumnReorderEvent): void {
-    const currentColumns = this._columns();
-    const newColumns = [...currentColumns];
-    const [movedColumn] = newColumns.splice(event.from, 1);
-    newColumns.splice(event.to, 0, movedColumn);
-    this._columns.set(newColumns);
-  }
+  // COMPUTED
 
   // Computed signals for reactive derived state
   visibleColumns = computed(() => {
@@ -474,8 +358,216 @@ export class Table implements AfterViewInit {
   // Public getter for columns shrunk state
   columnsShrunk = computed(() => this._columnsShrunk());
 
-  toggleColumnSelector(): void {
-    this.showColumnSelector.update((value) => !value);
+  constructor() {
+    /** START SVG ICONS */
+    this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['FILTER']
+    );
+
+    this.settingsIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['SETTINGS']
+    );
+
+    this.rightArrow = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['RIGHT_ARROW']
+    );
+
+    this.downArrow = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['DOWN_ARROW']
+    );
+    /** END SVG ICONS */
+
+    /**
+     * Syncs locked items when data changes to ensure they stay up-to-date.
+     * This effect only handles the side effect of updating locked items.
+     */
+    effect(() => {
+      const currentData = this.data();
+      this.syncLockedItemsWithData(currentData);
+    });
+
+    /**
+     * Emits column changes when internal column signal updates.
+     * Only emits when external column control is disabled.
+     */
+    effect(() => {
+      if (!this.externalColumnControl()) {
+        const cols = this._columns();
+        if (cols.length > 0) {
+          // Only emit if there are listeners (optional feature)
+          this.columnsChange.emit([...cols]);
+        }
+      }
+    });
+
+    /**
+     * Emits locked items when the locked items signal updates.
+     * Keeps external consumers in sync with internal state.
+     */
+    effect(() => {
+      const locked = this._lockedItems();
+      this.lockedItemsChange.emit([...locked]);
+    });
+
+    /**
+     * Emits selected row data when the selection state changes.
+     */
+    effect(() => {
+      const selectedData = this.getSelectedRowsData();
+      this.selectedRowsChange.emit([...selectedData]);
+    });
+
+    /**
+     * Recalculates table header height when displayed or locked data changes.
+     * Uses a timeout to wait for DOM updates before recalculating.
+     * Uses untracked() to avoid unnecessary re-runs when calling updateHeaderHeight.
+     */
+    effect(() => {
+      const data = this.displayData();
+      const locked = this.lockedItems();
+      // Recalculate heights after data changes (with a small delay for DOM updates)
+      if (data.length > 0 || locked.length > 0) {
+        setTimeout(() => untracked(() => this.updateHeaderHeight()), 100);
+      }
+    });
+
+    /**
+     * Resets pagination when internal data signal changes.
+     */
+    effect(
+      () => {
+        const data = this._data();
+        // Reset pagination when data changes
+        this.resetPagination();
+      },
+      { allowSignalWrites: true }
+    );
+
+    /**
+     * Applies dynamic table styles from theme signals (e.g., background colors).
+     */
+    effect(() => {
+      this.el.nativeElement.style.setProperty(
+        '--header-bg-color',
+        this.tableHeaderBGColor()
+      );
+
+      this.el.nativeElement.style.setProperty(
+        '--body-bg-color',
+        this.tableBGColor()
+      );
+    });
+
+    // Track if this is the initial data load
+    let isInitialLoad = true;
+
+    /**
+     * Shows a brief loading overlay when external `data()` changes after the initial load.
+     * Skips the overlay during the first data initialization to avoid unnecessary UI flicker.
+     */
+    effect(
+      () => {
+        const data = this.data();
+        // Skip loading overlay on initial data load
+        if (isInitialLoad) {
+          isInitialLoad = false;
+          return;
+        }
+        // Show loading overlay briefly when external data changes after initial load
+        if (data.length > 0) {
+          this.withLoadingOverlay('Updating data...', 800);
+        }
+      },
+      { allowSignalWrites: true }
+    );
+
+    /**
+     * Updates header height when the tableHeader viewChild signal changes.
+     * Replaces the need for ngAfterViewInit lifecycle hook.
+     */
+    effect(() => {
+      const header = this.tableHeader();
+      if (header?.nativeElement) {
+        const height = header.nativeElement.offsetHeight;
+        this.headerHeight.set(height);
+      }
+    });
+  }
+  /**
+   * Updates the header height by calculating the current height of the table header element.
+   * Sets the calculated height in the `headerHeight` signal for dynamic layout adjustments.
+   */
+  private updateHeaderHeight(): void {
+    const header = this.tableHeader();
+    if (header?.nativeElement) {
+      const height = header.nativeElement.offsetHeight;
+      this.headerHeight.set(height);
+    }
+  }
+
+  public onColumnReorder(event: ColumnReorderEvent): void {
+    const visibleCols = this.visibleColumns();
+    const currentColumns = this._columns(); // Use internal columns signal
+
+    // Validate indices
+    if (
+      event.from < 0 ||
+      event.from >= visibleCols.length ||
+      event.to < 0 ||
+      event.to >= visibleCols.length
+    ) {
+      console.warn('Invalid drag indices:', event);
+      return;
+    }
+
+    const fromColumn = visibleCols[event.from];
+    const toColumn = visibleCols[event.to];
+
+    // Find the actual indices in the full columns array
+    const fromIndex = currentColumns.findIndex((col) => col === fromColumn);
+    const toIndex = currentColumns.findIndex((col) => col === toColumn);
+
+    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+      const reorderEvent: ColumnReorderEvent = {
+        from: fromIndex,
+        to: toIndex,
+      };
+
+      if (this.externalColumnControl()) {
+        // Emit event for external handling
+        this.columnReorder.emit(reorderEvent);
+      } else {
+        // Handle internally
+        this.handleColumnReorderInternal(reorderEvent);
+      }
+    } else {
+      console.warn('Could not find column indices or same column drag:', {
+        fromIndex,
+        toIndex,
+        fromColumn,
+        toColumn,
+      });
+    }
+  }
+
+  private handleColumnReorderInternal(event: ColumnReorderEvent): void {
+    const currentColumns = this._columns();
+    const newColumns = this.tableService.reorderColumns(
+      currentColumns,
+      event.from,
+      event.to
+    );
+
+    // Update internal state
+    this._internalColumnState.set(newColumns);
+
+    // Save to localStorage if persistence is enabled
+    if (this.persistColumnVisibility) {
+      this.tableService.saveColumnVisibilityToStorage(
+        newColumns,
+        this.storageKey()
+      );
+    }
   }
 
   toggleColumnVisibility(column: TableColumn): void {
@@ -498,16 +590,21 @@ export class Table implements AfterViewInit {
     visible: boolean;
   }): void {
     const currentColumns = this._columns();
-    const newColumns = currentColumns.map((col) =>
-      col.field === event.column.field
-        ? { ...col, visible: event.visible }
-        : col
+    const newColumns = this.tableService.updateColumnVisibility(
+      currentColumns,
+      event.column.field,
+      event.visible
     );
-    this._columns.set(newColumns);
+
+    // Update internal state
+    this._internalColumnState.set(newColumns);
 
     // Save to localStorage if persistence is enabled
     if (this.persistColumnVisibility) {
-      this.saveColumnVisibilityToStorage(newColumns);
+      this.tableService.saveColumnVisibilityToStorage(
+        newColumns,
+        this.storageKey()
+      );
     }
   }
 
@@ -541,7 +638,7 @@ export class Table implements AfterViewInit {
         ...col,
         shrunk: !currentShrunkState,
       }));
-      this._columns.set(newColumns);
+      this._internalColumnState.set(newColumns);
     }
   }
 
@@ -605,15 +702,15 @@ export class Table implements AfterViewInit {
     } else {
       // Handle internally
       const currentColumns = this._columns();
-      const newColumns = currentColumns.map((col) => ({
-        ...col,
-        visible: true,
-      }));
-      this._columns.set(newColumns);
+      const newColumns = this.tableService.showAllColumns(currentColumns);
+      this._internalColumnState.set(newColumns);
 
       // Save to localStorage if persistence is enabled
       if (this.persistColumnVisibility) {
-        this.saveColumnVisibilityToStorage(newColumns);
+        this.tableService.saveColumnVisibilityToStorage(
+          newColumns,
+          this.storageKey()
+        );
       }
     }
   }
@@ -631,31 +728,16 @@ export class Table implements AfterViewInit {
       });
     } else {
       // Handle internally - reset to original columns from input
-      const originalColumns = this.columns();
-      this._columns.set([...originalColumns]);
+      this._internalColumnState.set([]);
 
       // Clear localStorage if persistence is enabled
       if (this.persistColumnVisibility) {
-        this.clearColumnVisibilityFromStorage();
+        this.tableService.clearColumnVisibilityFromStorage(this.storageKey());
       }
     }
     // Clear search term and reset shrunk state
     this._columnSearchTerm.set('');
     this._columnsShrunk.set(false);
-  }
-
-  onClickOutside(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.column-settings')) {
-      this.showColumnSelector.set(false);
-    }
-    // Close filter popup when clicking outside the filter popup and filter icon
-    if (
-      !target.closest('.filter-popup') &&
-      !target.closest('.filter-icon-btn')
-    ) {
-      this.closeFilterPopup();
-    }
   }
 
   lockedRows = computed(() => {
@@ -664,46 +746,12 @@ export class Table implements AfterViewInit {
 
   // Filtered data based on current filters
   filteredData = computed(() => {
-    // Check if any column has filtering enabled
-    const hasFilterEnabledColumns = this.displayColumns().some(
-      (col) => col.filter === true
+    return TableUtils.filterData(
+      this._data(),
+      this._filters(),
+      this.displayColumns(),
+      this.filterEnabled()
     );
-    if (!hasFilterEnabledColumns && !this.filterEnabled()) {
-      return this._data();
-    }
-
-    const data = this._data();
-    const filters = this._filters();
-
-    return data.filter((item) => {
-      return Object.keys(filters).every((field) => {
-        const filterValue = filters[field];
-        if (!filterValue || filterValue === '') return true;
-
-        const itemValue = item[field];
-        const column = this.displayColumns().find((col) => col.field === field);
-
-        if (!column || !column.filter) return true;
-
-        switch (column.filterType) {
-          case 'text':
-            return String(itemValue || '')
-              .toLowerCase()
-              .includes(String(filterValue).toLowerCase());
-          case 'number':
-            return Number(itemValue) === Number(filterValue);
-          case 'date':
-            // For date filters, we don't filter here as it's handled by sorting
-            return true;
-          case 'select':
-            return itemValue === filterValue;
-          default:
-            return String(itemValue || '')
-              .toLowerCase()
-              .includes(String(filterValue).toLowerCase());
-        }
-      });
-    });
   });
 
   // Sorted data based on current sort settings
@@ -714,33 +762,12 @@ export class Table implements AfterViewInit {
 
     if (!sortField) return data;
 
-    return [...data].sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-
-      // Handle date sorting
-      const column = this.displayColumns().find(
-        (col) => col.field === sortField
-      );
-      if (column?.filterType === 'date') {
-        const aDate = new Date(aValue);
-        const bDate = new Date(bValue);
-        const comparison = aDate.getTime() - bDate.getTime();
-        return sortOrder === 'asc' ? comparison : -comparison;
-      }
-
-      // Handle number sorting
-      if (column?.filterType === 'number') {
-        const comparison = Number(aValue) - Number(bValue);
-        return sortOrder === 'asc' ? comparison : -comparison;
-      }
-
-      // Handle text sorting
-      const comparison = String(aValue || '').localeCompare(
-        String(bValue || '')
-      );
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+    return TableUtils.sortDataByField(
+      data,
+      sortField,
+      sortOrder,
+      this.displayColumns()
+    );
   });
 
   unlockedRows = computed(() => {
@@ -824,15 +851,18 @@ export class Table implements AfterViewInit {
   }
 
   isRowLocked(item: any): boolean {
-    return this.lockedItems().some(
-      (lockedItem) =>
-        lockedItem[this.lockIdentifierField()] ===
-        item[this.lockIdentifierField()]
+    return TableUtils.isRowLocked(
+      item,
+      this.lockedItems(),
+      this.lockIdentifierField()
     );
   }
 
   canLockMoreRows(): boolean {
-    return this.lockedItems().length < this.maxLockedRows();
+    return TableUtils.canLockMoreRows(
+      this.lockedItems().length,
+      this.maxLockedRows()
+    );
   }
 
   onLockRow(item: any): void {
@@ -860,31 +890,28 @@ export class Table implements AfterViewInit {
   }
 
   getRowIndex(rowData: any): number {
-    return this.sortedData().indexOf(rowData) + 1;
+    return TableUtils.getRowIndex(
+      rowData,
+      this.sortedData(),
+      this.lockIdentifierField()
+    );
   }
 
   getLockedRowStickyTop(rowData: any): string {
-    const lockedRows = this.lockedRows();
-    const lockedIndex = lockedRows.findIndex(
-      (item) =>
-        item[this.lockIdentifierField()] === rowData[this.lockIdentifierField()]
+    return TableUtils.getLockedRowStickyTop(
+      rowData,
+      this.lockedRows(),
+      this.lockIdentifierField(),
+      this.headerHeight(),
+      this.getEstimatedRowHeight()
     );
-
-    if (lockedIndex === -1) return `${this.headerHeight()}px`; // Dynamic header height
-
-    // Dynamic header height + (locked row index * estimated row height)
-    const headerHeight = this.headerHeight();
-    const rowHeight = this.getEstimatedRowHeight();
-    const stickyTop = headerHeight + lockedIndex * rowHeight;
-
-    return `${stickyTop}px`;
   }
 
   private getEstimatedRowHeight(): number {
     // Try to get actual row height from DOM, fallback to estimated value
-    if (this.tableHeader?.nativeElement) {
-      const tbody =
-        this.tableHeader.nativeElement.parentElement?.querySelector('tbody');
+    const header = this.tableHeader();
+    if (header?.nativeElement) {
+      const tbody = header.nativeElement.parentElement?.querySelector('tbody');
       const firstRow = tbody?.querySelector('tr');
       if (firstRow) {
         return firstRow.offsetHeight;
@@ -915,79 +942,12 @@ export class Table implements AfterViewInit {
     this.onFilterChange(field, target.value);
   }
 
-  toggleFilterPopup(field: string, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    const currentPopup = this._activeFilterPopup();
-    this._activeFilterPopup.set(currentPopup === field ? null : field);
-
-    // Position the popup if opening
-    if (currentPopup !== field && event) {
-      setTimeout(
-        () => this.positionFilterPopup(event.target as HTMLElement),
-        0
-      );
-    }
-  }
-
-  private positionFilterPopup(triggerElement: HTMLElement): void {
-    const popup = document.querySelector('.filter-popup') as HTMLElement;
-    if (!popup || !triggerElement) return;
-
-    const triggerRect = triggerElement.getBoundingClientRect();
-    const popupRect = popup.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Calculate initial position (below the trigger)
-    let top = triggerRect.bottom + 4;
-    let left = triggerRect.left;
-
-    // Adjust if popup would go off the right edge
-    if (left + popupRect.width > viewportWidth) {
-      left = triggerRect.right - popupRect.width;
-    }
-
-    // Adjust if popup would go off the bottom edge
-    if (top + popupRect.height > viewportHeight) {
-      top = triggerRect.top - popupRect.height - 4;
-    }
-
-    // Ensure popup doesn't go off the left edge
-    if (left < 8) {
-      left = 8;
-    }
-
-    // Ensure popup doesn't go off the top edge
-    if (top < 8) {
-      top = triggerRect.bottom + 4;
-    }
-
-    popup.style.top = `${top}px`;
-    popup.style.left = `${left}px`;
-  }
-
-  closeFilterPopup(): void {
-    this._activeFilterPopup.set(null);
-  }
-
-  isFilterPopupOpen(field: string): boolean {
-    return this._activeFilterPopup() === field;
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    // Close filter popup when clicking outside
-    if (this._activeFilterPopup()) this.closeFilterPopup();
-  }
-
   // Handle scroll events on the table wrapper
   onTableScroll(event: Event): void {
     const target = event.target as HTMLElement;
 
-    // Close filter popup when scrolling
-    this.closeFilterPopup();
+    // Close all open popovers when scrolling
+    this.closeAllPopovers();
 
     if (target && this.expandableRows()) {
       // Check if any locked rows have expanded content
@@ -1004,6 +964,18 @@ export class Table implements AfterViewInit {
       if (hasExpandedLockedRow) {
         this.animateCollapseExpandedRows();
       }
+    }
+  }
+
+  // Close all open popovers
+  private closeAllPopovers(): void {
+    const popoverList = this.popovers();
+    if (popoverList) {
+      popoverList.forEach((popover) => {
+        if (popover.isVisible()) {
+          popover.hide();
+        }
+      });
     }
   }
 
@@ -1045,20 +1017,21 @@ export class Table implements AfterViewInit {
     const currentSortField = this._sortField();
     const currentSortOrder = this._sortOrder();
 
-    if (currentSortField === field) {
-      // Toggle sort order if same field
-      this._sortOrder.set(currentSortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new field and default to ascending
-      this._sortField.set(field);
-      this._sortOrder.set('asc');
-    }
+    const newSortState = this.tableService.handleSort(
+      field,
+      currentSortField,
+      currentSortOrder
+    );
+
+    this._sortField.set(newSortState.sortField);
+    this._sortOrder.set(newSortState.sortOrder);
   }
 
   clearFilters(): void {
-    this._filters.set({});
-    this._sortField.set(null);
-    this._sortOrder.set('asc');
+    const resetState = this.tableService.clearFiltersAndSort();
+    this._filters.set(resetState.filters);
+    this._sortField.set(resetState.sortField);
+    this._sortOrder.set(resetState.sortOrder);
   }
 
   getFilterValue(field: string): any {
@@ -1067,25 +1040,18 @@ export class Table implements AfterViewInit {
 
   hasActiveFilter(field: string): boolean {
     const filterValue = this._filters()[field];
-    return (
-      filterValue !== undefined && filterValue !== null && filterValue !== ''
-    );
+    return TableUtils.hasActiveFilter(filterValue);
   }
 
   getSortIcon(field: string): string {
     const sortField = this._sortField();
     const sortOrder = this._sortOrder();
-
-    if (sortField !== field) return '↕️';
-    return sortOrder === 'asc' ? '↑' : '↓';
+    return TableUtils.getSortIcon(field, sortField, sortOrder);
   }
 
   getUniqueValues(field: string): string[] {
     const data = this._data();
-    const values = data
-      .map((item) => item[field])
-      .filter((value) => value !== null && value !== undefined);
-    return [...new Set(values)].sort();
+    return TableUtils.getUniqueValues(data, field);
   }
 
   // Expandable rows methods
@@ -1129,21 +1095,39 @@ export class Table implements AfterViewInit {
   }
 
   getExpandedContentColspan(): number {
-    let colspan = this.visibleColumns().length;
-    if (this.hasCheckBox()) colspan++;
-    if (this.hasIndex()) colspan++;
-    if (this.expandableRows()) colspan++;
-    return colspan;
+    return TableUtils.calculateExpandedContentColspan(
+      this.visibleColumns().length,
+      this.hasCheckBox(),
+      this.hasIndex(),
+      this.expandableRows()
+    );
+  }
+
+  getTotalColumnCount(): number {
+    let count = this.visibleColumns().length;
+    if (this.hasCheckBox()) count++;
+    if (this.hasIndex()) count++;
+    if (this.expandableRows()) count++;
+    return count;
   }
 
   // Pagination methods
   showMore(): void {
-    this._currentPage.update((page) => page + 1);
+    const newState = this.tableService.handlePagination(
+      this._currentPage(),
+      'next'
+    );
+    this._currentPage.set(newState.currentPage);
+    this._showAllItems.set(newState.showAllItems);
   }
 
   resetPagination(): void {
-    this._currentPage.set(1);
-    this._showAllItems.set(false);
+    const newState = this.tableService.handlePagination(
+      this._currentPage(),
+      'reset'
+    );
+    this._currentPage.set(newState.currentPage);
+    this._showAllItems.set(newState.showAllItems);
   }
 
   /**
@@ -1173,21 +1157,20 @@ export class Table implements AfterViewInit {
 
   // Checkbox selection methods
   isRowSelected(rowData: any): boolean {
-    const identifier = rowData[this.lockIdentifierField()];
-    return this._selectedRows().has(identifier);
+    return TableUtils.isRowSelected(
+      rowData,
+      this._selectedRows(),
+      this.lockIdentifierField()
+    );
   }
 
   toggleRowSelection(rowData: any): void {
-    const identifier = rowData[this.lockIdentifierField()];
-    const selectedRows = new Set(this._selectedRows());
-
-    if (selectedRows.has(identifier)) {
-      selectedRows.delete(identifier);
-    } else {
-      selectedRows.add(identifier);
-    }
-
-    this._selectedRows.set(selectedRows);
+    const newSelectedRows = this.tableService.toggleRowSelection(
+      rowData,
+      this._selectedRows(),
+      this.lockIdentifierField()
+    );
+    this._selectedRows.set(newSelectedRows);
   }
 
   /**
@@ -1196,24 +1179,16 @@ export class Table implements AfterViewInit {
    */
   public toggleSelectAll(): void {
     const currentData = this.sortedData();
-    const selectedRows = new Set(this._selectedRows());
-    const allSelected = this._selectAll();
+    const allSelected = this._selectAllComputed();
 
-    if (allSelected) {
-      // Deselect all current page items
-      currentData.forEach((row) => {
-        const identifier = row[this.lockIdentifierField()];
-        selectedRows.delete(identifier);
-      });
-    } else {
-      // Select all current page items
-      currentData.forEach((row) => {
-        const identifier = row[this.lockIdentifierField()];
-        selectedRows.add(identifier);
-      });
-    }
+    const newSelectedRows = this.tableService.toggleSelectAll(
+      currentData,
+      this._selectedRows(),
+      this.lockIdentifierField(),
+      allSelected
+    );
 
-    this._selectedRows.set(selectedRows);
+    this._selectedRows.set(newSelectedRows);
   }
 
   /**
@@ -1222,79 +1197,28 @@ export class Table implements AfterViewInit {
    * @returns An array of selected row data objects.
    */
   private getSelectedRowsData(): any[] {
-    const selectedIdentifiers = this._selectedRows();
-    const allData = this._data();
-    return allData.filter((row) => {
-      const identifier = row[this.lockIdentifierField()];
-      return selectedIdentifiers.has(identifier);
-    });
+    return TableUtils.getSelectedRowsData(
+      this._selectedRows(),
+      this._data(),
+      this.lockIdentifierField()
+    );
   }
 
   /**
-   * Saves the visibility state of each table column to localStorage.
-   * This allows restoring user preferences for column visibility on future visits.
-   *
-   * @param columns - The array of table columns to persist visibility for.
-   * @private
+   * Syncs locked items with current data to ensure they stay up-to-date.
+   * This method handles updating locked items when the data changes.
    */
-  private saveColumnVisibilityToStorage(columns: TableColumn[]): void {
-    try {
-      const visibilityMap: Record<string, boolean> = {};
-      columns.forEach((col) => {
-        visibilityMap[col.field] = col.visible !== false;
-      });
-      localStorage.setItem(this.storageKey(), JSON.stringify(visibilityMap));
-    } catch (error) {
-      console.warn('Failed to save column visibility to localStorage:', error);
-    }
-  }
+  private syncLockedItemsWithData(currentData: any[]): void {
+    const currentLocked = this._lockedItems();
+    const updatedLocked = TableUtils.syncLockedItemsWithData(
+      currentLocked,
+      currentData,
+      this.lockIdentifierField()
+    );
 
-  /**
-   * Loads column visibility settings from localStorage and applies them to the provided columns.
-   *
-   * @param columns - The default array of table columns.
-   * @returns The updated array of columns with visibility flags set according to stored preferences.
-   * @private
-   */
-  private loadColumnVisibilityFromStorage(
-    columns: TableColumn[]
-  ): TableColumn[] {
-    try {
-      const stored = localStorage.getItem(this.storageKey());
-      if (!stored) {
-        return columns;
-      }
-
-      const visibilityMap: Record<string, boolean> = JSON.parse(stored);
-      return columns.map((col) => ({
-        ...col,
-        visible: Object.prototype.hasOwnProperty.call(visibilityMap, col.field)
-          ? visibilityMap[col.field]
-          : col.visible !== false,
-      }));
-    } catch (error) {
-      console.warn(
-        'Failed to load column visibility from localStorage:',
-        error
-      );
-      return columns;
-    }
-  }
-
-  /**
-   * Clears the saved column visibility settings from localStorage.
-   * Useful when resetting table view preferences to default.
-   *
-   * @private
-   */
-  private clearColumnVisibilityFromStorage(): void {
-    try {
-      localStorage.removeItem(this.storageKey());
-    } catch (error) {
-      console.warn(
-        'Failed to clear column visibility from localStorage:',
-        error
-      );
+    // Only update if there are actual changes
+    if (JSON.stringify(currentLocked) !== JSON.stringify(updatedLocked)) {
+      this._lockedItems.set(updatedLocked);
     }
   }
 }

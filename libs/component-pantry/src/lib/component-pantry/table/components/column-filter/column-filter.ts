@@ -2,8 +2,7 @@ import { Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 //Local
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { FILE_ICONS } from '../../../../utils/file-icons';
+import { DomSanitizer } from '@angular/platform-browser';
 import { TableColumn } from '../../table.types';
 
 @Component({
@@ -22,22 +21,10 @@ export class ColumnFilter {
   filterValue = input<any>('');
   sortField = input<string | null>(null);
   sortOrder = input<'asc' | 'desc'>('asc');
-  isPopupOpen = input<boolean>(false);
 
   // Outputs
   filterChange = output<{ field: string; value: any }>();
   sortChange = output<string>();
-  togglePopup = output<{ field: string; event?: Event }>();
-  closePopup = output<void>();
-
-  // SVG
-  public readonly filtersIcon: SafeHtml;
-
-  constructor() {
-    this.filtersIcon = this.sanitizer.bypassSecurityTrustHtml(
-      FILE_ICONS['FILTER']
-    );
-  }
 
   onFilterInputChange(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -47,14 +34,6 @@ export class ColumnFilter {
   onFilterSelectChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.filterChange.emit({ field: this.column().field, value: target.value });
-  }
-
-  onToggleFilterPopup(event?: Event): void {
-    this.togglePopup.emit({ field: this.column().field, event });
-  }
-
-  onCloseFilterPopup(): void {
-    this.closePopup.emit();
   }
 
   onSort(): void {

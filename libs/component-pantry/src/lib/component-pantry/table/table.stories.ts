@@ -1526,3 +1526,139 @@ export const CustomStyle: Story = {
     },
   },
 };
+
+// 8. Custom Style
+export const NoData: Story = {
+  args: {
+    columns: sampleColumns(),
+    data: [],
+    tableStyle: { 'min-width': '50rem' },
+    columnDraggable: false,
+    expandableRows: false,
+    hasIndex: true,
+    hasCheckBox: true,
+    maxLockedRows: 3,
+    lockIdentifierField: 'licenseKey',
+    showColumnSettings: true,
+  },
+  render: (args) => ({
+    props: {
+      ...args,
+      ...globalHandlers,
+    },
+    moduleMetadata: {
+      imports: [Card, TruncatePipe],
+    },
+    template: `
+    <div class="m-4">
+      <ntv-card [variant]="'default'" [rounded]="'lg'">
+      <div class="p-4">
+        <ntv-table 
+        [columns]="columns"
+        [data]="data"
+        [tableStyle]="tableStyle"
+        [columnDraggable]="columnDraggable" 
+        [hasIndex]="hasIndex"
+        [maxLockedRows]="maxLockedRows"
+        [lockIdentifierField]="lockIdentifierField"
+       >
+          <ng-template #header let-column>
+            <span>{{ column.header }}</span>
+          </ng-template>
+          
+          <ng-template
+            #body
+            let-rowData
+            let-columns="columns"
+            let-isLocked="isLocked"
+            let-onLockRow="onLockRow"
+            let-onUnlockRow="onUnlockRow"
+            let-canLockMoreRows="canLockMoreRows"
+            let-hasIndex="hasIndex"
+            let-rowIndex="rowIndex"
+            let-stickyTop="stickyTop"
+            let-onToggleExpansion="onToggleExpansion"
+        >
+          <tr [class.locked-row]="isLocked" [style.--sticky-top]="stickyTop">
+            @if (hasIndex) {
+              <td class="index-column">{{ rowIndex }}</td>
+            } 
+            @for (col of columns; track col.field) {
+            <td>
+              @if (col.field === 'licenseKey') {
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-lime-400"></span>
+                <span>
+                  {{ rowData[col.field] | truncate: 15 }}
+                </span>
+              </div>
+              } @else if (col.field === 'display') {
+              <span [class]="displayClass(rowData[col.field])">
+                {{ rowData[col.field] }} 
+              </span>
+              } @else if (col.field === 'downloadSpeed') {
+              <span>
+                {{ rowData[col.field] }} Mbps
+              </span>
+              }
+              @else if (col.field === 'uploadSpeed') {
+              <span [class]="getUploadSpeedClass(rowData[col.field])">
+                {{ rowData[col.field] }} Mbps
+              </span>
+              } @else if (col.field === 'action') {
+              <div class="action-buttons">
+                <button class="edit-btn" title="Edit" (click)="onEditRow(rowData)">
+                  ✏️
+                </button>
+                <button
+                  class="delete-btn"
+                  title="Delete"
+                  (click)="onDeleteRow(rowData)"
+                >
+                  🗑️
+                </button>
+                @if (isLocked) {
+                <button
+                  class="lock-btn locked"
+                  title="Unlock Row"
+                  (click)="onUnlockRow(rowData)"
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="lock-btn unlocked"
+                  title="Lock Row"
+                  [disabled]="!canLockMoreRows"
+                  (click)="onLockRow(rowData)"
+                >
+                  🔓
+                </button>
+                }
+                <button class="more-btn" title="More">⋯</button>
+              </div>
+              } @else {
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+              }
+            </td>
+            }
+          </tr>
+        </ng-template>
+      </ntv-table>
+      </div>
+    </ntv-card>
+    </div>
+     
+    `,
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Default table configuration with basic functionality. Shows index numbers and column settings.',
+      },
+    },
+  },
+};

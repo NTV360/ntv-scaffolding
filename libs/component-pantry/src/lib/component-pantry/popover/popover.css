@@ -22,8 +22,6 @@
   @apply p-3 text-sm text-gray-900 dark:text-gray-100;
 }
 
-
-
 /* Transform origin adjustments for smooth animations */
 .ntv-popover--top,
 .ntv-popover--top-start,
@@ -60,11 +58,6 @@
   }
 }
 
-/* Focus and hover states for accessibility */
-.ntv-popover:focus-within {
-  @apply ring-2 ring-blue-500 ring-opacity-50;
-}
-
 /* Custom scrollbar for content overflow */
 .ntv-popover__content::-webkit-scrollbar {
   @apply w-1;
@@ -81,8 +74,6 @@
 .ntv-popover__content::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400 dark:bg-gray-500;
 }
-
-
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
