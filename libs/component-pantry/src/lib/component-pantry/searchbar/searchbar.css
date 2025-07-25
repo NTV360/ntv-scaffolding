@@ -1,0 +1,118 @@
+/* Base container styles */
+.searchbar-container {
+  @apply flex flex-col gap-2 w-full max-w-md relative;
+}
+
+.searchbar-wrapper {
+  @apply flex items-stretch gap-2;
+}
+
+.search-input-wrapper {
+  @apply flex-1 relative;
+}
+
+.search-icon {
+  @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4;
+}
+
+.min-chars-message {
+  @apply text-sm text-gray-500;
+}
+
+/* Search Results Dropdown */
+.search-results {
+  @apply absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-64 overflow-y-auto;
+}
+
+.search-result-item {
+  @apply px-4 py-3 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors duration-150;
+}
+
+.search-result-item:hover {
+  @apply bg-blue-50;
+}
+
+.result-main {
+  @apply flex items-center justify-between mb-1;
+}
+
+.result-name {
+  @apply font-medium text-gray-900 text-sm;
+}
+
+.result-type {
+  @apply text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize;
+}
+
+.result-details {
+  @apply flex items-center text-xs text-gray-500 gap-1;
+}
+
+.result-country {
+  @apply text-gray-600;
+}
+
+.result-separator {
+  @apply text-gray-400;
+}
+
+.result-region {
+  @apply text-gray-500;
+}
+
+.no-results {
+  @apply px-4 py-3 text-sm text-gray-500 text-center;
+}
+
+/* Type-specific styling */
+.search-result-item:has(.result-type:contains('city')) .result-type {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.search-result-item:has(.result-type:contains('landmark')) .result-type {
+  @apply bg-green-100 text-green-700;
+}
+
+.search-result-item:has(.result-type:contains('country')) .result-type {
+  @apply bg-purple-100 text-purple-700;
+}
+
+/* Loading State Styles */
+.loading-container {
+  @apply flex flex-col items-center justify-center py-6 px-4;
+}
+
+.loading-spinner {
+  @apply w-6 h-6 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-2;
+}
+
+.loading-text {
+  @apply text-sm text-gray-600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .searchbar-container {
+    @apply max-w-full;
+  }
+
+  .searchbar-wrapper {
+    @apply flex-col gap-2;
+  }
+
+  .search-results {
+    @apply max-h-48;
+  }
+
+  .search-result-item {
+    @apply px-3 py-2;
+  }
+
+  .result-name {
+    @apply text-xs;
+  }
+
+  .result-details {
+    @apply text-xs;
+  }
+}

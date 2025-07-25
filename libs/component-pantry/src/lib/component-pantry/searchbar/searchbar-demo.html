@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Searchbar Component Demo</title>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        .demo-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+        .demo-description {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-hint {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #0369a1;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .data-category {
+            padding: 1rem;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        .data-category h4 {
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .data-category p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Searchbar Component Demo</h1>
+    <p>This page demonstrates the usage of the Searchbar component with different configurations.</p>
+    
+    <div class="demo-section">
+        <h2 class="demo-title">Location Search with Autocomplete</h2>
+        <p class="demo-description">Search for cities, landmarks, and countries. Autocomplete suggestions appear after clicking the search button.</p>
+        <!-- Angular component would be rendered here -->
+        <lib-searchbar 
+            placeholder="Search for cities, landmarks, or countries..."
+            [minCharacters]="2"
+            size="md"
+            variant="default"
+            (search)="onSearch($event)"
+            (searchValueChange)="onSearchValueChange($event)">
+        </lib-searchbar>
+        <div class="demo-hint">
+            💡 Try searching for: "New York", "Paris", "Eiffel Tower", "Asia", etc. Click the search button to see results!
+        </div>
+    </div>
+    
+    <div class="demo-section">
+         <h2 class="demo-title">Primary Variant</h2>
+         <p class="demo-description">Primary state search style with 2 minimum characters requirement.</p>
+         <lib-searchbar 
+             placeholder="Primary search style..."
+             [minCharacters]="2"
+             size="md"
+             variant="primary"
+             (search)="onSearch($event)"
+             (searchValueChange)="onSearchValueChange($event)">
+         </lib-searchbar>
+     </div>
+     
+     <div class="demo-section">
+         <h2 class="demo-title">Danger Variant</h2>
+         <p class="demo-description">Danger state search style with 2 minimum characters requirement.</p>
+         <lib-searchbar 
+             placeholder="Danger search style..."
+             [minCharacters]="2"
+             size="md"
+             variant="danger"
+             (search)="onSearch($event)"
+             (searchValueChange)="onSearchValueChange($event)">
+         </lib-searchbar>
+     </div>
+     
+     <div class="demo-section">
+         <h2 class="demo-title">Success Variant</h2>
+         <p class="demo-description">Success state search style with 1 character minimum requirement.</p>
+         <lib-searchbar 
+             placeholder="Success search style..."
+             [minCharacters]="1"
+             size="md"
+             variant="success"
+             (search)="onSearch($event)"
+             (searchValueChange)="onSearchValueChange($event)">
+         </lib-searchbar>
+     </div>
+     
+     <div class="demo-section">
+         <h2 class="demo-title">Large Size</h2>
+         <p class="demo-description">Large size searchbar with 1 character minimum requirement.</p>
+         <lib-searchbar 
+             placeholder="Large search..."
+             [minCharacters]="1"
+             size="lg"
+             variant="default"
+             (search)="onSearch($event)"
+             (searchValueChange)="onSearchValueChange($event)">
+         </lib-searchbar>
+     </div>
+     
+     <div class="demo-section">
+         <h2 class="demo-title">Disabled Searchbar</h2>
+         <p class="demo-description">Small size searchbar in disabled state.</p>
+         <lib-searchbar 
+             placeholder="Disabled search"
+             [minCharacters]="2"
+             size="sm"
+             variant="default"
+             [disabled]="true">
+         </lib-searchbar>
+     </div>
+    
+    <div class="demo-section">
+        <h2 class="demo-title">Usage in TypeScript</h2>
+        <pre><code>
+// Component implementation
+export class MyComponent {
+  onSearch(searchTerm: string): void {
+    console.log('Searching for:', searchTerm);
+    // Perform search logic here
+    this.performSearch(searchTerm);
+  }
+  
+  onValueChange(value: string): void {
+    console.log('Search value changed:', value);
+    // Handle real-time value changes if needed
+  }
+  
+  private performSearch(term: string): void {
+    // Your search implementation
+  }
+}
+        </code></pre>
+    </div>
+    
+    <div class="demo-section">
+        <h2 class="demo-title">Features</h2>
+        <ul>
+            <li>✅ Built on top of the existing Input component</li>
+            <li>✅ Configurable minimum character requirement</li>
+            <li>✅ Search button disabled until minimum characters are met</li>
+            <li>✅ Search icon in the input field</li>
+            <li>✅ Keyboard support (Enter key to search)</li>
+            <li>✅ Multiple size options (xs, sm, md, lg)</li>
+            <li>✅ Visual variants (inherits from input: default, primary, success, danger, and custom strings)</li>
+            <li>✅ Location Search: Built-in autocomplete with 20+ cities, landmarks, and regions</li>
+            <li>✅ Smart Filtering: Search by name, country, or region</li>
+            <li>✅ Responsive design (stacks on mobile)</li>
+            <li>✅ Event emissions for search and value changes</li>
+            <li>✅ Disabled state support</li>
+            <li>✅ Visual feedback for minimum character requirement</li>
+        </ul>
+    </div>
+    
+    <div class="demo-section">
+        <h2 class="demo-title">Available Search Data</h2>
+        <p class="demo-description">The searchbar includes dummy data for testing autocomplete functionality.</p>
+        <div class="data-grid">
+            <div class="data-category">
+                <h4>Cities (15)</h4>
+                <p>New York, London, Tokyo, Paris, Sydney, Dubai, Singapore, Los Angeles, Barcelona, Toronto, Berlin, Mumbai, Rome, Bangkok, Amsterdam</p>
+            </div>
+            <div class="data-category">
+                <h4>Landmarks (5)</h4>
+                <p>Eiffel Tower, Statue of Liberty, Great Wall of China, Machu Picchu, Taj Mahal</p>
+            </div>
+            <div class="data-category">
+                <h4>Regions</h4>
+                <p>North America, Europe, Asia, Oceania, Middle East, South America</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
