@@ -181,10 +181,6 @@ npx nx g @nx/storybook:story my-component --project=component-pantry
 
 </div>
 
-<table>
-<tr>
-<td width="50%">
-
 ### 📱 **Host Installation App**
 
 **🔧 Development Environment**
@@ -199,9 +195,6 @@ Build: npm run build:host:prod
 Output: dist/apps/ntv-host-installation/host-installation/browser
 ```
 
-</td>
-<td width="50%">
-
 ### 📚 **Storybook Documentation**
 
 **🔧 Development**
@@ -215,12 +208,6 @@ Output: dist/storybook/component-pantry
 Build: npm run build:storybook:prod
 Output: dist/storybook/component-pantry
 ```
-
-> 💡 **Perfect for team collaboration and component showcasing**
-
-</td>
-</tr>
-</table>
 
 <details>
 <summary><strong>⚡ CI/CD Pipeline with Nx Cloud</strong></summary>
