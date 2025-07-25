@@ -1,101 +1,153 @@
-# NtvScaffolding
+# NTV Scaffolding
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+An Angular Nx monorepo workspace containing a host installation application and a comprehensive component library with Storybook documentation.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## 📁 Project Structure
 
-## Run tasks
+- **`apps/ntv-host-installation/host-installation`** - Main Angular application for host installation flow
+- **`libs/component-pantry`** - Reusable Angular component library with Storybook
+- **`apps/ntv-host-installation/host-installation-e2e`** - End-to-end tests using Playwright
 
-To run the dev server for your app, use:
+## 🚀 Quick Start
+
+### Development Server
 
 ```sh
-npx nx serve component-demo
+# Start the host installation app
+npm run serve
+# or
+npx nx serve host-installation
+
+# Start Storybook for component development
+npm run storybook
+# or
+npx nx storybook component-pantry
 ```
 
-To create a production bundle:
+### Building Projects
 
 ```sh
-npx nx build component-demo
+# Build host installation app (production)
+npm run build:host:prod
+
+# Build host installation app (development)
+npm run build:host:dev
+
+# Build component library
+npm run build:pantry
+
+# Build Storybook
+npm run build:storybook:prod
 ```
 
-To see all available targets to run for a project, run:
+### Testing
 
 ```sh
-npx nx show project component-demo
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run e2e
+
+# Run E2E tests with UI
+npm run e2e:ui
+
+# Run linting
+npm run lint
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 📚 Component Library
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The `component-pantry` library contains reusable Angular components with comprehensive Storybook documentation:
 
-## Add new projects
+- **Button** - Configurable button component with multiple variants
+- **Card** - Flexible card component for content containers
+- **Popover** - Advanced popover with positioning and trigger options
+- **Stepper** - Multi-variant stepper for workflow navigation
+- **Table** - Feature-rich table with sorting, filtering, and row actions
+- **Layout** - Application layout components
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+### Using Components
 
-Use the plugin's generator to create new projects.
+```typescript
+import { Button, Card, Table } from '@ntv-scaffolding/component-pantry';
 
-To generate a new application, use:
-
-```sh
-npx nx g @nx/angular:app demo
+@Component({
+  imports: [Button, Card, Table],
+  // ...
+})
 ```
 
-To generate a new library, use:
+## 🔧 Development Workflow
+
+### Adding New Components
 
 ```sh
-npx nx g @nx/angular:lib mylib
+# Generate a new component in the library
+npx nx g @nx/angular:component my-component --project=component-pantry
+
+# Generate a new application
+npx nx g @nx/angular:app my-app
+
+# Generate a new library
+npx nx g @nx/angular:lib my-lib
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Nx Console
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[Install Nx Console](https://nx.dev/getting-started/editor-setup) for VSCode to browse generators and run tasks through a GUI interface.
 
-## Set up CI!
+## 🚀 Deployment
 
-### Step 1
+### AWS Amplify Setup
 
-To connect to Nx Cloud, run the following command:
+For deploying to AWS Amplify with GitHub integration:
+
+1. **Host Installation App**:
+   - Development: `npm run build:host:dev`
+   - Production: `npm run build:host:prod`
+   - Output: `dist/apps/ntv-host-installation/host-installation/browser`
+
+2. **Storybook Documentation**:
+   - Development: `npm run build:storybook:dev`
+   - Production: `npm run build:storybook:prod`
+   - Output: `dist/storybook/component-pantry`
+
+### CI/CD Pipeline
 
 ```sh
+# Connect to Nx Cloud for faster CI
 npx nx connect
-```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
+# Generate CI workflow
 npx nx g ci-workflow
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Nx Cloud provides remote caching, task distribution, and automated test splitting for faster CI/CD pipelines.
 
-## Install Nx Console
+## 📋 Available Scripts
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+All available npm scripts are organized in `package.json` with comments for clarity:
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Host Installation App**: `serve`, `build:host:dev`, `build:host:prod`
+- **Component Library**: `build:pantry:dev`, `build:pantry:prod`
+- **Storybook**: `storybook`, `build:storybook:dev`, `build:storybook:prod`
+- **Testing**: `test`, `lint`, `e2e`, `e2e:ui`, `e2e:headed`
 
-## Useful links
+## 🛠️ Tech Stack
 
-Learn more:
+- **Framework**: Angular 20+ with standalone components
+- **Build System**: Nx 21.2.2
+- **Styling**: Tailwind CSS
+- **Testing**: Jest (unit), Playwright (E2E)
+- **Documentation**: Storybook
+- **Package Manager**: npm
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📖 Useful Resources
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [Nx Documentation](https://nx.dev)
+- [Angular Documentation](https://angular.dev)
+- [Storybook Documentation](https://storybook.js.org)
+- [Tailwind CSS Documentation](https://tailwindcss.com)
