@@ -11,7 +11,7 @@
 }
 
 .stepper-container {
-  @apply flex-1 flex flex-col justify-start px-6;
+  @apply flex-1 flex flex-col justify-start px-4;
 }
 
 .installation-stepper {

@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Button,
   Stepper,
   StepperConfig,
+  StepClickEvent,
 } from '@ntv-scaffolding/component-pantry';
+import { DEFAULT_STEPPER_CONFIG } from '../../../constants';
+import { InstallationFlowService } from '../../../services';
 
 @Component({
   selector: 'ntv-sidebar',
@@ -13,39 +16,24 @@ import {
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
-  installationSteps = [
-    {
-      id: 'step1',
-      label: 'Create a Host',
-      description: 'Step 1',
-    },
-    {
-      id: 'step2',
-      label: 'Create Screen',
-      description: 'Step 2',
-    },
-    {
-      id: 'step3',
-      label: 'Set Installation Date',
-      description: 'Step 3',
-    },
-    {
-      id: 'step4',
-      label: 'Review Information',
-      description: 'Step 4',
-    },
-  ];
+  private installationFlowService = inject(InstallationFlowService);
 
-  currentStep = 0;
+  // Public computed signals from service
+  installationSteps = this.installationFlowService.steps;
+  currentStep = this.installationFlowService.currentStepIndex;
 
+  // Stepper configuration with clickable enabled and descriptions disabled for sidebar
   stepperConfig: StepperConfig = {
-    variant: 'vertical-reverse',
-
-    stepperColor: 'accent',
-    labelColor: 'white',
-    descriptionColor: 'neutral',
-    showLabels: true,
-    showDescriptions: true,
-    clickable: false,
+    ...DEFAULT_STEPPER_CONFIG,
+    clickable: true,
+    showDescriptions: false,
   };
+
+  /**
+   * Handles step click events and delegates to service
+   */
+  onStepClick(event: StepClickEvent): void {
+    const { index } = event;
+    this.installationFlowService.navigateToStep(index);
+  }
 }

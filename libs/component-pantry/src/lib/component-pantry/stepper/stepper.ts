@@ -1,9 +1,14 @@
-import { Component, input, output, linkedSignal, computed } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  linkedSignal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   StepData,
   StepperVariant,
-  StepperOrientation,
   StepperSize,
   ColorVariant,
   StepClickEvent,
@@ -37,7 +42,7 @@ import {
  *
  * @example
  * // DRY config pattern
- * <ntv-stepper 
+ * <ntv-stepper
  *   [steps]="stepData"
  *   [currentStep]="activeStep"
  *   [config]="stepperConfig">
@@ -74,8 +79,6 @@ export class Stepper {
   /** Visual variant of the stepper (default, progress, detailed, panel, vertical, etc.) */
   variant = input<StepperVariant>('default');
 
-
-
   /** Size variant for step numbers and overall spacing */
   size = input<StepperSize>('md');
 
@@ -100,59 +103,63 @@ export class Stepper {
   /** Whether users can skip ahead to future steps */
   allowSkipping = input<boolean>(false);
 
-  /** 
+  /** Whether to animate the progress lines in vertical steppers */
+  animateProgress = input<boolean>(false);
+
+  /**
    * Configuration object for DRY usage - combines all stepper properties into a single object
    * @description Reduces template verbosity by 90% when using multiple properties
    */
   config = input<Partial<StepperConfig>>();
 
   // Computed properties that merge config with individual inputs
-  
+
   /** Resolved variant from config or individual property */
   readonly mergedVariant = computed(
     () => this.config()?.variant ?? this.variant()
   );
-  
 
-  
   /** Resolved size from config or individual property */
-  readonly mergedSize = computed(
-    () => this.config()?.size ?? this.size()
-  );
-  
+  readonly mergedSize = computed(() => this.config()?.size ?? this.size());
+
   /** Resolved stepper color from config or individual property */
   readonly mergedStepperColor = computed(
     () => this.config()?.stepperColor ?? this.stepperColor()
   );
-  
+
   /** Resolved label color from config or individual property */
   readonly mergedLabelColor = computed(
     () => this.config()?.labelColor ?? this.labelColor()
   );
-  
+
   /** Resolved description color from config or individual property */
   readonly mergedDescriptionColor = computed(
     () => this.config()?.descriptionColor ?? this.descriptionColor()
   );
-  
+
   /** Resolved clickable state from config or individual property */
   readonly mergedClickable = computed(
     () => this.config()?.clickable ?? this.clickable()
   );
-  
+
   /** Resolved show labels state from config or individual property */
   readonly mergedShowLabels = computed(
     () => this.config()?.showLabels ?? this.showLabels()
   );
-  
+
   /** Resolved show descriptions state from config or individual property */
   readonly mergedShowDescriptions = computed(
     () => this.config()?.showDescriptions ?? this.showDescriptions()
   );
-  
+
   /** Resolved allow skipping state from config or individual property */
   readonly mergedAllowSkipping = computed(
     () => this.config()?.allowSkipping ?? this.allowSkipping()
+  );
+
+  /** Resolved animate progress state from config or individual property */
+  readonly mergedAnimateProgress = computed(
+    () => this.config()?.animateProgress ?? this.animateProgress()
   );
 
   // Signal outputs
@@ -190,19 +197,20 @@ export class Stepper {
    */
   isStepCompleted(index: number): boolean {
     return (
-      index < this.currentStep() || this.steps()[index]?.completed === true
+      index < this.internalCurrentStep() ||
+      this.steps()[index]?.completed === true
     );
   }
 
   /**
    * Determines if a step is currently active.
-   * A step is active if it matches the current step or is explicitly marked as active.
+   * Only one step can be active at a time.
    *
    * @param index - The zero-based step index to check
-   * @returns True if the step is active
+   * @returns True if the step is currently active
    */
   isStepActive(index: number): boolean {
-    return index === this.currentStep() || this.steps()[index]?.active === true;
+    return index === this.internalCurrentStep();
   }
 
   /**
@@ -212,7 +220,7 @@ export class Stepper {
    * @returns True if the step is disabled
    */
   isStepDisabled(index: number): boolean {
-    return this.steps()[index]?.disabled === true;
+    return this.steps()[index]?.disabled ?? false;
   }
 
   /**
@@ -222,58 +230,51 @@ export class Stepper {
    * @returns True if the step has an error
    */
   isStepError(index: number): boolean {
-    return this.steps()[index]?.error === true;
+    return this.steps()[index]?.error ?? false;
   }
 
   /**
-   * Generates CSS classes for a step element based on its state and configuration.
+   * Generates CSS classes for step containers based on variant and state.
    *
    * @param index - The zero-based step index
-   * @returns Space-separated CSS class string
+   * @returns Space-separated CSS class string for step containers
    */
   getStepClasses(index: number): string {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
     const isDisabled = this.isStepDisabled(index);
     const isError = this.isStepError(index);
-
     let classes = 'step';
 
-    // Add variant classes
+    // Add variant-specific classes
     classes += ` step--${this.mergedVariant()}`;
 
-    // Add color classes for text
-    if (isError) {
-      classes += ' step__text--danger';
-    } else {
-      classes += ` step__text--${this.mergedStepperColor()}`;
-    }
+    // Add size classes
+    classes += ` step--${this.mergedSize()}`;
 
-    // Add state classes
-    if (isCompleted || isActive) {
-      classes += ' step__text--active';
-    } else {
-      classes += ' step__text--inactive';
-    }
-
-    // Add interactive classes
-    if (this.mergedClickable() && !isDisabled) {
-      classes += ' step--clickable';
-    }
-
-    if (isDisabled) {
-      classes += ' step--disabled';
-    }
-
+    // Add state classes with priority: error > active > completed > disabled > default
     if (isError) {
       classes += ' step--error';
+    } else if (isActive) {
+      classes += ' step--active';
+    } else if (isCompleted) {
+      classes += ' step--completed';
+    } else if (isDisabled) {
+      classes += ' step--disabled';
+    } else {
+      classes += ' step--inactive';
+    }
+
+    // Add clickable class if applicable
+    if (this.mergedClickable() && !isDisabled) {
+      classes += ' step--clickable';
     }
 
     return classes;
   }
 
   /**
-   * Generates CSS classes for step number/icon elements.
+   * Generates CSS classes for step numbers with color and state variations.
    *
    * @param index - The zero-based step index
    * @returns Space-separated CSS class string for step numbers
@@ -282,7 +283,6 @@ export class Stepper {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
     const isError = this.isStepError(index);
-
     let classes = 'step__number';
 
     // Add size classes
@@ -291,20 +291,20 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__number--danger';
-      if (isCompleted) {
-        classes += ' step__number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__number--danger--completed';
       } else {
         classes += ' step__number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__number--${color}`;
-      if (isCompleted) {
-        classes += ` step__number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__number--${color}--completed`;
       } else {
         classes += ` step__number--${color}--inactive`;
       }
@@ -323,48 +323,39 @@ export class Stepper {
   }
 
   /**
-   * Generates CSS classes for connector lines between steps.
+   * Generates CSS classes for step connectors (lines between steps).
    *
    * @param index - The zero-based step index
-   * @returns Space-separated CSS class string for connectors
+   * @returns Space-separated CSS class string for step connectors
    */
   getConnectorClasses(index: number): string {
     const isCompleted = this.isStepCompleted(index);
-    let classes = '';
+    let classes = 'step__connector';
 
-    switch (this.mergedVariant()) {
-      case 'default':
-      case 'form':
-      case 'numbered': // Add support for numbered variant
-        classes = 'step__connector';
-        break;
-      case 'progress':
-        classes = 'step__connector--progress';
-        if (isCompleted) {
-          classes += ' step__connector--progress-completed';
-        } else {
-          classes += ' step__connector--progress-inactive';
-        }
-        break;
-      case 'vertical':
-        classes = 'step__connector--vertical';
-        if (isCompleted) {
-          classes += ' step__connector--vertical-completed';
-        } else {
-          classes += ' step__connector--vertical-inactive';
-        }
-        break;
-    }
-
-    // Add color classes
+    // Add color classes for connector
     classes += ` step__connector--${this.mergedStepperColor()}`;
+
+    if (isCompleted) {
+      classes += ' step__connector--completed';
+      // Check if the next step is also completed to determine connector state
+      const nextStepCompleted = this.isStepCompleted(index + 1);
+      if (nextStepCompleted) {
+        classes += ' step__connector--next-completed';
+      }
+    } else {
+      classes += ' step__connector--inactive';
+      // Check if this is the connector before the active step
+      const isBeforeActive = index + 1 === this.internalCurrentStep();
+      if (isBeforeActive) {
+        classes += ' step__connector--before-active';
+      }
+    }
 
     return classes;
   }
 
-  // Additional helper methods for different variants
   /**
-   * Generates CSS classes specifically for progress variant steps.
+   * Generates CSS classes for progress variant step containers.
    *
    * @param index - The zero-based step index
    * @param isLast - Whether this is the last step in the sequence
@@ -383,6 +374,7 @@ export class Stepper {
       } else {
         classes += ` step__connector--${this.mergedStepperColor()}`;
       }
+
       if (isCompleted) {
         classes += ' step__connector--progress-completed';
       } else {
@@ -390,15 +382,11 @@ export class Stepper {
       }
     }
 
-    if (isError) {
-      classes += ' step--error';
-    }
-
     return classes;
   }
 
   /**
-   * Generates CSS classes for step numbers in progress variant.
+   * Generates CSS classes for progress variant step numbers.
    *
    * @param index - The zero-based step index
    * @returns Space-separated CSS class string for progress step numbers
@@ -446,12 +434,13 @@ export class Stepper {
     // Add color classes
     classes += ` step__detailed--${this.mergedStepperColor()}`;
 
+    // Add state classes with priority: error > active > completed > default
     if (isError) {
       classes += ' step__detailed--error';
-    } else if (isCompleted) {
-      classes += ' step__detailed--completed';
     } else if (isActive) {
       classes += ' step__detailed--active';
+    } else if (isCompleted) {
+      classes += ' step__detailed--completed';
     } else {
       classes += ' step__detailed--inactive';
     }
@@ -468,15 +457,9 @@ export class Stepper {
   getDetailedStepTextClasses(index: number): string {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
-    const isError = this.isStepError(index);
     let classes = 'step__detailed-text';
 
-    // Add color classes
-    classes += ` step__detailed-text--${this.mergedStepperColor()}`;
-
-    if (isError) {
-      classes += ' step__detailed-text--error';
-    } else if (isCompleted || isActive) {
+    if (isCompleted || isActive) {
       classes += ' step__detailed-text--active';
     } else {
       classes += ' step__detailed-text--inactive';
@@ -495,14 +478,17 @@ export class Stepper {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
     const isError = this.isStepError(index);
-    let classes = 'step__detailed-title';
+
+    let classes = 'text-sm font-medium leading-tight';
 
     // Add color classes
-    classes += ` step__detailed-title--${this.mergedStepperColor()}`;
+    classes += ` step__detailed-title--${this.mergedLabelColor()}`;
 
     if (isError) {
-      classes += ' step__detailed-title--error';
-    } else if (isCompleted || isActive) {
+      classes += ' step__detailed-title--danger';
+    }
+
+    if (isCompleted || isActive) {
       classes += ' step__detailed-title--active';
     } else {
       classes += ' step__detailed-title--inactive';
@@ -526,12 +512,13 @@ export class Stepper {
     // Add color classes
     classes += ` step__panel--${this.mergedStepperColor()}`;
 
+    // Add state classes with priority: error > active > completed > default
     if (isError) {
       classes += ' step__panel--error';
-    } else if (isCompleted) {
-      classes += ' step__panel--completed';
     } else if (isActive) {
       classes += ' step__panel--active';
+    } else if (isCompleted) {
+      classes += ' step__panel--completed';
     } else {
       classes += ' step__panel--inactive';
     }
@@ -548,15 +535,9 @@ export class Stepper {
   getPanelStepTextClasses(index: number): string {
     const isCompleted = this.isStepCompleted(index);
     const isActive = this.isStepActive(index);
-    const isError = this.isStepError(index);
     let classes = 'step__panel-text';
 
-    // Add color classes
-    classes += ` step__panel-text--${this.mergedStepperColor()}`;
-
-    if (isError) {
-      classes += ' step__panel-text--error';
-    } else if (isCompleted || isActive) {
+    if (isCompleted || isActive) {
       classes += ' step__panel-text--active';
     } else {
       classes += ' step__panel-text--inactive';
@@ -577,14 +558,26 @@ export class Stepper {
 
     if (!isLast) {
       const isCompleted = this.isStepCompleted(index);
+      const isError = this.isStepError(index);
       classes += ' step__connector--vertical';
-      // Add color classes for connector
-      classes += ` step__connector--${this.mergedStepperColor()}`;
 
-      if (isCompleted) {
-        classes += ' step__connector--vertical-completed';
+      if (isError) {
+        // Add error color for connector
+        classes += ' step__connector--danger';
+        classes += ' step__connector--vertical-error';
       } else {
-        classes += ' step__connector--vertical-inactive';
+        // Add color classes for connector
+        classes += ` step__connector--${this.mergedStepperColor()}`;
+
+        if (isCompleted) {
+          classes += ' step__connector--vertical-completed';
+          // Add animation class if enabled
+          if (this.mergedAnimateProgress()) {
+            classes += ' step__connector--animated';
+          }
+        } else {
+          classes += ' step__connector--vertical-inactive';
+        }
       }
     }
 
@@ -606,20 +599,20 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__vertical-number--danger';
-      if (isCompleted) {
-        classes += ' step__vertical-number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__vertical-number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__vertical-number--danger--completed';
       } else {
         classes += ' step__vertical-number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__vertical-number--${color}`;
-      if (isCompleted) {
-        classes += ` step__vertical-number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__vertical-number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__vertical-number--${color}--completed`;
       } else {
         classes += ` step__vertical-number--${color}--inactive`;
       }
@@ -628,10 +621,10 @@ export class Stepper {
     // Add basic state classes for fallback
     if (isError) {
       classes += ' step__vertical-number--error';
-    } else if (isCompleted) {
-      classes += ' step__vertical-number--completed';
     } else if (isActive) {
       classes += ' step__vertical-number--active';
+    } else if (isCompleted) {
+      classes += ' step__vertical-number--completed';
     } else {
       classes += ' step__vertical-number--inactive';
     }
@@ -744,14 +737,26 @@ export class Stepper {
 
     if (!isLast) {
       const isCompleted = this.isStepCompleted(index);
+      const isError = this.isStepError(index);
       classes += ' step__connector--vertical-reverse';
-      // Add color classes for connector
-      classes += ` step__connector--${this.mergedStepperColor()}`;
 
-      if (isCompleted) {
-        classes += ' step__connector--vertical-reverse-completed';
+      if (isError) {
+        // Add error color for connector
+        classes += ' step__connector--danger';
+        classes += ' step__connector--vertical-reverse-error';
       } else {
-        classes += ' step__connector--vertical-reverse-inactive';
+        // Add color classes for connector
+        classes += ` step__connector--${this.mergedStepperColor()}`;
+
+        if (isCompleted) {
+          classes += ' step__connector--vertical-reverse-completed';
+          // Add animation class if enabled
+          if (this.mergedAnimateProgress()) {
+            classes += ' step__connector--animated';
+          }
+        } else {
+          classes += ' step__connector--vertical-reverse-inactive';
+        }
       }
     }
 
@@ -773,20 +778,20 @@ export class Stepper {
     // Add combined color and state classes for CSS optimization compatibility
     if (isError) {
       classes += ' step__vertical-reverse-number--danger';
-      if (isCompleted) {
-        classes += ' step__vertical-reverse-number--danger--completed';
-      } else if (isActive) {
+      if (isActive) {
         classes += ' step__vertical-reverse-number--danger--active';
+      } else if (isCompleted) {
+        classes += ' step__vertical-reverse-number--danger--completed';
       } else {
         classes += ' step__vertical-reverse-number--danger--inactive';
       }
     } else {
       const color = this.mergedStepperColor();
       classes += ` step__vertical-reverse-number--${color}`;
-      if (isCompleted) {
-        classes += ` step__vertical-reverse-number--${color}--completed`;
-      } else if (isActive) {
+      if (isActive) {
         classes += ` step__vertical-reverse-number--${color}--active`;
+      } else if (isCompleted) {
+        classes += ` step__vertical-reverse-number--${color}--completed`;
       } else {
         classes += ` step__vertical-reverse-number--${color}--inactive`;
       }
@@ -795,10 +800,10 @@ export class Stepper {
     // Add basic state classes for fallback
     if (isError) {
       classes += ' step__vertical-reverse-number--error';
-    } else if (isCompleted) {
-      classes += ' step__vertical-reverse-number--completed';
     } else if (isActive) {
       classes += ' step__vertical-reverse-number--active';
+    } else if (isCompleted) {
+      classes += ' step__vertical-reverse-number--completed';
     } else {
       classes += ' step__vertical-reverse-number--inactive';
     }
@@ -987,6 +992,45 @@ export class Stepper {
       classes += ' step__description--active';
     } else {
       classes += ' step__description--inactive';
+    }
+
+    return classes;
+  }
+
+  /**
+   * Generates CSS classes for step subtitles with appropriate color theming.
+   *
+   * @param index - The zero-based step index
+   * @returns Space-separated CSS class string for step subtitles
+   */
+  getSubtitleClasses(index: number): string {
+    const isCompleted = this.isStepCompleted(index);
+    const isActive = this.isStepActive(index);
+    const isError = this.isStepError(index);
+
+    let classes = 'step__subtitle';
+
+    // Add combined color and state classes for CSS optimization compatibility
+    if (isError) {
+      classes += ' step__subtitle--danger';
+      classes += ' step__subtitle--danger--error';
+    } else {
+      const color = this.mergedDescriptionColor();
+      classes += ` step__subtitle--${color}`;
+      if (isCompleted || isActive) {
+        classes += ` step__subtitle--${color}--active`;
+      } else {
+        classes += ` step__subtitle--${color}--inactive`;
+      }
+    }
+
+    // Add basic state classes for fallback
+    if (isError) {
+      classes += ' step__subtitle--error';
+    } else if (isCompleted || isActive) {
+      classes += ' step__subtitle--active';
+    } else {
+      classes += ' step__subtitle--inactive';
     }
 
     return classes;

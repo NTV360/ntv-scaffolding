@@ -135,7 +135,7 @@ export class Button {
    * Computed CSS classes for the button based on all merged properties
    * @description Dynamically generates CSS classes for styling
    */
-  buttonClasses = computed(() => {
+  readonly buttonClasses = computed(() => {
     const baseClasses = 'btn';
     const variantClass = `btn--${this.mergedVariant()}`;
     const sizeClass = `btn--${this.mergedSize()}`;
@@ -169,7 +169,7 @@ export class Button {
    * Computed inline styles for custom color support
    * @description Generates CSS custom properties for custom hex colors
    */
-  customStyles = computed(() => {
+  readonly customStyles = computed(() => {
     if (this.mergedColor() === 'custom' && this.mergedCustomColor()) {
       const customColor = this.mergedCustomColor();
       const variant = this.mergedVariant();

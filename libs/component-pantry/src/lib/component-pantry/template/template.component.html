@@ -1,0 +1,17 @@
+<div class="template-outer">
+  <div class="template-canvas">
+    @for (zone of zones() ?? []; track zone.name) {
+    <ntv-zone
+      [zoneData]="zone"
+      [zones]="zones() ?? []"
+      [availablePlaylists]="availablePlaylists()"
+      [selected]="selectedZone() === zone.name"
+      [selectedZoneName]="selectedZone() ?? ''"
+      [showSizeToggle]="true"
+      (zoneSelected)="onZoneSelected($event)"
+      [fullscreen]="0"
+      [showZoneInfo]="showZoneInfo()"
+    ></ntv-zone>
+    }
+  </div>
+</div>

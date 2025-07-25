@@ -1,0 +1,28 @@
+.main-container {
+  position: relative;
+}
+
+/* Step Content Container */
+.step-content-container {
+}
+
+/* Navigation Controls */
+.navigation-controls {
+  @apply mt-8 flex justify-between items-center;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .navigation-controls {
+    @apply flex-col gap-4;
+  }
+
+  .navigation-controls > button,
+  .navigation-controls > div {
+    @apply w-full;
+  }
+
+  .navigation-controls > div {
+    @apply flex flex-col gap-3;
+  }
+}
