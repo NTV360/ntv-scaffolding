@@ -287,7 +287,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     );
   });
 
-  modalClasses = computed(() =>
+  readonly modalClasses = computed(() =>
     [
       'modal',
       `modal--${this.mergedSize()}`,
@@ -306,7 +306,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       .join(' ')
   );
 
-  modalContentClasses = computed(() =>
+  readonly modalContentClasses = computed(() =>
     [
       'modal__content',
       `modal__content--${this.mergedSize()}`,
@@ -317,7 +317,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
       .join(' ')
   );
 
-  modalBackdropClasses = computed(() =>
+  readonly modalBackdropClasses = computed(() =>
     [
       'modal__backdrop',
       `modal__backdrop--${this.mergedBackdrop()}`,
@@ -328,7 +328,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
   );
 
   // Compute inline style for modal content based on size configuration
-  modalContentStyle = computed(() => {
+  readonly modalContentStyle = computed(() => {
     const sizeConfig = this.sizeConfig();
 
     return (
