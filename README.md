@@ -210,21 +210,43 @@ Output: dist/storybook/component-pantry
 ```
 
 <details>
-<summary><strong>⚡ CI/CD Pipeline with Nx Cloud</strong></summary>
+<summary><strong>⚡ CI/CD Pipeline with Nx Cloud (Recommended)</strong></summary>
 
+> 💡 **Highly recommended for teams and larger projects** - Nx Cloud provides significant performance improvements and valuable insights.
+
+**🚀 Quick Setup (Choose one method):**
+
+**Method 1: CLI Setup (Recommended)**
 ```bash
-# 🔗 Connect to Nx Cloud for faster CI
+# 1. Connect to Nx Cloud (free tier available)
 npx nx connect
 
-# 🏗️ Generate CI workflow
-npx nx g ci-workflow
+# 2. Generate CI workflow for your platform
+npx nx g ci-workflow --ci=github  # or gitlab, azure, etc.
+
+# 3. Commit and push - your CI is now optimized!
 ```
 
-**🎯 Benefits:**
-- ⚡ Remote caching for faster builds
-- 🔄 Task distribution across agents
-- 🧪 Automated test splitting
-- 📊 Build insights and analytics
+**Method 2: Web Dashboard Setup**
+```bash
+# 1. Visit https://cloud.nx.app
+# 2. Sign in with GitHub/GitLab
+# 3. Select your repository from the list
+# 4. Follow the guided setup process
+```
+
+**🎯 Key Benefits:**
+- ⚡ **Remote Caching** - Share build artifacts across team and CI
+- 🔄 **Distributed Task Execution** - Run tasks in parallel across multiple agents
+- 🧪 **Intelligent Test Splitting** - Automatically distribute tests for faster execution
+- 📊 **Advanced Analytics** - Detailed build performance insights and bottleneck detection
+- 🎯 **Affected Detection** - Only rebuild what changed
+- 💰 **Cost Reduction** - Significantly reduce CI/CD pipeline costs
+
+**📈 Performance Impact:**
+- Up to 10x faster CI/CD pipelines
+- 70% reduction in compute costs
+- Instant local cache hits for unchanged code
 
 </details>
 
