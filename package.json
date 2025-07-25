@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "nx build",
+    "build": "nx build host-installation",
+    "build:host": "nx build host-installation",
+    "build:storybook": "nx build-storybook component-pantry",
+    "build:storybook:pantry": "nx build-storybook component-pantry",
     "serve": "nx serve host-installation",
     "serve:host": "nx serve host-installation",
     "test": "nx test",
