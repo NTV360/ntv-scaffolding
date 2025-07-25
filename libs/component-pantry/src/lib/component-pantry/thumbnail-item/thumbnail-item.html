@@ -32,7 +32,7 @@
             [alt]="item().name"
             class="thumbnail-image"
             loading="lazy"
-            (error)="$event.target.style.display='none'" />
+            (error)="onImageError($event)" />
         } @else if (item().type === 'video') {
           <video 
             [src]="item().src" 
@@ -84,14 +84,14 @@
       <!-- Metadata -->
       @if (showMetadata() && item().metadata) {
         <div class="thumbnail-metadata">
-          @if (item().metadata['dimensions']) {
-            <span class="metadata-item metadata-item--dimensions">{{ item().metadata['dimensions'] }}</span>
+          @if (item().metadata?.['dimensions']) {
+            <span class="metadata-item metadata-item--dimensions">{{ item().metadata?.['dimensions'] }}</span>
           }
-          @if (item().metadata['duration']) {
-            <span class="metadata-item metadata-item--duration">{{ item().metadata['duration'] }}</span>
+          @if (item().metadata?.['duration']) {
+            <span class="metadata-item metadata-item--duration">{{ item().metadata?.['duration'] }}</span>
           }
-          @if (item().metadata['pages']) {
-            <span class="metadata-item metadata-item--pages">{{ item().metadata['pages'] }} pages</span>
+          @if (item().metadata?.['pages']) {
+            <span class="metadata-item metadata-item--pages">{{ item().metadata?.['pages'] }} pages</span>
           }
         </div>
       }

@@ -65,6 +65,7 @@ export interface ThumbnailAction {
   icon?: string;
   disabled?: boolean;
   submenu?: ThumbnailAction[];
+  divider?: boolean;
 }
 
 export interface ThumbnailActionEvent {

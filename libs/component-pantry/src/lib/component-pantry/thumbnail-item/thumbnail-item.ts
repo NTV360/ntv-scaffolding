@@ -120,6 +120,13 @@ export class ThumbnailItemComponent {
     this.mouseLeave.emit();
   }
 
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.style.display = 'none';
+    }
+  }
+
   getFileIcon(): string {
     const item = this.item();
     return item.icon || FILE_TYPE_ICONS[item.type] || FILE_TYPE_ICONS['unknown'];
