@@ -34,7 +34,7 @@ jobs:
       - name: Check if component-pantry is affected
         id: affected
         run: |
-          npx nx show projects --affected --target=storybook | grep component-pantry \
+          npx nx show projects --affected --target=build | grep component-pantry \
             && echo "affected=true" >> $GITHUB_OUTPUT \
             || echo "affected=false" >> $GITHUB_OUTPUT
 
