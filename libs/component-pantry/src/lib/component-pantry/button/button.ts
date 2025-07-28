@@ -271,7 +271,6 @@ export class Button {
   
   /** Gets the resolved button type */
   getType() {
-    let a = 0; //test only triggered commit
     return this.mergedType();
   }
 }
