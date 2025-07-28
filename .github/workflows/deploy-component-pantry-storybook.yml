@@ -7,10 +7,9 @@ on:
       - staging
       - development
       - feature/ci-cd-deployment
-      
-    paths:
-      - 'libraries/component-pantry/**'
-      - '.github/workflows/deploy-component-pantry-storybook.yml'
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
@@ -27,15 +26,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Storybook (production)
+      - name: Set Nx affected SHAs (manual fallback)
         run: |
-          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
-            npm run build:storybook:prod
-          else
-            npm run build:storybook:dev
-          fi
+          echo "NX_BASE=origin/main" >> $GITHUB_ENV
+          echo "NX_HEAD=$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Check if component-pantry is affected
+        id: affected
+        run: |
+          npx nx show projects --affected --target=storybook | grep component-pantry \
+            && echo "affected=true" >> $GITHUB_OUTPUT \
+            || echo "affected=false" >> $GITHUB_OUTPUT
 
       - name: Set deployment variables
+        if: steps.affected.outputs.affected == 'true'
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PROD }}" >> $GITHUB_ENV
@@ -54,7 +58,17 @@ jobs:
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
           fi
 
+      - name: Build Storybook (only if affected)
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
+            npm run build:storybook:prod
+          else
+            npm run build:storybook:dev
+          fi
+
       - name: Configure AWS credentials
+        if: steps.affected.outputs.affected == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
@@ -62,6 +76,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy Storybook to S3 and Invalidate CloudFront
+        if: steps.affected.outputs.affected == 'true'
         run: |
           aws s3 sync dist/storybook/component-pantry s3://$S3_BUCKET --delete
           aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
