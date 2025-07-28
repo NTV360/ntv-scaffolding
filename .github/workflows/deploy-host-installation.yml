@@ -12,6 +12,7 @@ on:
       - 'libraries/component-pantry/**'
       - '.github/workflows/deploy-host-installation.yml'
 
+      
 permissions:
   contents: read
 
