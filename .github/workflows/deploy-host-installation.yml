@@ -7,6 +7,10 @@ on:
       - staging
       - development
       - feature/ci-cd-deployment
+    paths:
+      - 'apps/host-installation/**'
+      - 'libraries/component-pantry/**'
+      - '.github/workflows/deploy-host-installation.yml'
 
 permissions:
   contents: read
@@ -34,7 +38,6 @@ jobs:
         run: |
           echo "NX_BASE=origin/main" >> $GITHUB_ENV
           echo "NX_HEAD=$GITHUB_SHA" >> $GITHUB_ENV
-
 
       - name: Check if host-installation is affected
         id: affected
