@@ -8,6 +8,9 @@ on:
       - development
       - feature/ci-cd-deployment
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
