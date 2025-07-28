@@ -35,10 +35,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Set Nx affected SHAs (manual override)
-        run: |
-          echo "NX_BASE=origin/main" >> $GITHUB_ENV
-          echo "NX_HEAD=$GITHUB_SHA" >> $GITHUB_ENV
+      - name: Set Nx affected SHAs
+        uses: nrwl/nx-set-shas@v4
+        with:
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if host-installation is affected
         id: affected
