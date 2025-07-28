@@ -73,12 +73,10 @@
     <div class="search-result-item" (click)="onLocationSelect(location)">
       <div class="result-main">
         <span class="result-name">{{ location.name }}</span>
-        <span class="result-type">{{ location.type }}</span>
       </div>
       <div class="result-details">
         <span class="result-country">{{ location.country }}</span>
         <span class="result-separator">•</span>
-        <span class="result-region">{{ location.region }}</span>
       </div>
     </div>
     } } @else if (searchValue().length >= minCharacters()) {

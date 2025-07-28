@@ -11,6 +11,10 @@
   @apply flex items-stretch gap-2;
 }
 
+.searchbar-input {
+  flex: 1;
+}
+
 .search-input-wrapper {
   @apply flex-1 relative;
 }

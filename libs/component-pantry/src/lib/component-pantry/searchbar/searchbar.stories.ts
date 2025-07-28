@@ -63,7 +63,7 @@ A searchbar component that combines an input field with a search button and mini
       control: { type: 'object' },
       description: 'Array of location data for search results',
     },
-    search: { action: 'search' },
+    selectedValue: { action: 'selectedValue' },
     searchValueChange: { action: 'searchValueChange' },
   },
   args: {
@@ -77,137 +77,99 @@ A searchbar component that combines an input field with a search button and mini
     data: [
       {
         id: 1,
-        name: 'New York',
+        name: 'London1',
         country: 'United States',
-        region: 'North America',
-        type: 'city',
       },
       {
         id: 2,
         name: 'London',
         country: 'United Kingdom',
-        region: 'Europe',
-        type: 'city',
       },
-      { id: 3, name: 'Tokyo', country: 'Japan', region: 'Asia', type: 'city' },
+      { id: 3, name: 'Tokyo', country: 'Japan' },
       {
         id: 4,
-        name: 'Paris',
+        name: 'London4',
         country: 'France',
-        region: 'Europe',
-        type: 'city',
       },
       {
         id: 5,
-        name: 'Sydney',
+        name: 'London5',
         country: 'Australia',
-        region: 'Oceania',
-        type: 'city',
       },
       {
         id: 6,
         name: 'Dubai',
         country: 'United Arab Emirates',
-        region: 'Middle East',
-        type: 'city',
       },
       {
         id: 7,
         name: 'Singapore',
         country: 'Singapore',
-        region: 'Asia',
-        type: 'city',
       },
       {
         id: 8,
         name: 'Los Angeles',
         country: 'United States',
-        region: 'North America',
-        type: 'city',
       },
       {
         id: 9,
         name: 'Barcelona',
         country: 'Spain',
-        region: 'Europe',
-        type: 'city',
       },
       {
         id: 10,
         name: 'Toronto',
         country: 'Canada',
-        region: 'North America',
-        type: 'city',
       },
       {
         id: 11,
         name: 'Berlin',
         country: 'Germany',
-        region: 'Europe',
-        type: 'city',
       },
       {
         id: 12,
         name: 'Mumbai',
         country: 'India',
-        region: 'Asia',
-        type: 'city',
       },
       {
         id: 13,
         name: 'Rome',
         country: 'Italy',
-        region: 'Europe',
-        type: 'city',
       },
       {
         id: 14,
         name: 'Bangkok',
         country: 'Thailand',
-        region: 'Asia',
-        type: 'city',
       },
       {
         id: 15,
         name: 'Amsterdam',
         country: 'Netherlands',
-        region: 'Europe',
-        type: 'city',
       },
       {
         id: 16,
         name: 'Eiffel Tower',
         country: 'France',
-        region: 'Europe',
-        type: 'landmark',
       },
       {
         id: 17,
         name: 'Statue of Liberty',
         country: 'United States',
-        region: 'North America',
-        type: 'landmark',
       },
       {
         id: 18,
         name: 'Great Wall of China',
         country: 'China',
-        region: 'Asia',
-        type: 'landmark',
       },
       {
         id: 19,
         name: 'Machu Picchu',
         country: 'Peru',
-        region: 'South America',
-        type: 'landmark',
       },
       {
         id: 20,
         name: 'Taj Mahal',
         country: 'India',
-        region: 'Asia',
-        type: 'landmark',
       },
     ],
   },
@@ -220,8 +182,16 @@ type Story = StoryObj<Searchbar>;
 export const Default: Story = {
   args: {},
   render: (args) => ({
-    props: args,
-    template: `<lib-searchbar 
+    props: {
+      ...args,
+      searchValueChange: (value: string) => {
+        console.log('searchValueChange', value);
+      },
+      selectedValue: (value: any) => {
+        console.log('selectedValue', value);
+      },
+    },
+    template: `<ntv-searchbar 
       [placeholder]="placeholder"
       [minCharacters]="minCharacters"
       [size]="size"
@@ -229,9 +199,9 @@ export const Default: Story = {
       [borderRadius]="borderRadius"
       [disabled]="disabled"
       [data]="data"
-      (search)="search($event)"
+      (selectedValue)="selectedValue($event)"
       (searchValueChange)="searchValueChange($event)">
-    </lib-searchbar>`,
+    </ntv-searchbar>`,
   }),
 };
 
@@ -243,46 +213,46 @@ export const Sizes: Story = {
       <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 400px;">
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Extra Small</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             size="xs"
             placeholder="Search (xs size)..."
             [minCharacters]="2"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Small</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             size="sm"
             placeholder="Search (sm size)..."
             [minCharacters]="2"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Medium</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             size="md"
             placeholder="Search (md size)..."
             [minCharacters]="3"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Large</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             size="lg"
             placeholder="Search (lg size)..."
             [minCharacters]="3"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
       </div>
     `,
@@ -297,46 +267,46 @@ export const Variants: Story = {
        <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 400px;">
          <div>
            <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Default</h3>
-           <lib-searchbar 
+           <ntv-searchbar 
              variant="default"
              placeholder="Default variant"
              [minCharacters]="1"
              [borderRadius]="borderRadius"
              [data]="data">
-           </lib-searchbar>
+           </ntv-searchbar>
          </div>
          
          <div>
            <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Primary</h3>
-           <lib-searchbar 
+           <ntv-searchbar 
              variant="primary"
              placeholder="Primary variant"
              [minCharacters]="1"
              [borderRadius]="borderRadius"
              [data]="data">
-           </lib-searchbar>
+           </ntv-searchbar>
          </div>
          
          <div>
            <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Success</h3>
-           <lib-searchbar 
+           <ntv-searchbar 
              variant="success"
              placeholder="Success variant"
              [minCharacters]="1"
              [borderRadius]="borderRadius"
              [data]="data">
-           </lib-searchbar>
+           </ntv-searchbar>
          </div>
          
          <div>
            <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Danger</h3>
-           <lib-searchbar 
+           <ntv-searchbar 
              variant="danger"
              placeholder="Danger variant"
              [minCharacters]="1"
              [borderRadius]="borderRadius"
              [data]="data">
-           </lib-searchbar>
+           </ntv-searchbar>
          </div>
        </div>
      `,
@@ -351,32 +321,32 @@ export const MinCharacterVariations: Story = {
       <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 400px;">
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Min 1 Character</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             placeholder="Search with min 1 char..."
             [minCharacters]="1"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Min 3 Characters (Default)</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             placeholder="Search with min 3 chars..."
             [minCharacters]="3"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Min 5 Characters</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             placeholder="Search with min 5 chars..."
             [minCharacters]="5"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
       </div>
     `,
@@ -391,24 +361,24 @@ export const Disabled: Story = {
       <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 400px;">
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Disabled Searchbar</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             placeholder="This searchbar is disabled"
             [disabled]="true"
             [minCharacters]="2"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
         
         <div>
           <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Enabled for Comparison</h3>
-          <lib-searchbar 
+          <ntv-searchbar 
             placeholder="This searchbar is enabled"
             [disabled]="false"
             [minCharacters]="2"
             [borderRadius]="borderRadius"
             [data]="data">
-          </lib-searchbar>
+          </ntv-searchbar>
         </div>
       </div>
     `,
@@ -433,14 +403,14 @@ export const Interactive: Story = {
     },
     template: `
       <div style="width: 400px;">
-        <lib-searchbar 
+        <ntv-searchbar 
           placeholder="Search for cities, countries, or landmarks..."
           [minCharacters]="2"
           [borderRadius]="borderRadius"
           [data]="data"
           (search)="onSearch($event)"
           (searchValueChange)="onValueChange($event)">
-        </lib-searchbar>
+        </ntv-searchbar>
         
         <div style="margin-top: 1rem; padding: 1rem; background-color: #f3f4f6; border-radius: 0.5rem;">
           <h4 style="margin: 0 0 0.5rem 0; font-weight: 600;">Search Events:</h4>
@@ -462,14 +432,14 @@ export const LocationSearch: Story = {
     template: `
       <div style="width: 500px;">
         <h3 style="margin-bottom: 1rem; font-weight: 600;">Location Search with Results on Button Click</h3>
-        <lib-searchbar 
+        <ntv-searchbar 
           placeholder="Search for cities, landmarks, or countries..."
           [minCharacters]="2"
           size="lg"
           variant="primary"
           [borderRadius]="borderRadius"
           [data]="data">
-        </lib-searchbar>
+        </ntv-searchbar>
         
         <div style="margin-top: 1.5rem; padding: 1rem; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
           <h4 style="margin: 0 0 0.75rem 0; font-weight: 600; color: #374151;">How to Use:</h4>
@@ -492,7 +462,7 @@ export const LoadingSearch: Story = {
   render: (args) => ({
     props: args,
     template: `
-      <lib-searchbar 
+      <ntv-searchbar 
         [placeholder]="placeholder"
         [minCharacters]="minCharacters"
         [size]="size"
@@ -500,9 +470,9 @@ export const LoadingSearch: Story = {
         [variant]="variant"
         [disabled]="disabled"
         [data]="data"
-        (search)="search($event)"
+        (selectedValue)="selectedValue($event)"
         (searchValueChange)="searchValueChange($event)">
-      </lib-searchbar>
+      </ntv-searchbar>
       <p class="mt-4 text-sm text-gray-600">
         This story demonstrates the built-in loading functionality. The loading spinner appears automatically when no search results are found, simulating real API behavior.
         <br><br>

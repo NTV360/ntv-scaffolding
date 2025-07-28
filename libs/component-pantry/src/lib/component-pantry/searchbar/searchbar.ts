@@ -17,12 +17,10 @@ interface Location {
   id: number;
   name: string;
   country: string;
-  region: string;
-  type: 'city' | 'country' | 'landmark';
 }
 
 @Component({
-  selector: 'lib-searchbar',
+  selector: 'ntv-searchbar',
   standalone: true,
   imports: [Input, FormsModule, CommonModule],
   templateUrl: './searchbar.html',
@@ -56,7 +54,7 @@ export class Searchbar {
   readonly disabled = input<boolean>(false);
 
   /** Event emitted when search is performed */
-  readonly search = output<string>();
+  readonly selectedValue = output<Location>();
 
   /** Event emitted when search input value changes */
   readonly searchValueChange = output<string>();
@@ -84,8 +82,7 @@ export class Searchbar {
       .filter(
         (location) =>
           location.name.toLowerCase().includes(query) ||
-          location.country.toLowerCase().includes(query) ||
-          location.region.toLowerCase().includes(query)
+          location.country.toLowerCase().includes(query)
       )
       .slice(0, 8); // Limit to 8 results
   });
@@ -149,7 +146,6 @@ export class Searchbar {
       if (currentResults.length === 0) {
         this.isLoading.set(true);
         this.showResults.set(true);
-        this.search.emit(this.searchValue());
 
         // Simulate API loading delay when no data is available
         setTimeout(() => {
@@ -157,7 +153,6 @@ export class Searchbar {
         }, 1000);
       } else {
         // If we have results, show them immediately
-        this.search.emit(this.searchValue());
         this.showResults.set(true);
       }
     }
@@ -174,9 +169,10 @@ export class Searchbar {
 
   /** Handle location selection from results */
   onLocationSelect(location: Location): void {
+    console.log(location, 'uhu');
     this.searchValue.set(location.name);
     this.searchValueChange.emit(location.name);
-    this.search.emit(location.name);
+    this.selectedValue.emit(location);
     this.showResults.set(false);
   }
 
