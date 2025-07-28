@@ -23,15 +23,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Angular app
+      - name: Set Nx affected SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Check if host-installation is affected
+        id: affected
         run: |
-          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
-            npm run build:host:prod
-          else
-            npm run build:host:dev
-          fi
+          npx nx show projects --affected --target=build | grep host-installation \
+            && echo "affected=true" >> $GITHUB_OUTPUT \
+            || echo "affected=false" >> $GITHUB_OUTPUT
 
       - name: Set deployment variables
+        if: steps.affected.outputs.affected == 'true'
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PROD }}" >> $GITHUB_ENV
@@ -50,7 +53,17 @@ jobs:
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
           fi
 
+      - name: Build host-installation (only if affected)
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
+            npm run build:host:prod
+          else
+            npm run build:host:dev
+          fi
+
       - name: Configure AWS credentials
+        if: steps.affected.outputs.affected == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
@@ -58,6 +71,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy to S3 and Invalidate CloudFront
+        if: steps.affected.outputs.affected == 'true'
         run: |
           aws s3 sync dist/apps/ntv-host-installation/host-installation/browser s3://$S3_BUCKET --delete
           aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
