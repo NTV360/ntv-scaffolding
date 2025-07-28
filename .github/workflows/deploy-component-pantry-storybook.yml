@@ -11,7 +11,6 @@ on:
       - 'libraries/component-pantry/**'
       - '.github/workflows/deploy-component-pantry-storybook.yml'
 
-
 permissions:
   contents: read
 
