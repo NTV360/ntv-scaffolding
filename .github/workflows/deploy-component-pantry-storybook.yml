@@ -9,7 +9,7 @@ on:
       - feature/ci-cd-deployment
       
     paths:
-      - 'libraries/component-pantry/**'
+      - 'libs/component-pantry/**'
       - '.github/workflows/deploy-component-pantry-storybook.yml'
 
 jobs:
