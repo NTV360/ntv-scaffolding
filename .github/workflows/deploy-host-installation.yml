@@ -9,10 +9,10 @@ on:
       - feature/ci-cd-deployment
     paths:
       - 'apps/host-installation/**'
-      - 'libraries/component-pantry/**'
+      - 'libs/component-pantry/**'
       - '.github/workflows/deploy-host-installation.yml'
 
-      
+
 permissions:
   contents: read
 
