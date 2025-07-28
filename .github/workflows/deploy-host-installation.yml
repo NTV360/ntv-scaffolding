@@ -39,10 +39,10 @@ jobs:
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_PROD }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_PROD }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STAGING }}" >> $GITHUB_ENV
-            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_STAGING }}" >> $GITHUB_ENV
-            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_STAGING }}" >> $GITHUB_ENV
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STG }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
           else
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
