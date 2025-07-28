@@ -1,0 +1,75 @@
+.host-place__form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.div1 {
+  grid-column: span 2 / span 2;
+}
+
+.div2 {
+  grid-column: span 2 / span 2;
+  grid-column-start: 3;
+}
+
+.div3 {
+  grid-column: span 2 / span 2;
+  grid-row-start: 2;
+}
+
+.div4 {
+  grid-column: span 2 / span 2;
+  grid-column-start: 3;
+  grid-row-start: 2;
+}
+
+.div5 {
+  grid-column: span 2 / span 2;
+  grid-row-start: 3;
+}
+
+.div6 {
+  grid-column: span 2 / span 2;
+  grid-column-start: 3;
+  grid-row-start: 3;
+}
+
+.div7 {
+  grid-column: span 2 / span 2;
+  grid-row-start: 4;
+}
+
+.div8 {
+  grid-column: span 2 / span 2;
+  grid-column-start: 3;
+  grid-row-start: 4;
+}
+
+.div9 {
+  grid-column: span 2 / span 2;
+  grid-row-start: 5;
+}
+
+.div10 {
+  grid-column: span 2 / span 2;
+  grid-column-start: 3;
+  grid-row-start: 5;
+}
+
+.div11 {
+  grid-row-start: 6;
+}
+
+.div12 {
+  grid-row-start: 6;
+}
+
+.div13 {
+  grid-row-start: 6;
+}
+
+.div14 {
+  grid-row-start: 6;
+}

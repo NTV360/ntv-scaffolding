@@ -109,7 +109,7 @@ export class Searchbar {
         full: 'rounded-full',
       }[this.borderRadius()] || 'rounded-md';
 
-    const baseClasses = `inline-flex items-center gap-2 px-4 ${verticalPadding} text-sm font-medium text-white border border-transparent ${radius} shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`;
+    const baseClasses = `inline-flex items-center gap-2 px-4  text-sm font-medium text-white border border-transparent ${radius} shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`;
     return `${baseClasses} `;
   });
 

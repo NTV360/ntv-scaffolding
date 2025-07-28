@@ -10,19 +10,16 @@
     "build:host": "nx build host-installation --configuration=production",
     "build:host:dev": "nx build host-installation --configuration=development",
     "build:host:prod": "nx build host-installation --configuration=production",
-    
     "// === COMPONENT PANTRY LIBRARY ===": "",
     "build:pantry": "nx build component-pantry",
     "build:pantry:dev": "nx build component-pantry --configuration=development",
     "build:pantry:prod": "nx build component-pantry --configuration=production",
-    
     "// === STORYBOOK ===": "",
     "storybook": "nx storybook component-pantry",
     "storybook:pantry": "nx storybook component-pantry",
     "build:storybook": "nx build-storybook component-pantry",
     "build:storybook:dev": "nx build-storybook component-pantry --configuration=development",
     "build:storybook:prod": "nx build-storybook component-pantry --configuration=production",
-    
     "// === TESTING ===": "",
     "test": "nx test",
     "lint": "nx lint",
@@ -38,6 +35,7 @@
     "@angular/compiler": "~20.0.0",
     "@angular/core": "~20.0.0",
     "@angular/forms": "~20.0.0",
+    "@angular/google-maps": "^20.1.3",
     "@angular/platform-browser": "~20.0.0",
     "@angular/platform-browser-dynamic": "~20.0.0",
     "@angular/router": "~20.0.0",

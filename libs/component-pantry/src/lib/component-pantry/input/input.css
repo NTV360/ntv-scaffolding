@@ -69,7 +69,7 @@
 
 /* ✅ Wrapper Styling */
 .input__wrapper {
-  @apply flex items-center h-full relative border transition-all duration-75;
+  @apply flex items-center relative border transition-all duration-75;
   @apply bg-[var(--input-background-color)] border-[var(--input-variant-color)] text-[var(--input-text-color)];
   @apply focus-within:outline-none;
 }

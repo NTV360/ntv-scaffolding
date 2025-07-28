@@ -4,7 +4,7 @@
 
 /* Base container styles */
 .searchbar-container {
-  @apply flex flex-col gap-2 w-full max-w-md relative;
+  @apply flex flex-col gap-2 w-full relative;
 }
 
 .searchbar-wrapper {
