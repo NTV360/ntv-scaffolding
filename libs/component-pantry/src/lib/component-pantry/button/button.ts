@@ -274,3 +274,5 @@ export class Button {
     return this.mergedType();
   }
 }
+
+// test: change button component used in host app
