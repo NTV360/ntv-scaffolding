@@ -38,18 +38,23 @@ A searchbar component that combines an input field with a search button and mini
     size: {
       control: { type: 'select' },
       options: ['xs', 'sm', 'md', 'lg'],
-      description: 'Size of the search input'
+      description: 'Size of the search input',
+    },
+    buttonBgColor: {
+      control: { type: 'color' },
+      description: 'Background color of the search button',
     },
     borderRadius: {
       control: { type: 'select' },
       options: ['none', 'sm', 'md', 'lg', 'xl', 'full'],
-      description: 'Border radius of the searchbar components'
+      description: 'Border radius of the searchbar components',
     },
     variant: {
-        control: { type: 'select' },
-        options: ['default', 'primary', 'success', 'danger'],
-        description: 'Visual variant of the searchbar (inherited from input component)',
-      },
+      control: { type: 'select' },
+      options: ['default', 'primary', 'success', 'danger'],
+      description:
+        'Visual variant of the searchbar (inherited from input component)',
+    },
     disabled: {
       control: { type: 'boolean' },
       description: 'Whether the searchbar is disabled',
@@ -65,30 +70,145 @@ A searchbar component that combines an input field with a search button and mini
     placeholder: 'Search locations...',
     minCharacters: 3,
     size: 'md',
+    buttonBgColor: 'red',
     borderRadius: 'md',
     variant: 'default',
     disabled: false,
     data: [
-      { id: 1, name: 'New York', country: 'United States', region: 'North America', type: 'city' },
-      { id: 2, name: 'London', country: 'United Kingdom', region: 'Europe', type: 'city' },
+      {
+        id: 1,
+        name: 'New York',
+        country: 'United States',
+        region: 'North America',
+        type: 'city',
+      },
+      {
+        id: 2,
+        name: 'London',
+        country: 'United Kingdom',
+        region: 'Europe',
+        type: 'city',
+      },
       { id: 3, name: 'Tokyo', country: 'Japan', region: 'Asia', type: 'city' },
-      { id: 4, name: 'Paris', country: 'France', region: 'Europe', type: 'city' },
-      { id: 5, name: 'Sydney', country: 'Australia', region: 'Oceania', type: 'city' },
-      { id: 6, name: 'Dubai', country: 'United Arab Emirates', region: 'Middle East', type: 'city' },
-      { id: 7, name: 'Singapore', country: 'Singapore', region: 'Asia', type: 'city' },
-      { id: 8, name: 'Los Angeles', country: 'United States', region: 'North America', type: 'city' },
-      { id: 9, name: 'Barcelona', country: 'Spain', region: 'Europe', type: 'city' },
-      { id: 10, name: 'Toronto', country: 'Canada', region: 'North America', type: 'city' },
-      { id: 11, name: 'Berlin', country: 'Germany', region: 'Europe', type: 'city' },
-      { id: 12, name: 'Mumbai', country: 'India', region: 'Asia', type: 'city' },
-      { id: 13, name: 'Rome', country: 'Italy', region: 'Europe', type: 'city' },
-      { id: 14, name: 'Bangkok', country: 'Thailand', region: 'Asia', type: 'city' },
-      { id: 15, name: 'Amsterdam', country: 'Netherlands', region: 'Europe', type: 'city' },
-      { id: 16, name: 'Eiffel Tower', country: 'France', region: 'Europe', type: 'landmark' },
-      { id: 17, name: 'Statue of Liberty', country: 'United States', region: 'North America', type: 'landmark' },
-      { id: 18, name: 'Great Wall of China', country: 'China', region: 'Asia', type: 'landmark' },
-      { id: 19, name: 'Machu Picchu', country: 'Peru', region: 'South America', type: 'landmark' },
-      { id: 20, name: 'Taj Mahal', country: 'India', region: 'Asia', type: 'landmark' }
+      {
+        id: 4,
+        name: 'Paris',
+        country: 'France',
+        region: 'Europe',
+        type: 'city',
+      },
+      {
+        id: 5,
+        name: 'Sydney',
+        country: 'Australia',
+        region: 'Oceania',
+        type: 'city',
+      },
+      {
+        id: 6,
+        name: 'Dubai',
+        country: 'United Arab Emirates',
+        region: 'Middle East',
+        type: 'city',
+      },
+      {
+        id: 7,
+        name: 'Singapore',
+        country: 'Singapore',
+        region: 'Asia',
+        type: 'city',
+      },
+      {
+        id: 8,
+        name: 'Los Angeles',
+        country: 'United States',
+        region: 'North America',
+        type: 'city',
+      },
+      {
+        id: 9,
+        name: 'Barcelona',
+        country: 'Spain',
+        region: 'Europe',
+        type: 'city',
+      },
+      {
+        id: 10,
+        name: 'Toronto',
+        country: 'Canada',
+        region: 'North America',
+        type: 'city',
+      },
+      {
+        id: 11,
+        name: 'Berlin',
+        country: 'Germany',
+        region: 'Europe',
+        type: 'city',
+      },
+      {
+        id: 12,
+        name: 'Mumbai',
+        country: 'India',
+        region: 'Asia',
+        type: 'city',
+      },
+      {
+        id: 13,
+        name: 'Rome',
+        country: 'Italy',
+        region: 'Europe',
+        type: 'city',
+      },
+      {
+        id: 14,
+        name: 'Bangkok',
+        country: 'Thailand',
+        region: 'Asia',
+        type: 'city',
+      },
+      {
+        id: 15,
+        name: 'Amsterdam',
+        country: 'Netherlands',
+        region: 'Europe',
+        type: 'city',
+      },
+      {
+        id: 16,
+        name: 'Eiffel Tower',
+        country: 'France',
+        region: 'Europe',
+        type: 'landmark',
+      },
+      {
+        id: 17,
+        name: 'Statue of Liberty',
+        country: 'United States',
+        region: 'North America',
+        type: 'landmark',
+      },
+      {
+        id: 18,
+        name: 'Great Wall of China',
+        country: 'China',
+        region: 'Asia',
+        type: 'landmark',
+      },
+      {
+        id: 19,
+        name: 'Machu Picchu',
+        country: 'Peru',
+        region: 'South America',
+        type: 'landmark',
+      },
+      {
+        id: 20,
+        name: 'Taj Mahal',
+        country: 'India',
+        region: 'Asia',
+        type: 'landmark',
+      },
     ],
   },
 };
@@ -105,6 +225,7 @@ export const Default: Story = {
       [placeholder]="placeholder"
       [minCharacters]="minCharacters"
       [size]="size"
+      [buttonBgColor]="buttonBgColor"
       [borderRadius]="borderRadius"
       [disabled]="disabled"
       [data]="data"
@@ -169,10 +290,10 @@ export const Sizes: Story = {
 };
 
 // Different variants showcase
- export const Variants: Story = {
-   render: (args) => ({
-     props: args,
-     template: `
+export const Variants: Story = {
+  render: (args) => ({
+    props: args,
+    template: `
        <div style="display: flex; flex-direction: column; gap: 1.5rem; width: 400px;">
          <div>
            <h3 style="margin-bottom: 0.5rem; font-weight: 600;">Default</h3>
@@ -219,8 +340,8 @@ export const Sizes: Story = {
          </div>
        </div>
      `,
-   }),
- };
+  }),
+};
 
 // Different minimum character requirements
 export const MinCharacterVariations: Story = {

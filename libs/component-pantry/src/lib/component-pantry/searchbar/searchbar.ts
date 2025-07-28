@@ -1,4 +1,13 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  signal,
+  computed,
+  ElementRef,
+  inject,
+  effect,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Input } from '../input/input';
@@ -20,6 +29,9 @@ interface Location {
   styleUrl: './searchbar.css',
 })
 export class Searchbar {
+  /** Injects a reference to the host DOM element of the component */
+  private el = inject(ElementRef);
+
   /** Placeholder text for the search input */
   readonly placeholder = input<string>('Search...');
 
@@ -28,6 +40,9 @@ export class Searchbar {
 
   /** Size of the search input */
   readonly size = input<'xs' | 'sm' | 'md' | 'lg'>('md');
+
+  /** Button BG color */
+  readonly buttonBgColor = input<string>('#8DCB2C');
 
   /** Border radius of the searchbar components */
   readonly borderRadius = input<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'>(
@@ -97,10 +112,18 @@ export class Searchbar {
         full: 'rounded-full',
       }[this.borderRadius()] || 'rounded-md';
 
-    const baseClasses = `inline-flex items-center gap-2 px-4 ${verticalPadding} text-sm font-medium text-white bg-blue-600 border border-transparent ${radius} shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`;
-    const disabledClasses = 'disabled:bg-gray-400 disabled:cursor-not-allowed';
-    return `${baseClasses} ${disabledClasses}`;
+    const baseClasses = `inline-flex items-center gap-2 px-4 ${verticalPadding} text-sm font-medium text-white border border-transparent ${radius} shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`;
+    return `${baseClasses} `;
   });
+
+  constructor() {
+    effect(() => {
+      this.el.nativeElement.style.setProperty(
+        '--header-bg-color',
+        this.buttonBgColor()
+      );
+    });
+  }
 
   /** Handle input value changes */
   onSearchValueChange(value: string): void {

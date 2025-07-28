@@ -1,3 +1,7 @@
+:host {
+  --header-bg-color: #8dcb2c;
+}
+
 /* Base container styles */
 .searchbar-container {
   @apply flex flex-col gap-2 w-full max-w-md relative;
@@ -9,6 +13,14 @@
 
 .search-input-wrapper {
   @apply flex-1 relative;
+}
+
+.searchbar-button {
+  background-color: var(--header-bg-color);
+
+  &:disabled {
+    @apply bg-gray-400 cursor-not-allowed;
+  }
 }
 
 .search-icon {
