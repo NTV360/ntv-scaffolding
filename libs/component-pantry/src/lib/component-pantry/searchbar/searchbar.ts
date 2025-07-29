@@ -15,8 +15,8 @@ import { SearchbarVariant } from './searchbar.types';
 
 interface Location {
   id: number;
-  name: string;
-  country: string;
+  title: string;
+  description: string;
 }
 
 @Component({
@@ -59,6 +59,9 @@ export class Searchbar {
   /** Event emitted when search input value changes */
   readonly searchValueChange = output<string>();
 
+  /** Event emitted when search button is clicked */
+  readonly buttonClick = output<void>();
+
   /** Data source for search results */
   readonly data = input<Location[]>([]);
 
@@ -81,8 +84,8 @@ export class Searchbar {
     return this.data()
       .filter(
         (location) =>
-          location.name.toLowerCase().includes(query) ||
-          location.country.toLowerCase().includes(query)
+          location.title.toLowerCase().includes(query) ||
+          location.description.toLowerCase().includes(query)
       )
       .slice(0, 8); // Limit to 8 results
   });
@@ -134,6 +137,7 @@ export class Searchbar {
   /** Handle search button click */
   onSearch(): void {
     if (!this.isSearchDisabled()) {
+      this.buttonClick.emit();
       this.onSearchWithLoading();
     }
   }
@@ -170,8 +174,8 @@ export class Searchbar {
   /** Handle location selection from results */
   onLocationSelect(location: Location): void {
     console.log(location, 'uhu');
-    this.searchValue.set(location.name);
-    this.searchValueChange.emit(location.name);
+    this.searchValue.set(location.title);
+    this.searchValueChange.emit(location.title);
     this.selectedValue.emit(location);
     this.showResults.set(false);
   }

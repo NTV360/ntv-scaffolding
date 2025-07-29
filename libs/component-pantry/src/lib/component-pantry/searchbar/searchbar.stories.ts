@@ -65,6 +65,7 @@ A searchbar component that combines an input field with a search button and mini
     },
     selectedValue: { action: 'selectedValue' },
     searchValueChange: { action: 'searchValueChange' },
+    buttonClick: { action: 'buttonClick' },
   },
   args: {
     placeholder: 'Search locations...',
@@ -77,99 +78,99 @@ A searchbar component that combines an input field with a search button and mini
     data: [
       {
         id: 1,
-        name: 'London1',
-        country: 'United States',
+        title: 'London1',
+        description: 'United States',
       },
       {
         id: 2,
-        name: 'London',
-        country: 'United Kingdom',
+        title: 'London',
+        description: 'United Kingdom',
       },
-      { id: 3, name: 'Tokyo', country: 'Japan' },
+      { id: 3, title: 'Tokyo', description: 'Japan' },
       {
         id: 4,
-        name: 'London4',
-        country: 'France',
+        title: 'London4',
+        description: 'France',
       },
       {
         id: 5,
-        name: 'London5',
-        country: 'Australia',
+        title: 'London5',
+        description: 'Australia',
       },
       {
         id: 6,
-        name: 'Dubai',
-        country: 'United Arab Emirates',
+        title: 'Dubai',
+        description: 'United Arab Emirates',
       },
       {
         id: 7,
-        name: 'Singapore',
-        country: 'Singapore',
+        title: 'Singapore',
+        description: 'Singapore',
       },
       {
         id: 8,
-        name: 'Los Angeles',
-        country: 'United States',
+        title: 'Los Angeles',
+        description: 'United States',
       },
       {
         id: 9,
-        name: 'Barcelona',
-        country: 'Spain',
+        title: 'Barcelona',
+        description: 'Spain',
       },
       {
         id: 10,
-        name: 'Toronto',
-        country: 'Canada',
+        title: 'Toronto',
+        description: 'Canada',
       },
       {
         id: 11,
-        name: 'Berlin',
-        country: 'Germany',
+        title: 'Berlin',
+        description: 'Germany',
       },
       {
         id: 12,
-        name: 'Mumbai',
-        country: 'India',
+        title: 'Mumbai',
+        description: 'India',
       },
       {
         id: 13,
-        name: 'Rome',
-        country: 'Italy',
+        title: 'Rome',
+        description: 'Italy',
       },
       {
         id: 14,
-        name: 'Bangkok',
-        country: 'Thailand',
+        title: 'Bangkok',
+        description: 'Thailand',
       },
       {
         id: 15,
-        name: 'Amsterdam',
-        country: 'Netherlands',
+        title: 'Amsterdam',
+        description: 'Netherlands',
       },
       {
         id: 16,
-        name: 'Eiffel Tower',
-        country: 'France',
+        title: 'Eiffel Tower',
+        description: 'France',
       },
       {
         id: 17,
-        name: 'Statue of Liberty',
-        country: 'United States',
+        title: 'Statue of Liberty',
+        description: 'United States',
       },
       {
         id: 18,
-        name: 'Great Wall of China',
-        country: 'China',
+        title: 'Great Wall of China',
+        description: 'China',
       },
       {
         id: 19,
-        name: 'Machu Picchu',
-        country: 'Peru',
+        title: 'Machu Picchu',
+        description: 'Peru',
       },
       {
         id: 20,
-        name: 'Taj Mahal',
-        country: 'India',
+        title: 'Taj Mahal',
+        description: 'India',
       },
     ],
   },
@@ -190,6 +191,9 @@ export const Default: Story = {
       selectedValue: (value: any) => {
         console.log('selectedValue', value);
       },
+      buttonClick: () => {
+        console.log('Button was clicked!');
+      },
     },
     template: `<ntv-searchbar 
       [placeholder]="placeholder"
@@ -200,7 +204,8 @@ export const Default: Story = {
       [disabled]="disabled"
       [data]="data"
       (selectedValue)="selectedValue($event)"
-      (searchValueChange)="searchValueChange($event)">
+      (searchValueChange)="searchValueChange($event)"
+      (buttonClick)="buttonClick()">
     </ntv-searchbar>`,
   }),
 };
@@ -400,6 +405,9 @@ export const Interactive: Story = {
         this['currentValue'] = value;
         console.log('Value changed:', value);
       },
+      buttonClick: function () {
+        console.log('Button was clicked!');
+      },
     },
     template: `
       <div style="width: 400px;">
@@ -409,7 +417,8 @@ export const Interactive: Story = {
           [borderRadius]="borderRadius"
           [data]="data"
           (search)="onSearch($event)"
-          (searchValueChange)="onValueChange($event)">
+          (searchValueChange)="onValueChange($event)"
+          (buttonClick)="buttonClick()">
         </ntv-searchbar>
         
         <div style="margin-top: 1rem; padding: 1rem; background-color: #f3f4f6; border-radius: 0.5rem;">

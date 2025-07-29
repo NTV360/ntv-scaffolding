@@ -1,11 +1,11 @@
 import { Meta, StoryObj } from '@storybook/angular';
-import { TemplateComponent } from './template.component';
+import { Template } from './template.component';
 import type { ZoneData } from './zone/zone.component';
 import { mockLayouts } from './mockLayouts';
 
-const meta: Meta<TemplateComponent> = {
+const meta: Meta<Template> = {
   title: 'Components/Template',
-  component: TemplateComponent,
+  component: Template,
   tags: ['autodocs'],
   render: (args: any) => ({
     props: args,
@@ -32,7 +32,7 @@ const meta: Meta<TemplateComponent> = {
 };
 export default meta;
 
-type Story = StoryObj<TemplateComponent>;
+type Story = StoryObj<Template>;
 
 export const StandardLayout: Story = {
   name: 'Standard Layout',

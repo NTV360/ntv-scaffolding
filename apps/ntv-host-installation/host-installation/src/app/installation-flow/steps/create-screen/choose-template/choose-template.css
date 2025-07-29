@@ -1,0 +1,44 @@
+.template {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4;
+}
+
+.template-content {
+  @apply w-full h-[250px] pb-3 transition-all duration-300 hover:scale-105;
+}
+
+.template-body {
+  @apply p-4 relative cursor-pointer transition-all duration-300;
+}
+
+.template-body::before {
+  @apply absolute inset-0 border-2 border-lime-500 opacity-0 transition-opacity duration-300;
+  content: '';
+}
+
+.template-body:hover::before {
+  @apply opacity-20;
+}
+
+.template-captions {
+  @apply flex items-center justify-between;
+}
+
+.caption-content {
+  @apply flex flex-col gap-2;
+}
+
+.template-title {
+  @apply text-base font-bold;
+}
+
+.template-description {
+  @apply text-sm font-semibold;
+}
+
+ntv-button {
+  @apply opacity-0 transform translate-x-2 transition-all duration-300;
+}
+
+.template-body:hover ntv-button {
+  @apply opacity-100 translate-x-0;
+}

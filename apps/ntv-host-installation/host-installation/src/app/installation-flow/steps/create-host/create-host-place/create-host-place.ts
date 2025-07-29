@@ -6,7 +6,7 @@ import { Input } from '@ntv-scaffolding/component-pantry';
 import { HOST_FORM_FIELDS } from '../../../../constants/form-field.constant';
 
 @Component({
-  selector: 'app-create-host-place',
+  selector: 'ntv-create-host-place',
   imports: [Input],
   templateUrl: './create-host-place.html',
   styleUrl: './create-host-place.css',

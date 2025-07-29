@@ -1,8 +1,8 @@
 import { Validators } from '@angular/forms';
 
-import { HostFormField } from '../interfaces/form-field.interface';
+import { FormField } from '../interfaces/form-field.interface';
 
-export const HOST_FORM_FIELDS: HostFormField[] = [
+export const HOST_FORM_FIELDS: FormField[] = [
   {
     name: 'businessName',
     label: 'Business Name*',
@@ -114,5 +114,32 @@ export const HOST_FORM_FIELDS: HostFormField[] = [
     type: 'text',
     validators: [Validators.required],
     inputType: 'input',
+  },
+];
+
+export const CREATE_SCREEN_FORM: FormField[] = [
+  {
+    name: 'screenName',
+    label: 'Screen Name*',
+    placeholder: 'Enter screen name',
+    type: 'text',
+    validators: [Validators.required],
+    inputType: 'input',
+  },
+  {
+    name: 'description',
+    label: 'Screen Name*',
+    placeholder: 'Enter screen name',
+    type: 'text',
+    validators: [Validators.required],
+    inputType: 'input',
+  },
+  {
+    name: 'screenType',
+    label: 'Screen Name*',
+    placeholder: 'Click to select Screen Type*',
+    type: 'text',
+    validators: [Validators.required],
+    inputType: 'autocomplete',
   },
 ];

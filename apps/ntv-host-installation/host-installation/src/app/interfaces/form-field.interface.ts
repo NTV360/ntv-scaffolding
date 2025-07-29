@@ -1,6 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
 
-export interface HostFormField {
+export interface FormField {
   name: string;
   label: string;
   type: string;

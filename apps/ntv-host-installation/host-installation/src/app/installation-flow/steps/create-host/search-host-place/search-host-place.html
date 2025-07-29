@@ -16,8 +16,9 @@
         [size]="'md'"
         [buttonBgColor]="'green'"
         [borderRadius]="'md'"
-        [disabled]="false"
         [data]="data"
+        (searchValueChange)="onSearchValueChange($event)"
+        (buttonClick)="onButtonClick()"
         (selectedValue)="selectedValue($event)"
       >
       </ntv-searchbar>
@@ -31,6 +32,7 @@
       width="100%"
       [zoom]="zoom"
       [options]="mapOptions"
+      (mapInitialized)="onMapReady($event)"
       (mapClick)="addMarker($event)"
     />
   </div>

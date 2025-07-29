@@ -44,7 +44,7 @@ export interface CreateScreenState {
   description: string;
   screenTypeId: string;
   templateId: string;
-  templateZone: TemplateZone[];
+  templateZones: TemplateZone[];
 }
 
 interface TemplateZone {

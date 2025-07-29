@@ -35,6 +35,11 @@
   @apply text-sm text-gray-500;
 }
 
+.helper-text {
+  @apply text-xs text-gray-400 whitespace-nowrap pointer-events-none select-none;
+  font-style: italic;
+}
+
 /* Search Results Dropdown */
 .search-results {
   @apply absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-64 overflow-y-auto;

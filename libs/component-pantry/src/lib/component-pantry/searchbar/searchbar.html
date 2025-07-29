@@ -5,6 +5,7 @@
       [placeholder]="placeholder()"
       [size]="size()"
       [borderRadius]="borderRadius()"
+      [clearable]="true"
       [variant]="variant()"
       [disabled]="disabled()"
       [(ngModel)]="searchValue"
@@ -27,6 +28,14 @@
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
+
+      <!-- Helper text on the right -->
+      @if (searchValue().length === 0 || searchValue().length < minCharacters())
+      {
+      <span right-icon class="helper-text"
+        >Enter at least {{ minCharacters() }} characters to search</span
+      >
+      }
     </ntv-input>
 
     <button
@@ -51,12 +60,6 @@
     </button>
   </div>
 
-  @if (searchValue().length > 0 && searchValue().length < minCharacters()) {
-  <p class="min-chars-message">
-    Enter at least {{ minCharacters() }} characters to search
-  </p>
-  }
-
   <!-- Search Results Dropdown -->
   @if (showResults()) {
   <div class="search-results">
@@ -64,24 +67,31 @@
     @if (isLoading()) {
     <div class="loading-container">
       <div class="loading-spinner"></div>
-      <span class="loading-text">Searching locations...</span>
+      <span class="loading-text">Searching...</span>
     </div>
     } @else {
     <!-- Actual Results -->
     @if (searchResults().length > 0) { @for (location of searchResults(); track
     location.id) {
-    <div class="search-result-item" (click)="onLocationSelect(location)">
+    <div
+      class="search-result-item"
+      tabindex="0"
+      (click)="onLocationSelect(location)"
+      (keydown.enter)="onLocationSelect(location)"
+      (keydown.space)="onLocationSelect(location)"
+    >
       <div class="result-main">
-        <span class="result-name">{{ location.name }}</span>
+        <span class="result-name">{{ location.title }}</span>
       </div>
       <div class="result-details">
-        <span class="result-country">{{ location.country }}</span>
+        <span class="result-country">{{ location.description }}</span>
         <span class="result-separator">•</span>
       </div>
     </div>
-    } } @else if (searchValue().length >= minCharacters()) {
+    } } @else if (searchValue().length >= minCharacters() && data().length > 0)
+    {
     <div class="no-results">
-      <span>No locations found for "{{ searchValue() }}"</span>
+      <span>No results found for "{{ searchValue() }}"</span>
     </div>
     } }
   </div>
