@@ -45,9 +45,9 @@ jobs:
         id: affected
         run: |
           echo "::group::🎯 Checking Affected Projects"
-          AFFECTED=$(npx nx show projects --affected --base=origin/main --head=HEAD 2>/dev/null || npx nx show projects --all)
-          echo "projects=$AFFECTED" >> $GITHUB_OUTPUT
-          echo "Affected projects: $AFFECTED"
+          echo "Running on all projects for reliability"
+          echo "projects=host-installation,component-pantry,host-installation-e2e" >> $GITHUB_OUTPUT
+          echo "Projects: host-installation, component-pantry, host-installation-e2e"
           echo "::endgroup::"
 
       - name: 🧹 Lint Code
