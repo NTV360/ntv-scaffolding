@@ -1,44 +1,33 @@
 <div class="template">
-  @for (template of sampleTemplatedata; track $index) {
-  <ntv-card>
-    <div class="template-body">
-      <div class="template-content">
-        <ntv-template
-          [zones]="template.layout"
-          style="width: 100%; height: 100%"
-        ></ntv-template>
-      </div>
-
-      <div class="template-captions">
-        <div class="caption-content">
-          <h3 class="template-title">{{template.name}}</h3>
-          <span class="template-description">{{template.description}}</span>
+  <h2>Click on a template to select it</h2>
+  <div class="template-main">
+    @for (template of sampleTemplatedata; track $index) {
+    <ntv-card>
+      <div
+        class="template-body"
+        [class.selected]="selectedTemplate === template"
+        (click)="selectTemplate(template)"
+        (keydown.enter)="selectTemplate(template)"
+        (keydown.space)="selectTemplate(template)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="'Select template: ' + template.name"
+      >
+        <div class="template-content">
+          <ntv-template
+            [zones]="template.layout"
+            style="width: 100%; height: 100%"
+          ></ntv-template>
         </div>
-        <ntv-button
-          [color]="'custom'"
-          [customColor]="'#8DCB2C'"
-          [rounded]="'full'"
-          (click)="selectTemplate(template)"
-        >
-          <div style="display: flex; align-items: center">
-            <svg
-              style="width: 16px; height: 16px; margin-right: 8px"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              ></path>
-            </svg>
-            <span class="text-white">Select Template</span>
+
+        <div class="template-captions">
+          <div class="caption-content">
+            <h3 class="template-title">{{template.name}}</h3>
+            <span class="template-description">{{template.description}}</span>
           </div>
-        </ntv-button>
+        </div>
       </div>
-    </div>
-  </ntv-card>
-  }
+    </ntv-card>
+    }
+  </div>
 </div>

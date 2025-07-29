@@ -1,4 +1,4 @@
-.template {
+.template-main {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4;
 }
 
@@ -39,6 +39,12 @@ ntv-button {
   @apply opacity-0 transform translate-x-2 transition-all duration-300;
 }
 
-.template-body:hover ntv-button {
-  @apply opacity-100 translate-x-0;
+.template-body.selected::after {
+  @apply absolute inset-0  border-2 border-lime-500 bg-lime-500/20 rounded-md pointer-events-none;
+  content: '';
+  z-index: 10;
+}
+
+.template-body.selected {
+  @apply border-lime-500;
 }
