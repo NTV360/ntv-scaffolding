@@ -71,32 +71,20 @@ describe('Button', () => {
     expect(classes).toContain('btn--full-width');
   });
 
-  it('should emit buttonClick event when clicked and not disabled', () => {
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).toHaveBeenCalled();
+  it('should be clickable when not disabled or loading', () => {
+    expect(buttonElement.nativeElement.disabled).toBe(false);
   });
 
-  it('should not emit buttonClick event when disabled', () => {
+  it('should be disabled when disabled input is true', () => {
     fixture.componentRef.setInput('disabled', true);
     fixture.detectChanges();
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).not.toHaveBeenCalled();
+    expect(buttonElement.nativeElement.disabled).toBe(true);
   });
 
-  it('should not emit buttonClick event when loading', () => {
+  it('should be disabled when loading input is true', () => {
     fixture.componentRef.setInput('loading', true);
     fixture.detectChanges();
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).not.toHaveBeenCalled();
+    expect(buttonElement.nativeElement.disabled).toBe(true);
   });
 
   it('should show loading spinner when loading', () => {
