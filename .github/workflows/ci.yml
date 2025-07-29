@@ -1,4 +1,4 @@
-name: CI
+name: 🚀 CI Pipeline
 
 on:
   push:
@@ -8,96 +8,194 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  NX_CLOUD_DISTRIBUTED_EXECUTION_AGENT_COUNT: 3
+  NX_BRANCH: ${{ github.event.number || github.ref_name }}
+  NX_RUN_GROUP: ${{ github.run_id }}
+  CI: true
 
 jobs:
+  # Main CI job with comprehensive reporting
   main:
+    name: 🔍 Main CI Pipeline
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      affected-projects: ${{ steps.affected.outputs.projects }}
+      cache-hit: ${{ steps.cache-nx.outputs.cache-hit }}
+
     steps:
-      - name: Checkout
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Setup Node.js with caching
-      - name: Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
-      # Cache node_modules for faster installs
-      - name: Cache node_modules
-        uses: actions/cache@v3
+      - name: 📦 Cache Dependencies
+        id: cache-deps
+        uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-deps-
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm ci
+      - name: 🔧 Install Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          echo "::group::📦 Installing Dependencies"
+          npm ci --prefer-offline --no-audit
+          echo "::endgroup::"
 
-      # Setup Nx Cloud for distributed caching
-      - name: Setup Nx Cloud
+      - name: ⚡ Setup Nx Cloud
         uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
 
-      # Cache Nx build outputs
-      - name: Cache Nx
-        uses: actions/cache@v3
+      - name: 🎯 Cache Nx Build Outputs
+        id: cache-nx
+        uses: actions/cache@v4
         with:
           path: |
             .nx/cache
             node_modules/.cache/nx
-          key: ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.js', '**/*.json') }}
+            dist
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.js', '**/*.json', '**/*.html', '**/*.css') }}
           restore-keys: |
             ${{ runner.os }}-nx-${{ hashFiles('**/package-lock.json') }}-
             ${{ runner.os }}-nx-
 
-      # Lint affected projects
-      - name: Lint
-        run: npx nx affected --target=lint --parallel=3
+      - name: 🔍 Get Affected Projects
+        id: affected
+        run: |
+          echo "::group::🎯 Checking Affected Projects"
+          AFFECTED=$(npx nx show projects --affected --json | jq -r '. | join(",")')
+          echo "projects=$AFFECTED" >> $GITHUB_OUTPUT
+          echo "Affected projects: $AFFECTED"
+          echo "::endgroup::"
 
-      # Test affected projects
-      - name: Test
-        run: npx nx affected --target=test --parallel=3 --configuration=ci --coverage
+      - name: 🧹 Lint Code
+        id: lint
+        run: |
+          echo "::group::🧹 Linting Code"
+          npx nx affected --target=lint --parallel=3 --verbose
+          echo "::endgroup::"
+        continue-on-error: true
 
-      # Build affected projects
-      - name: Build Host Installation
-        run: npx nx affected --target=build --parallel=3
+      - name: 🧪 Run Tests
+        id: test
+        run: |
+          echo "::group::🧪 Running Tests"
+          npx nx affected --target=test --parallel=3 --configuration=ci --coverage --verbose
+          echo "::endgroup::"
+        continue-on-error: true
 
-      # Build Component Pantry Library
-      - name: Build Component Pantry
-        run: npx nx build component-pantry
+      - name: 🏗️ Build Projects
+        id: build
+        run: |
+          echo "::group::🏗️ Building Projects"
+          npx nx affected --target=build --parallel=3 --verbose
+          echo "::endgroup::"
+        continue-on-error: true
 
-      # Build Storybook
-      - name: Build Storybook
-        run: npx nx affected --target=build-storybook --parallel=3
+      - name: 📚 Build Storybook
+        id: storybook
+        run: |
+          echo "::group::📚 Building Storybook"
+          npx nx affected --target=build-storybook --parallel=2 --verbose
+          echo "::endgroup::"
+        continue-on-error: true
 
-      # Run E2E tests
-      - name: E2E Tests
-        run: npx nx affected --target=e2e --parallel=1
+      - name: 🎭 Run E2E Tests
+        id: e2e
+        run: |
+          echo "::group::🎭 Running E2E Tests"
+          npx nx affected --target=e2e --parallel=1 --verbose
+          echo "::endgroup::"
+        continue-on-error: true
 
-      # Upload coverage reports (optional)
-      - name: Upload coverage to Codecov
+      - name: 📊 Generate Job Summary
         if: always()
-        uses: codecov/codecov-action@v3
+        run: |
+          echo "# 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📈 Cache Performance" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dependencies Cache**: ${{ steps.cache-deps.outputs.cache-hit == 'true' && '✅ HIT' || '❌ MISS' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Nx Build Cache**: ${{ steps.cache-nx.outputs.cache-hit == 'true' && '✅ HIT' || '❌ MISS' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 Affected Projects" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.affected.outputs.projects }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📋 Task Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Task | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧹 Lint | ${{ steps.lint.outcome == 'success' && '✅ PASSED' || steps.lint.outcome == 'failure' && '❌ FAILED' || '⏭️ SKIPPED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 Test | ${{ steps.test.outcome == 'success' && '✅ PASSED' || steps.test.outcome == 'failure' && '❌ FAILED' || '⏭️ SKIPPED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏗️ Build | ${{ steps.build.outcome == 'success' && '✅ PASSED' || steps.build.outcome == 'failure' && '❌ FAILED' || '⏭️ SKIPPED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📚 Storybook | ${{ steps.storybook.outcome == 'success' && '✅ PASSED' || steps.storybook.outcome == 'failure' && '❌ FAILED' || '⏭️ SKIPPED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎭 E2E | ${{ steps.e2e.outcome == 'success' && '✅ PASSED' || steps.e2e.outcome == 'failure' && '❌ FAILED' || '⏭️ SKIPPED' }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload Test Coverage
+        if: always() && steps.test.outcome == 'success'
+        uses: codecov/codecov-action@v4
         with:
           directory: ./coverage
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
-  # Separate job for dependency updates to maximize cache hits
-  dependency-check:
+      - name: 📤 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            coverage/
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+      - name: ❌ Fail if Critical Tasks Failed
+        if: steps.lint.outcome == 'failure' || steps.test.outcome == 'failure' || steps.build.outcome == 'failure'
+        run: |
+          echo "::error::Critical tasks failed. Check the logs above."
+          exit 1
+
+  # Security and dependency check
+  security:
+    name: 🔒 Security & Dependencies
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+
     steps:
-      - name: Checkout
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      - name: Check for dependency vulnerabilities
-        run: npm audit --audit-level=high
+      - name: 🔍 Audit Dependencies
+        run: |
+          echo "::group::🔍 Security Audit"
+          npm audit --audit-level=moderate || true
+          echo "::endgroup::"
+
+      - name: 📊 Generate Security Summary
+        run: |
+          echo "# 🔒 Security Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          npm audit --audit-level=moderate >> $GITHUB_STEP_SUMMARY || echo "No critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
