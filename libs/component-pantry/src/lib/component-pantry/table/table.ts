@@ -1248,6 +1248,3 @@ export class Table implements AfterViewInit {
     }
   }
 }
-
-
-// Test commit for component not use by host installation
