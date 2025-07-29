@@ -63,5 +63,5 @@
     "@nx/angular:library": { "linter": "eslint", "unitTestRunner": "jest" },
     "@nx/angular:component": { "style": "css" }
   },
-  "nxCloudId": "68882fb6b3196731a24a9f33"
+  "nxCloudId": "68883282b3196731a24a9f3e"
 }
