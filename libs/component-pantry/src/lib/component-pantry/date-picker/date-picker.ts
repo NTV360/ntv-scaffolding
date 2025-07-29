@@ -63,7 +63,7 @@ export class DatePicker implements OnChanges {
   /** */
   public showYearsList = signal<boolean>(false);
 
-  /** See method docs */
+  /** See reactive monthWeeks docs */
   public monthOfWeeks = this._calendarService.monthWeeks;
 
   /** List of week days */
@@ -206,12 +206,9 @@ export class DatePicker implements OnChanges {
    * @param date - Date to check based on the input endDate
    */
   public isInvalidSelectableStartDate(date: Date): boolean {
-    const isEndDatePickerComponent = this._elRef.nativeElement.hasAttribute(
-      'data-end-date-picker'
-    );
-    console.log('isEndDatePickerComponent', isEndDatePickerComponent);
     const endDate = this.endDate();
-    if (isEndDatePickerComponent && endDate) return date > endDate;
+    const startDate = this.startDate();
+    if (endDate && !startDate) return date > endDate;
     return false;
   }
 

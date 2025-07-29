@@ -323,6 +323,7 @@ export class Calendar implements OnInit {
     // Only set highlighting for non-past dates
     if (!this.isPastDate(date)) {
       this.selectedDateForHighlight.set(new Date(date));
+      this._calendarService.setSelectedDate(date);
     }
     this.selectedDateData.emit(new Date(date));
     this.announceSelection(date);

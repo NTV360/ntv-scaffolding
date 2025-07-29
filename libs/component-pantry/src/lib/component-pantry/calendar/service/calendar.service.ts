@@ -114,6 +114,12 @@ export class CalendarService {
     this._currentDate.set(new Date(this._today));
   }
 
+  /** Comment later, update selected date */
+  public setSelectedDate(date: Date): void {
+    this._currentDate.set(date);
+    this.selectedDateForHighlight.set(date);
+  }
+
   /** Select a year */
   public selectYear = (year: number) => {
     const currentDate = this._currentDate();

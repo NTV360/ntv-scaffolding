@@ -27,6 +27,10 @@ A fully interactive calendar component with month, week, and day views.
       control: { type: 'object' },
       description: 'List of events to display on the calendar',
     },
+    selectedDateData: {
+      action: 'onSelectedDate',
+      description: 'Triggered on every select date',
+    },
     event: {
       action: 'onAddEvent',
       description: 'Triggered when a new event is added',
@@ -73,6 +77,9 @@ export const Default: Story = {
           isAllDay: true,
         },
       ],
+      onSelectedDate: (date: Date) => {
+        console.log('selected date is', date);
+      },
       onAddEvent: (event: Event) => {
         args.isModifyingEvent = true;
         console.log('Added event:', event);
@@ -93,6 +100,7 @@ export const Default: Story = {
         [inputEvents]="events"
         (event)="onAddEvent($event)"
         (deleteEvent)="onDeleteEvent($event)"
+        (selectedDateData)="onSelectedDate($event)"
       />
     </div>`,
   }),
