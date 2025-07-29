@@ -7,7 +7,7 @@ The `ntv-modal` component is a highly configurable modal dialog that supports co
 ### Simple Modal
 
 ```typescript
-// Component
+// Components
 export class MyComponent {
   showModal = false;
 

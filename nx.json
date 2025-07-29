@@ -16,7 +16,7 @@
       "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/tsconfig.storybook.json"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
   "targetDefaults": {
     "@angular/build:application": {
@@ -57,7 +57,6 @@
     }
   },
   "plugins": [
-
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
@@ -85,5 +84,6 @@
     "@nx/angular:component": {
       "style": "css"
     }
-  }
+  },
+  "nxCloudId": "68882cb3a0b8e5c8bfc559b7"
 }
