@@ -12,6 +12,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModalComponent } from './modal';
 import { ModalAlertConfig } from './modal.types';
 
+// Import jest spyOn
+const { spyOn } = jest;
+
 describe('ModalComponent', () => {
   let component: ModalComponent;
   let fixture: ComponentFixture<ModalComponent>;

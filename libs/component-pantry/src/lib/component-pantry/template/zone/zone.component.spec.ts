@@ -2,6 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ZoneComponent, ZoneData } from './zone.component';
 import { By } from '@angular/platform-browser';
 
+// Import jest spyOn
+const { spyOn } = jest;
+
 describe('ZoneComponent', () => {
   let component: ZoneComponent;
   let fixture: ComponentFixture<ZoneComponent>;
@@ -25,7 +28,7 @@ describe('ZoneComponent', () => {
 
     fixture = TestBed.createComponent(ZoneComponent);
     component = fixture.componentInstance;
-    component.zoneData.set(mockZone);
+    fixture.componentRef.setInput('zoneData', mockZone);
     fixture.detectChanges();
   });
 

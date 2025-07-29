@@ -4,6 +4,9 @@ import { By } from '@angular/platform-browser';
 import { Accordion } from './accordion';
 import { AccordionConfig } from './accordion.types';
 
+// Import jest spyOn
+const { spyOn } = jest;
+
 @Component({
   template: `
     <ntv-accordion

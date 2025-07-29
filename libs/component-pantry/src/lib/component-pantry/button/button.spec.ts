@@ -3,6 +3,9 @@ import { Button } from './button';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
+// Import jest spyOn
+const { spyOn } = jest;
+
 describe('Button', () => {
   let component: Button;
   let fixture: ComponentFixture<Button>;
