@@ -7,11 +7,6 @@ on:
       - staging
       - development
       - feature/ci-cd-deployment
-    paths:
-      - 'apps/host-installation/**'
-      - 'libs/component-pantry/**'
-      - '.github/workflows/deploy-host-installation.yml'
-
 
 permissions:
   contents: read
