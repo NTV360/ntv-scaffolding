@@ -1,0 +1,3 @@
+.date-range-picker {
+  @apply flex items-center gap-5;
+}

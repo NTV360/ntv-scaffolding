@@ -176,7 +176,7 @@ export class Popover implements OnDestroy {
   public toggle(event: Event, triggerElement?: HTMLElement): void {
     if (this.mergedDisabled()) return;
 
-    const trigger = triggerElement || (event.target as HTMLElement);
+    const trigger = triggerElement || (event.currentTarget as HTMLElement);
     this.triggerElement.set(trigger);
 
     if (this.isVisible()) {

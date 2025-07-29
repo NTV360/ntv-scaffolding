@@ -1,0 +1,30 @@
+<div class="date-range-picker">
+  @switch (variant()) { @case ("double") {
+  <!-- Start date picker -->
+  <ntv-date-picker
+    variant="date-range"
+    placeholder="Start Date"
+    [endDate]="endDate()"
+    (selectDate)="onSelectStartDate($event)"
+  />
+
+  <span>-></span>
+
+  <!-- End date picker -->
+  <div>
+    <ntv-date-picker
+      data-end-date-picker
+      variant="date-range"
+      placeholder="End Date"
+      [startDate]="startDate()"
+      [endDate]="endDate()"
+      (selectDate)="onSelectEndDate($event)"
+    />
+    @if (isEndDateInvalid()) {
+    <p>Invalid siya hehe</p>
+    }
+  </div>
+  } @case ('single') {
+  <ntv-date-picker variant="date-range" />
+  } }
+</div>

@@ -8,8 +8,14 @@
         (keyup.enter)="goToToday()"
         (keyup.space)="goToToday()"
       >
-        <span>Today: <span [style]="{ display: 'inline-block', 'margin-inline-start': '3px' }"></span>{{ today.toLocaleDateString('en-US', { month: 'long' }) }}</span>
-   
+        <span
+          >Today:
+          <span
+            [style]="{ display: 'inline-block', 'margin-inline-start': '3px' }"
+          ></span
+          >{{ today.toLocaleDateString('en-US', { month: 'long' }) }}</span
+        >
+
         <span>{{ today.toLocaleDateString('en-US', { day: 'numeric' }) }}</span>
       </button>
     </div>
@@ -32,20 +38,10 @@
         </h2>
         } @case ('week') {
         <h2 class="calendar__title-text w-[250px]">
-          {{
-            currentWeekStart().toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric'
-            })
-          }}
-          -
-          {{
-            addDays(currentWeekStart(), 6).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })
-          }}
+          {{ currentWeekStart().toLocaleDateString('en-US', { month: 'short',
+          day: 'numeric' }) }} - {{ addDays(currentWeekStart(),
+          6).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year:
+          'numeric' }) }}
         </h2>
         } @default {
         <h2 class="calendar__title-text w-[170px]">
@@ -74,7 +70,7 @@
           [attr.aria-label]="'Select year, currently ' + currentYear()"
           [rounded]="'md'"
         >
-         <span [innerHTML]="calendar"></span>
+          <span [innerHTML]="calendar"></span>
         </ntv-button>
 
         <!-- Year Picker Dropdown -->
@@ -91,17 +87,19 @@
           >
             <h3>Select Year</h3>
             <div class="calendar__year-picker-controls-wrapper">
-              <button 
-                data-control-prev 
-                class="calendar__year-picker-controls" 
-                (click)="goPrevYears($event)">
+              <button
+                data-control-prev
+                class="calendar__year-picker-controls"
+                (click)="goPrevYears($event)"
+              >
                 <span [innerHTML]="goPrevIcon"></span>
               </button>
-              <button 
-                data-control-next 
-                class="calendar__year-picker-controls next" 
-                (click)="goNextYears($event)">
-                   <span [innerHTML]="goNextIcon"></span>
+              <button
+                data-control-next
+                class="calendar__year-picker-controls next"
+                (click)="goNextYears($event)"
+              >
+                <span [innerHTML]="goNextIcon"></span>
               </button>
             </div>
             <button
@@ -113,7 +111,6 @@
             >
               ×
             </button>
-          
           </div>
 
           <div class="calendar__year-picker-list" #yearPickerList>
@@ -138,17 +135,23 @@
       </div>
 
       <div class="calendar__view-select">
-        <button class="calendar__view-select-trigger" [class.isPopoverOpen]="viewPopover.isVisible()" (click)="viewPopover.toggle($event)">
-            <span>{{ view() | capitalize }}</span>
-            <span data-icon [innerHTML]="downArrow"></span>
+        <button
+          class="calendar__view-select-trigger"
+          [class.isPopoverOpen]="viewPopover.isVisible()"
+          (click)="viewPopover.toggle($event); $event.stopPropagation()"
+        >
+          <span>{{ view() | capitalize }}</span>
+          <span data-icon [innerHTML]="downArrow"></span>
         </button>
-       <ntv-popover #viewPopover placement="bottom-end">
-        <div class="calendar__view-select-options-container">
+        <ntv-popover #viewPopover placement="bottom-end">
+          <div class="calendar__view-select-options-container">
             @for(view of views(); track $index) {
-                <button (click)="setView($any(view), $event)">{{ view | capitalize }}</button>
+            <button (click)="setView($any(view), $event)">
+              {{ view | capitalize }}
+            </button>
             }
-        </div>
-       </ntv-popover>
+          </div>
+        </ntv-popover>
       </div>
     </div>
   </div>
@@ -176,6 +179,7 @@
         <div
           class="calendar__day"
           [class.calendar__day--other-month]="!day.isCurrentMonth"
+          [class.calendar__day--other-month--selected]="!day.isCurrentMonth && day.isSelected"
           [class.calendar__day--today]="day.isToday"
           [class.calendar__day--selected]="day.isSelected"
           [class.calendar__day--past]="day.isPast"
@@ -210,12 +214,12 @@
               [title]="event.title"
             >
               @if (event.isAllDay) {
-              <span class="calendar__event-title">{{ event.title | truncate:10 }}</span>
+              <span class="calendar__event-title">{{ event.title }}</span>
               } @else {
-              <span class="calendar__event-time">{{
-                formatTime(event.startTime!)
-              }}</span>
-              <span class="calendar__event-title">{{ event.title | truncate:10 }}</span>
+              <span class="calendar__event-time"
+                >{{ formatTime(event.startTime!) }}</span
+              >
+              <span class="calendar__event-title">{{ event.title }}</span>
               }
             </div>
             } @if (day.events.length > 2) {
@@ -331,7 +335,7 @@
                 ' (cannot add events)'
               : 'Add event on ' + day.date.toLocaleDateString()
           "
-          (click)="day.isPast ? selectDate(day.date) : startAddEvent(day.date)"
+          (click)="selectDate(day.date); startAddEvent(day.date)"
           (keyup.enter)="
             day.isPast ? selectDate(day.date) : startAddEvent(day.date)
           "
@@ -371,14 +375,12 @@
     <div class="calendar__day-view">
       <div class="calendar__day-view-header">
         <h3 class="calendar__day-view-title">
-          {{
-            currentDate().toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric'
-            })
-          }}
+          {{ currentDate().toLocaleDateString('en-US', { weekday: 'long', month:
+          'long', day: 'numeric' }) }}
         </h3>
+        <ntv-button size="sm" (buttonClick)="startAddEvent(this.currentDate())">
+          Add Note
+        </ntv-button>
       </div>
 
       <div class="calendar__day-events-container">
@@ -401,8 +403,8 @@
             <h4 class="calendar__event-title">{{ event.title }}</h4>
             @if (!event.isAllDay) {
             <span class="calendar__event-time">
-              {{ formatTime(event.startTime!) }} -
-              {{ formatTime(event.endTime!) }}
+              {{ formatTime(event.startTime!) }} - {{ formatTime(event.endTime!)
+              }}
             </span>
             } @else {
             <span class="calendar__event-all-day">All Day</span>
@@ -446,8 +448,8 @@
       <!-- Add/Edit Event Form -->
       <div class="calendar__modal-content">
         <h3 class="calendar__modal-title" id="modal-title">
-          {{ editingEvent() ? 'Edit Event' : 'Add Event' }}
-          @if (selectedDate()) {
+          {{ editingEvent() ? 'Edit Event' : 'Add Event' }} @if (selectedDate())
+          {
           <span class="calendar__modal-date">
             starting {{ selectedDate()!.toLocaleDateString() }}
           </span>
@@ -558,15 +560,16 @@
 
           <div class="calendar__modal-actions">
             @if (editingEvent()) {
-            <button
+            <ntv-button
+              variant="danger"
               type="button"
-              class="calendar__btn calendar__btn--danger"
-              (click)="deleteEvent(editingEvent()!.id)"
-              (keyup.enter)="deleteEvent(editingEvent()!.id)"
-              (keyup.space)="deleteEvent(editingEvent()!.id)"
+              [loading]="isDeletingEventInternal()"
+              (click)="onDeleteEvent(editingEvent()!.id)"
+              (keyup.enter)="onDeleteEvent(editingEvent()!.id)"
+              (keyup.space)="onDeleteEvent(editingEvent()!.id)"
             >
               Delete
-            </button>
+            </ntv-button>
             }
             <div class="calendar__modal-actions-right">
               <button
@@ -578,13 +581,14 @@
               >
                 Cancel
               </button>
-              <button
+              <ntv-button
+                [loading]="isModifyingEventInternal()"
+                variant="success"
                 type="submit"
-                class="calendar__btn calendar__view-btn--active"
                 [disabled]="!newEventTitle.trim() || !newEventDate"
               >
                 {{ editingEvent() ? 'Update' : 'Create' }}
-              </button>
+              </ntv-button>
             </div>
           </div>
         </form>
@@ -604,6 +608,7 @@
           >
             <div class="calendar__event-item-header">
               <h4 class="calendar__event-item-title">{{ event.title }}</h4>
+              @if (!isPastDate(event.date) ) {
               <button
                 type="button"
                 class="calendar__btn calendar__btn--small"
@@ -614,11 +619,12 @@
               >
                 Edit
               </button>
+              }
             </div>
             @if (!event.isAllDay) {
             <div class="calendar__event-item-time">
-              {{ formatTime(event.startTime!) }} -
-              {{ formatTime(event.endTime!) }}
+              {{ formatTime(event.startTime!) }} - {{ formatTime(event.endTime!)
+              }}
             </div>
             } @else {
             <div class="calendar__event-item-time">All Day</div>
@@ -647,4 +653,3 @@
   </div>
   }
 </div>
-

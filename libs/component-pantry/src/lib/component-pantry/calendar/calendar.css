@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NOTE: change later to w-full*/
+/* NOTE: change later to w-full and remove fixed height, it should be based on the parent's width and height*/
 .calendar {
-  @apply flex flex-col w-[900px] max-w-7xl bg-white rounded-lg border-2 shadow-sm font-sans h-[800px];
+  @apply flex flex-col w-full max-w-7xl bg-white rounded-lg border-2 shadow-sm font-sans h-full;
 }
 
 .calendar__header {
@@ -37,14 +37,6 @@
   @apply ring-gray-500;
 }
 
-.calendar__btn--danger {
-  @apply bg-red-600 border-red-600 text-white hover:bg-red-700;
-}
-
-.calendar__btn--danger:focus {
-  @apply ring-red-500;
-}
-
 .calendar__btn--small {
   @apply px-3 py-1 text-sm;
 }
@@ -54,7 +46,7 @@
 }
 
 .calendar__navigation {
-  @apply flex items-center gap-6;
+  @apply flex items-center gap-3;
 }
 
 .calendar__nav-btn {
@@ -90,15 +82,15 @@
 }
 
 .calendar__view-select-trigger {
-    @apply flex items-center justify-between gap-3 border-[1.3px] border-gray-300 rounded py-1 px-2;
+  @apply flex items-center justify-between gap-3 border-[1.3px] border-gray-300 rounded py-1 px-2;
 }
 
 .calendar__view-select-trigger > *[data-icon] {
-    @apply transition-all duration-100 inline-block rotate-90;
+  @apply transition-all duration-100 inline-block;
 }
 
 .calendar__view-select-trigger.isPopoverOpen > *[data-icon] {
-    @apply -rotate-90;
+  @apply rotate-180;
 }
 
 .calendar__view-select-options-container {
@@ -106,7 +98,7 @@
 }
 
 .calendar__view-select-options-container > * {
-    @apply text-start p-1.5 transition-colors duration-200 rounded;
+  @apply text-start p-1.5 transition-colors duration-200 rounded;
 }
 
 .calendar__view-select-options-container > *:hover {
@@ -220,7 +212,7 @@
 }
 
 .calendar__day {
-  @apply bg-white min-w-[120px] min-h-[120px] cursor-pointer border border-platinum transition-colors duration-200 p-[10px] relative overflow-visible;
+  @apply bg-white cursor-pointer border border-platinum transition-colors duration-200 p-[10px] relative overflow-visible;
   border-radius: 4px;
 }
 
@@ -231,6 +223,10 @@
 .calendar__day--other-month .calendar__day-number {
   color: #091635;
   opacity: 20%;
+}
+
+.calendar__day--other-month--selected .calendar__day-number {
+  opacity: 1;
 }
 
 .calendar__day--past {
@@ -284,7 +280,7 @@
 }
 
 .calendar__week-day--selected {
-  @apply bg-[#e8f5e8] border-2 border-accent-500;
+  @apply bg-[#e8f5e8] border border-accent-500;
 }
 
 .calendar__week-day--past {
@@ -318,8 +314,6 @@
   @apply border-r;
 }
 
-.calendar__week-day-header
-
 .calendar__week-day-header:focus {
   @apply outline-none bg-accent-500;
 }
@@ -345,11 +339,11 @@
 }
 
 .calendar__week-day-header--selected {
-  @apply bg-[#e8f5e8] border-2 border-accent-500;
+  @apply bg-[#e8f5e8] border border-b-0 border-accent-500;
 }
 
 .calendar__week-day-header--selected .calendar__week-day-number {
-  @apply text-accent-500 font-bold;
+  @apply text-black font-semibold;
 }
 
 /* Day Header/Footer */
@@ -432,8 +426,10 @@
   @apply rounded-r -ml-0.5 z-10;
 }
 
-.calendar__event--month.calendar__event--end:not(.calendar__event--single) .calendar__event-title,
-.calendar__event--month.calendar__event--end:not(.calendar__event--single) .calendar__event-time {
+.calendar__event--month.calendar__event--end:not(.calendar__event--single)
+  .calendar__event-title,
+.calendar__event--month.calendar__event--end:not(.calendar__event--single)
+  .calendar__event-time {
   @apply opacity-0;
 }
 
@@ -450,7 +446,7 @@
 }
 
 .calendar__event-title {
-  @apply font-medium;
+  @apply font-medium text-ellipsis whitespace-nowrap block overflow-hidden;
 }
 
 .calendar__event-time {
@@ -515,12 +511,12 @@
 }
 
 .calendar__week-grid {
-  @apply  grid grid-cols-7 gap-px flex-1 bg-gray-200;
+  @apply grid grid-cols-7 gap-px flex-1 bg-gray-300;
 }
 
 /* Day View */
 .calendar__day-view {
-  @apply h-full;
+  @apply h-full flex flex-col;
 }
 
 .calendar__day-view-header {
@@ -532,11 +528,11 @@
 }
 
 .calendar__day-events-container {
-  @apply space-y-4;
+  @apply flex-1 space-y-4;
 }
 
 .calendar__no-events {
-  @apply text-center py-12;
+  @apply h-full grid place-items-center text-center;
 }
 
 .calendar__no-events p {
