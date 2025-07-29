@@ -1,0 +1,340 @@
+@if (items().length === 0) {
+<!-- Empty State -->
+<div class="empty-state">
+  <div class="empty-icon">📁</div>
+  <div class="empty-message">No items to display</div>
+  <div class="empty-description">Add some files to see them here</div>
+</div>
+} @else { @if (mergedConfig().layout === 'list') {
+<!-- List Layout -->
+@if (draggable()) {
+<!-- Draggable List -->
+<div
+  cdkDropList
+  class="thumbnail-list-draggable"
+  [ngStyle]="containerStyles()"
+  (cdkDropListDropped)="onDrop($event)"
+  role="list"
+  [attr.aria-label]="'Draggable list with ' + items().length + ' items'"
+>
+  @for (item of itemsWithSelection(); track item.id; let i = $index) {
+  <div
+    class="thumbnail-list-item"
+    cdkDrag
+    [cdkDragData]="item"
+    tabindex="0"
+    role="button"
+    [attr.aria-label]="'Drag to reorder ' + item.name"
+    (click)="!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null"
+    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null); $event.preventDefault()"
+    (contextmenu)="onContextMenuRequest({item, event: $event})"
+  >
+    <div class="list-item-content">
+      @if (mergedConfig().selectable) {
+      <div class="list-item-checkbox">
+        <input
+          type="checkbox"
+          [checked]="item.selected"
+          (change)="onSelectionToggle(item)"
+          (click)="$event.stopPropagation()"
+          [attr.aria-label]="'Select ' + item.name"
+        />
+      </div>
+      }
+      <div class="list-item-icon">
+        @if (item.src && item.type === 'image') {
+        <img [src]="item.src" [alt]="item.name" class="list-thumbnail" />
+        } @else {
+        <div class="list-file-icon">{{ item.icon || '📄' }}</div>
+        }
+      </div>
+      <div class="list-item-details">
+        <div class="list-item-name">{{ item.name }}</div>
+        @if (mergedConfig().showMetadata) {
+        <div class="list-item-metadata">
+          @if (mergedConfig().showFileSize && item.size) {
+          <span class="list-item-size">{{ item.size }}</span>
+          } @if (mergedConfig().showModified && item.modified) {
+          <span class="list-item-modified"
+            >{{ item.modified | date:'short' }}</span
+          >
+          }
+        </div>
+        }
+      </div>
+      @if (mergedConfig().showActionButtons) {
+      <div class="list-item-actions">
+        <button
+          class="action-button action-button--more"
+          (click)="onContextMenuRequest({item, event: $event}); $event.stopPropagation()"
+          title="More options"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="5" r="2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <circle cx="12" cy="19" r="2" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>
+} @else {
+<!-- Static List -->
+<div
+  class="thumbnail-list-static"
+  [ngStyle]="containerStyles()"
+  role="list"
+  [attr.aria-label]="'List with ' + items().length + ' items'"
+>
+  @for (item of itemsWithSelection(); track item.id; let i = $index) {
+  <div
+    class="thumbnail-list-item"
+    [class.selected]="item.selected"
+    tabindex="0"
+    role="button"
+    [attr.aria-label]="'Select ' + item.name"
+    (click)="!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null"
+    (keydown)="($event.key === 'Enter' || $event.key === ' ') && (!mergedConfig().selectable ? onItemClick({item, index: i, event: $event}) : null); $event.preventDefault()"
+    (contextmenu)="onContextMenuRequest({item, event: $event})"
+  >
+    <div class="list-item-content">
+      @if (mergedConfig().selectable) {
+      <div class="list-item-checkbox">
+        <input
+          type="checkbox"
+          [checked]="item.selected"
+          (change)="onSelectionToggle(item)"
+          (click)="$event.stopPropagation()"
+          [attr.aria-label]="'Select ' + item.name"
+        />
+      </div>
+      }
+      <div class="list-item-icon">
+        @if (item.src && item.type === 'image') {
+        <img [src]="item.src" [alt]="item.name" class="list-thumbnail" />
+        } @else {
+        <div class="list-file-icon">{{ item.icon || '📄' }}</div>
+        }
+      </div>
+      <div class="list-item-details">
+        <div class="list-item-name">{{ item.name }}</div>
+        @if (mergedConfig().showMetadata) {
+        <div class="list-item-metadata">
+          @if (mergedConfig().showFileSize && item.size) {
+          <span class="list-item-size">{{ item.size }}</span>
+          } @if (mergedConfig().showModified && item.modified) {
+          <span class="list-item-modified"
+            >{{ item.modified | date:'short' }}</span
+          >
+          }
+        </div>
+        }
+      </div>
+      @if (mergedConfig().showActionButtons) {
+      <div class="list-item-actions">
+        <button
+          class="action-button action-button--more"
+          (click)="onContextMenuRequest({item, event: $event}); $event.stopPropagation()"
+          title="More options"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="5" r="2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <circle cx="12" cy="19" r="2" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>
+} } @else {
+<!-- Grid Layout -->
+@if (draggable()) {
+<!-- Draggable Grid -->
+<div
+  cdkDropList
+  cdkDropListOrientation="mixed"
+  class="thumbnail-drop-list"
+  [ngStyle]="containerStyles()"
+  (cdkDropListDropped)="onDrop($event)"
+  role="grid"
+  [attr.aria-label]="'Draggable thumbnail gallery with ' + items().length + ' items'"
+>
+  @for (item of itemsWithSelection(); track item.id; let i = $index) {
+  <div class="thumbnail-drag-item" cdkDrag [cdkDragData]="item">
+    <ntv-thumbnail-item
+      [item]="item"
+      [index]="i"
+      [size]="mergedConfig().size"
+      [variant]="mergedConfig().variant"
+      [layout]="mergedConfig().layout"
+      [selectable]="mergedConfig().selectable"
+      [showLabels]="mergedConfig().showLabels"
+      [showMetadata]="mergedConfig().showMetadata"
+      [showFileSize]="mergedConfig().showFileSize"
+      [showModified]="mergedConfig().showModified"
+      [hoverEffects]="mergedConfig().hoverEffects"
+      [clickable]="mergedConfig().clickable"
+      [showActionButtons]="mergedConfig().showActionButtons"
+      (itemClick)="onItemClick($event)"
+      (selectionToggle)="onSelectionToggle($event)"
+      (contextMenuRequest)="onContextMenuRequest($event)"
+      (mouseEnter)="onMouseEnter($event)"
+      (mouseLeave)="onMouseLeave()"
+    >
+    </ntv-thumbnail-item>
+  </div>
+  }
+</div>
+} @else {
+<!-- Static Grid -->
+<div
+  [class]="containerClasses()"
+  [ngStyle]="containerStyles()"
+  role="grid"
+  [attr.aria-label]="'Thumbnail gallery with ' + items().length + ' items'"
+>
+  @for (item of itemsWithSelection(); track item.id; let i = $index) {
+  <ntv-thumbnail-item
+    [item]="item"
+    [index]="i"
+    [size]="mergedConfig().size"
+    [variant]="mergedConfig().variant"
+    [layout]="mergedConfig().layout"
+    [selectable]="mergedConfig().selectable"
+    [showLabels]="mergedConfig().showLabels"
+    [showMetadata]="mergedConfig().showMetadata"
+    [showFileSize]="mergedConfig().showFileSize"
+    [showModified]="mergedConfig().showModified"
+    [hoverEffects]="mergedConfig().hoverEffects"
+    [clickable]="mergedConfig().clickable"
+    [showActionButtons]="mergedConfig().showActionButtons"
+    (itemClick)="onItemClick($event)"
+    (selectionToggle)="onSelectionToggle($event)"
+    (contextMenuRequest)="onContextMenuRequest($event)"
+    (mouseEnter)="onMouseEnter($event)"
+    (mouseLeave)="onMouseLeave()"
+  >
+  </ntv-thumbnail-item>
+  }
+</div>
+} } }
+
+<!-- Context Menu -->
+@if (contextMenuVisible() && showContextMenu()) {
+<div
+  class="thumbnail-context-menu"
+  [class.closing]="contextMenuClosing()"
+  [style.left.px]="contextMenuPosition().x"
+  [style.top.px]="contextMenuPosition().y"
+>
+  <!-- Context Menu Header -->
+  @if (contextMenuItem()) {
+  <div class="context-menu-header">
+    <div class="context-menu-title" [title]="contextMenuItem()!.name">
+      {{ contextMenuItem()!.name }}
+    </div>
+    <button 
+      class="context-menu-close"
+      (click)="hideContextMenu()"
+      aria-label="Close menu"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
+  </div>
+  }
+
+  <!-- Context Menu Content -->
+  <div class="context-menu-content">
+    @for (action of contextMenuActions(); track action.type) {
+    <div class="context-menu-item-wrapper">
+      @if (action.submenu && action.submenu.length > 0) {
+      <!-- Menu item with submenu -->
+      <div
+        class="context-menu-item has-submenu"
+        [class.disabled]="action.disabled"
+        tabindex="0"
+        role="menuitem"
+        [attr.aria-expanded]="activeSubmenu() === action.type"
+        (click)="toggleSubmenu(action.type, $event)"
+        (keydown)="$event.key === 'Enter' || $event.key === ' ' ? toggleSubmenu(action.type, $event) : null"
+      >
+        <div class="menu-item-icon" [innerHTML]="action.icon"></div>
+        <div class="menu-item-label">{{ action.label }}</div>
+        <div class="menu-item-arrow">▶</div>
+      </div>
+
+      <!-- Submenu -->
+      @if (activeSubmenu() === action.type) {
+      <div class="context-submenu" role="menu">
+        @for (subAction of action.submenu; track subAction.type) {
+        <div
+          class="context-menu-item submenu-item"
+          [class.disabled]="subAction.disabled"
+          tabindex="0"
+          role="menuitem"
+          (click)="onActionClick(subAction, contextMenuItem()!, $event)"
+          (keydown)="$event.key === 'Enter' || $event.key === ' ' ? onActionClick(subAction, contextMenuItem()!, $event) : null"
+        >
+          <div class="menu-item-icon" [innerHTML]="subAction.icon"></div>
+          <div class="menu-item-label">{{ subAction.label }}</div>
+        </div>
+        @if (subAction.divider) {
+        <div class="context-menu-divider"></div>
+        } }
+      </div>
+      } } @else {
+      <!-- Regular menu item -->
+      <div
+        class="context-menu-item"
+        [class.disabled]="action.disabled"
+        tabindex="0"
+        role="menuitem"
+        (click)="onActionClick(action, contextMenuItem()!, $event)"
+        (keydown)="$event.key === 'Enter' || $event.key === ' ' ? onActionClick(action, contextMenuItem()!, $event) : null"
+      >
+        <div class="menu-item-icon" [innerHTML]="action.icon"></div>
+        <div class="menu-item-label">{{ action.label }}</div>
+      </div>
+      } @if (action.divider) {
+      <div class="context-menu-divider"></div>
+      }
+    </div>
+    }
+  </div>
+</div>
+}
+
+<!-- Action Buttons Overlay (for hovered items) -->
+@if (hoveredItem() && showActionButtons()) {
+<div class="thumbnail-actions-overlay">
+  <div class="action-buttons">
+    @for (action of contextMenuActions().slice(0, 3); track action.type) {
+    <button
+      class="action-button"
+      [class]="'action-button--' + action.type"
+      [disabled]="action.disabled"
+      [title]="action.label"
+      (click)="onActionClick(action, hoveredItem()!, $event)"
+    >
+      <span [innerHTML]="action.icon"></span>
+    </button>
+    } @if (contextMenuActions().length > 3) {
+    <button
+      class="action-button action-button--more"
+      title="More actions"
+      (click)="onContextMenuRequest({item: hoveredItem()!, event: $event})"
+    >
+      <span>⋯</span>
+    </button>
+    }
+  </div>
+</div>
+}

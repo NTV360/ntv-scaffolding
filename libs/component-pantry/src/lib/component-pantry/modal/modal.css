@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modal Backdrop */
+.modal__backdrop {
+  @apply fixed inset-0 flex items-center justify-center z-50 pointer-events-none transition-all duration-300 ease-in-out opacity-0 invisible bg-black/50 backdrop-blur;
+}
+
+.modal__backdrop--visible {
+  @apply opacity-100 visible pointer-events-auto;
+}
+
+.modal__backdrop--blur {
+  @apply backdrop-blur-lg;
+}
+
+.modal__backdrop--dark {
+  @apply bg-black/80;
+}
+
+.modal__backdrop--none {
+  @apply bg-transparent backdrop-blur-none;
+}
+
+.modal__backdrop--glass {
+  @apply backdrop-blur-2xl border border-white/20 bg-white/10;
+}
+
+.modal__backdrop--gradient {
+  @apply backdrop-blur-sm bg-gradient-to-br from-black/60 to-black/30;
+}
+
+/* Modal Content */
+.modal__content {
+  @apply bg-white rounded-lg shadow-2xl overflow-hidden w-full p-2 flex flex-col flex-shrink-0 transform scale-90 -translate-y-5 transition-all duration-300 ease-in-out opacity-0;
+}
+
+.modal--visible .modal__content {
+  @apply scale-100 translate-y-0 opacity-100;
+}
+
+/* Modal Variants */
+.modal__content--form,
+.modal__content--info,
+.modal__content--confirmation,
+.modal__content--alert,
+.modal__content--success,
+.modal__content--error {
+  @apply bg-white;
+}
+
+/* Modal Positions */
+.modal--center .modal__content {
+  @apply mx-auto;
+}
+
+.modal--top .modal__content {
+  @apply mt-8 mb-auto;
+}
+
+.modal--bottom .modal__content {
+  @apply mb-8 mt-auto;
+}
+
+.modal--left .modal__content {
+  @apply ml-8 mr-auto;
+}
+
+.modal--right .modal__content {
+  @apply mr-8 ml-auto;
+}
+
+.modal--top-left .modal__content {
+  @apply mt-8 ml-8 mb-auto mr-auto;
+}
+
+.modal--top-right .modal__content {
+  @apply mt-8 mr-8 mb-auto ml-auto;
+}
+
+.modal--bottom-left .modal__content {
+  @apply mb-8 ml-8 mt-auto mr-auto;
+}
+
+.modal--bottom-right .modal__content {
+  @apply mb-8 mr-8 mt-auto ml-auto;
+}
+
+/* Modal Header */
+.modal__header {
+  @apply flex justify-between items-center p-4;
+}
+
+.modal__title {
+  @apply font-medium text-gray-900;
+}
+
+.modal__subtitle {
+  @apply text-sm text-gray-400 mt-1 mb-0;
+}
+
+.modal__close {
+  @apply p-2 rounded-full transition-colors hover:bg-gray-100 flex items-center justify-center;
+}
+
+.modal__close:hover svg path {
+  @apply fill-gray-700;
+}
+
+/* Modal Body */
+.modal__body {
+  @apply p-6 m-2 text-sm bg-gray-50;
+}
+
+/* Override background for specific variants */
+.modal--confirmation .modal__body,
+.modal--alert .modal__body,
+.modal--success .modal__body,
+.modal--error .modal__body {
+  @apply bg-white items-center;
+}
+
+/* Remove header space for alert and confirmation variants */
+.modal--alert .modal__header,
+.modal--confirmation .modal__header {
+  @apply hidden;
+}
+
+.modal--scrollable .modal__body {
+  @apply overflow-y-auto max-h-[60vh];
+}
+
+/* Modal Footer */
+.modal__footer {
+  @apply flex items-center justify-end gap-3 p-6 border-t border-gray-200;
+}
+
+/* Alert Modal Styles */
+.modal__alert-animation {
+  @apply mx-auto mb-6 flex items-center justify-center relative w-[200px] h-[200px];
+}
+
+/* Alert Animation Container */
+.modal__alert-animation iframe {
+  @apply border-none bg-transparent w-[200px];
+}
+
+.modal__alert-animation--error {
+  @apply mb-6;
+}
+
+.modal__alert-animation--error iframe {
+  @apply h-[200px];
+}
+
+.modal__alert-animation--success iframe {
+  @apply h-[300px];
+}
+
+/* Success Alert Styles */
+.modal--alert.modal--success .modal__body {
+  @apply text-emerald-600;
+}
+
+/* Error Alert Styles */
+.modal--alert.modal--error .modal__body {
+  @apply text-red-600;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .modal__content {
+    @apply mx-4 max-w-none;
+  }
+
+  .modal__header {
+    @apply p-4;
+  }
+
+  .modal__body {
+    @apply p-4;
+  }
+
+  .modal__footer {
+    @apply p-4;
+  }
+}
+
+/* Focus Management */
+.modal__content:focus {
+  @apply outline-none;
+}
+
+/* Accessibility */
+.modal__content[role='dialog'] {
+  @apply outline-none;
+}
