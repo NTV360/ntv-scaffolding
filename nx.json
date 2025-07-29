@@ -85,5 +85,15 @@
       "style": "css"
     }
   },
-  "nxCloudId": "68882cb3a0b8e5c8bfc559b7"
+  "nxCloudId": "68882c943e630d184e3781ae",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "parallel": 3,
+        "accessToken": "NzY4ODgyY2IzYTBiOGU1YzhiZmM1NTliN3xhZG1pbg=="
+      }
+    }
+  }
 }

@@ -1,0 +1,44 @@
+{
+  "nxCloudId": "68882c943e630d184e3781ae",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "parallel": 3,
+        "selfHealing": {
+          "enabled": true,
+          "autoApplyFixes": false,
+          "retryFailedTasks": true,
+          "maxRetries": 3,
+          "rules": [
+            {
+              "name": "retry-flaky-tests",
+              "condition": "test-failure",
+              "action": "retry",
+              "maxRetries": 3,
+              "description": "Automatically retry flaky tests"
+            },
+            {
+              "name": "clear-jest-cache",
+              "condition": "jest-cache-error",
+              "action": "clear-cache",
+              "autoApply": true,
+              "description": "Clear Jest cache on cache-related failures"
+            },
+            {
+              "name": "update-snapshots",
+              "condition": "snapshot-mismatch",
+              "action": "suggest-update",
+              "autoApply": false,
+              "description": "Suggest snapshot updates"
+            }
+          ]
+        },
+        "distributedTaskExecution": {
+          "enabled": true
+        }
+      }
+    }
+  }
+}
