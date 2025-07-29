@@ -4,28 +4,32 @@ This document explains the dark mode color system available in the component lib
 
 ## Configuration
 
-Dark mode is now configured using Tailwind's class-based approach (`darkMode: 'class'`) instead of media queries. This allows for programmatic control of dark mode.
+Dark modes is now configured using Tailwind's class-based approach (`darkMode: 'class'`) instead of media queries. This allows for programmatic control of dark mode.
 
 ## Available Dark Mode Colors
 
 The following custom colors are available for dark mode styling:
 
 ### Background Colors
+
 - `dark-bg-primary` - Main dark background (#1f2937 - gray-800)
 - `dark-bg-secondary` - Secondary dark background (#374151 - gray-700)
 - `dark-bg-tertiary` - Tertiary dark background (#4b5563 - gray-600)
 
 ### Text Colors
+
 - `dark-text-primary` - Primary text color (#f9fafb - gray-50)
 - `dark-text-secondary` - Secondary text color (#e5e7eb - gray-200)
 - `dark-text-tertiary` - Tertiary text color (#d1d5db - gray-300)
 - `dark-text-muted` - Muted text color (#9ca3af - gray-400)
 
 ### Border Colors
+
 - `dark-border-primary` - Primary border color (#4b5563 - gray-600)
 - `dark-border-secondary` - Secondary border color (#6b7280 - gray-500)
 
 ### Accent Colors
+
 - `dark-accent-primary` - Primary accent color (#3b82f6 - blue-500)
 - `dark-accent-secondary` - Secondary accent color (#1d4ed8 - blue-700)
 - `dark-accent-hover` - Hover accent color (#2563eb - blue-600)
@@ -42,6 +46,7 @@ The component library now includes global text color utilities that automaticall
 - `.text-auto` - Automatically contrasts with background (dark gray in light mode, very light gray in dark mode)
 
 ## Usage Examples
+
 ### Using Global Text Color Classes
 
 ```html
@@ -61,13 +66,11 @@ The component library now includes global text color utilities that automaticall
   <!-- Text -->
   <p class="text-gray-900 dark:text-dark-text-primary">Primary text</p>
   <p class="text-gray-600 dark:text-dark-text-secondary">Secondary text</p>
-  
+
   <!-- Borders -->
   <div class="border border-gray-300 dark:border-dark-border-primary">
     <!-- Accent elements -->
-    <button class="bg-blue-500 dark:bg-dark-accent-primary hover:bg-blue-600 dark:hover:bg-dark-accent-hover">
-      Click me
-    </button>
+    <button class="bg-blue-500 dark:bg-dark-accent-primary hover:bg-blue-600 dark:hover:bg-dark-accent-hover">Click me</button>
   </div>
 </div>
 ```
