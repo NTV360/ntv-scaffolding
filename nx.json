@@ -92,7 +92,7 @@
       "options": {
         "cacheableOperations": ["build", "lint", "test", "e2e"],
         "parallel": 3,
-        "accessToken": "NzY4ODgyY2IzYTBiOGU1YzhiZmM1NTliN3xhZG1pbg=="
+        "accessToken": "YzljZjVlNTAtYjU5YS00Y2IxLWE3YzktMWQ2N2IwOTIzMmFmfHJlYWQtd3JpdGU="
       }
     }
   }
