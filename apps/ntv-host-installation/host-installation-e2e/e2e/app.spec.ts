@@ -9,9 +9,9 @@ test.describe('host-installation-e2e', () => {
     await page.goto('/');
   });
 
-  test('should display page title', async ({ page }) => {
+  test('should display page title', async () => {
     // Check that the page loads and displays the main title
-    const pageTitle = page.locator('h2');
+    const pageTitle = appPage.getPageTitle();
     await expect(pageTitle).toBeVisible();
     await expect(pageTitle).toContainText(/Create a Host/);
   });
