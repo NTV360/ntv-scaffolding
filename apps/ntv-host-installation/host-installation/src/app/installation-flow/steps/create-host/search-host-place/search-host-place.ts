@@ -9,6 +9,24 @@ import { Autocomplete, Searchbar } from '@ntv-scaffolding/component-pantry';
 // LOCAL
 import { Fastedge } from '../../../../services';
 
+// Import the interface from fastedge service
+interface GoogleBusinessPlace {
+  placeId: string;
+  title: string;
+  type: string;
+  address: string;
+  thumbnail: string;
+  latitude: number;
+  longitude: number;
+  name?: string;
+  formatted_address?: string;
+  country?: string;
+}
+
+interface GoogleBusinessProfileResponse {
+  google_search: GoogleBusinessPlace[];
+}
+
 /**
  * Interface for search result data structure
  */
@@ -203,12 +221,12 @@ export class SearchHostPlace implements OnDestroy {
       .get_google_business_profile(searchQuery)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: any) => {
+        next: (response: GoogleBusinessProfileResponse) => {
           if (response?.google_search && response.google_search.length > 0) {
             // Map the API response to the data array structure
             const mappedResults: SearchResultData[] =
               response.google_search.map(
-                (item: any, index: number): SearchResultData => {
+                (item: GoogleBusinessPlace, index: number): SearchResultData => {
                   return {
                     id: index + 1,
                     title: item.title || item.name || 'Unknown Name',
