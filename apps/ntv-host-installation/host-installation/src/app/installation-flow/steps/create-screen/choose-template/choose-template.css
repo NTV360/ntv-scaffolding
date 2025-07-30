@@ -40,7 +40,7 @@ ntv-button {
 }
 
 .template-body.selected::after {
-  @apply absolute inset-0  border-4 border-lime-500 bg-lime-500/20 rounded-md pointer-events-none;
+  @apply absolute inset-0  border-2 border-lime-500 bg-lime-500/20 rounded-md pointer-events-none;
   content: '';
   z-index: 10;
 }

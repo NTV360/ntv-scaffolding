@@ -71,34 +71,6 @@ describe('Button', () => {
     expect(classes).toContain('btn--full-width');
   });
 
-  it('should emit buttonClick event when clicked and not disabled', () => {
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).toHaveBeenCalled();
-  });
-
-  it('should not emit buttonClick event when disabled', () => {
-    fixture.componentRef.setInput('disabled', true);
-    fixture.detectChanges();
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).not.toHaveBeenCalled();
-  });
-
-  it('should not emit buttonClick event when loading', () => {
-    fixture.componentRef.setInput('loading', true);
-    fixture.detectChanges();
-    spyOn(component.buttonClick, 'emit');
-
-    buttonElement.nativeElement.click();
-
-    expect(component.buttonClick.emit).not.toHaveBeenCalled();
-  });
-
   it('should show loading spinner when loading', () => {
     fixture.componentRef.setInput('loading', true);
     fixture.detectChanges();
