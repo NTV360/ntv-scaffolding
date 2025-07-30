@@ -4,9 +4,9 @@ import { Component } from '@angular/core';
 import { mockLayouts } from '../template-mockup.constant';
 
 //GLOBAL
-import { Button, Card, Template } from '@ntv-scaffolding/component-pantry';
+import { Card, Template } from '@ntv-scaffolding/component-pantry';
 
-const components = [Button, Card, Template];
+const components = [Card, Template];
 
 @Component({
   selector: 'ntv-choose-template',
@@ -20,7 +20,5 @@ export class ChooseTemplate {
 
   selectTemplate(template: any) {
     this.selectedTemplate = template;
-    console.log('Selected template:', template);
-    // Add your template selection logic here
   }
 }
