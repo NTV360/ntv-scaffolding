@@ -29,6 +29,12 @@
       "{projectRoot}/src/**/*.css",
       "{projectRoot}/src/**/*.scss"
     ],
+    "e2eFiles": [
+      "{projectRoot}/e2e/**/*.ts",
+      "{projectRoot}/e2e/**/*.js",
+      "{projectRoot}/playwright.config.ts",
+      "{projectRoot}/playwright.config.js"
+    ],
     "testFiles": [
       "{projectRoot}/src/**/*.spec.ts",
       "{projectRoot}/src/**/*.test.ts",
@@ -52,11 +58,13 @@
       "cache": true,
       "inputs": [
         "sourceFiles",
+        "e2eFiles",
         "{workspaceRoot}/.eslintrc.json",
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.mjs",
         "{projectRoot}/.eslintrc.json",
-        "{projectRoot}/eslint.config.mjs"
+        "{projectRoot}/eslint.config.mjs",
+        "{projectRoot}/tsconfig*.json"
       ],
       "outputs": ["{options.outputFile}"]
     },
