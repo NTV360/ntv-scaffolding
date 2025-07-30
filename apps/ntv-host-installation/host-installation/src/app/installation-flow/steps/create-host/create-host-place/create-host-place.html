@@ -3,6 +3,15 @@
     <div class="host-place__form">
       @for (field of hostFormFields; track field; let i = $index) {
       <div [class]="getDivClass(i)">
+        @if (field.inputType === 'autocomplete') {
+        <ntv-autocomplete
+          [label]="field.label"
+          [options]="options"
+          [config]="{placeholder: 'Select a License...', searchable: true, clearable: true}"
+          [size]="'md'"
+          [variant]="'default'"
+        ></ntv-autocomplete>
+        } @else {
         <ntv-input
           [id]="field.name"
           [label]="field.label"
@@ -10,6 +19,7 @@
           [type]="'text'"
           variant="'accent'"
         ></ntv-input>
+        }
       </div>
       }
     </div>

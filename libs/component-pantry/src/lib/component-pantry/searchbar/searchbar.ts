@@ -145,20 +145,14 @@ export class Searchbar {
   /** Handle search with loading simulation */
   onSearchWithLoading(): void {
     if (!this.isSearchDisabled()) {
-      // Only show loading if there are no results to display
-      const currentResults = this.searchResults();
-      if (currentResults.length === 0) {
-        this.isLoading.set(true);
-        this.showResults.set(true);
+      // Always show loading state for 3 seconds before displaying results or no data
+      this.isLoading.set(true);
+      this.showResults.set(true);
 
-        // Simulate API loading delay when no data is available
-        setTimeout(() => {
-          this.isLoading.set(false);
-        }, 1000);
-      } else {
-        // If we have results, show them immediately
-        this.showResults.set(true);
-      }
+      // Show loading for 3 seconds then display results or no data message
+      setTimeout(() => {
+        this.isLoading.set(false);
+      }, 3000);
     }
   }
 
