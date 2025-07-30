@@ -62,4 +62,40 @@ export class CreateScreen {
   onStepClick(event: StepClickEvent): void {
     this.currentStep.set(event.index);
   }
+
+  /** !!!!!!! START OF SUB STEP !!!!!!! */
+
+  /**
+   * Navigate to the next sub-step
+   */
+  nextSubStep(): void {
+    if (this.currentStep() < this.steps.length - 1) {
+      this.currentStep.set(this.currentStep() + 1);
+    }
+  }
+
+  /**
+   * Navigate to the previous sub-step
+   */
+  previousSubStep(): void {
+    if (this.currentStep() > 0) {
+      this.currentStep.set(this.currentStep() - 1);
+    }
+  }
+
+  /**
+   * Check if we're on the last sub-step
+   */
+  isLastSubStep(): boolean {
+    return this.currentStep() === this.steps.length - 1;
+  }
+
+  /**
+   * Check if we're on the first sub-step
+   */
+  isFirstSubStep(): boolean {
+    return this.currentStep() === 0;
+  }
+
+  /** !!!!!!! END OF SUB STEP !!!!!!! */
 }

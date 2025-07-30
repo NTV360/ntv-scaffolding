@@ -19,5 +19,7 @@
 }
 
 .step-content {
-  @apply bg-gray-50 rounded-lg p-6;
+  @apply rounded-lg p-6;
+  background: #fff;
+  box-shadow: 2px 2px 32px 0 rgba(208, 210, 218, 0.25);
 }

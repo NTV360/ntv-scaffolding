@@ -1,1 +1,22 @@
-<p>assign-playlist works!</p>
+<div class="assign-playlist">
+  <div class="assign-playlist-main">
+    <div class="assign-playlist__card">
+      <ntv-card>
+        <div class="card-body">
+          <h2>Standard Template</h2>
+          <div class="template">
+            <ntv-template
+              [zones]="sampleTemplatedata[0].layout"
+              style="width: 100%; height: 100%"
+            ></ntv-template>
+          </div>
+        </div>
+      </ntv-card>
+    </div>
+    <div class="assign-playlist__card">
+      <div class="card-body">
+        <ntv-card> Assign Playlist </ntv-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.assign-playlist-main {
+  @apply flex;
+}
+
+.assign-playlist__card {
+  flex: 1;
+}
+
+.template {
+  height: 300px;
+}
+
+.card-body {
+  @apply p-4;
+}

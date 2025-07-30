@@ -13,6 +13,12 @@
         role="button"
         [attr.aria-label]="'Select template: ' + template.name"
       >
+        @if (selectedTemplate === template) {
+        <div class="selected-tag">
+          <span class="selected-icon">✓</span>
+          <span class="selected-text">SELECTED</span>
+        </div>
+        }
         <div class="template-content">
           <ntv-template
             [zones]="template.layout"
