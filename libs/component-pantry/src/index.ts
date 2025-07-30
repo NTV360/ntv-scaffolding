@@ -16,5 +16,8 @@ export * from './lib/component-pantry/popover/popover.types';
 export * from './lib/component-pantry/thumbnail-gallery/thumbnail.types';
 export * from './lib/component-pantry/thumbnail-gallery/thumbnail-gallery';
 export * from './lib/component-pantry/thumbnail-item/thumbnail-item';
+export * from './lib/component-pantry/searchbar/searchbar';
+export * from './lib/component-pantry/searchbar/searchbar.types';
+
 export * from './lib/component-pantry/template/template.component';
 export * from './lib/component-pantry/template/zone/zone.component';

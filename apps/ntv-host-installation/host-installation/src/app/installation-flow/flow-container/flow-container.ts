@@ -27,10 +27,11 @@ import { ReviewInformation } from '../steps/review-information/review-informatio
 export class FlowContainer {
   private installationFlowService = inject(InstallationFlowService);
 
-  // ViewChild reference to CreateHost component for nested navigation
+  /** ViewChild references for components with nested navigation */
   @ViewChild(CreateHost) createHostComponent!: CreateHost;
+  @ViewChild(CreateScreen) createScreenComponent!: CreateScreen;
 
-  // Public computed signals from service
+  /** Public computed signals from service */
   currentStep = this.installationFlowService.currentStep;
   currentStepIndex = this.installationFlowService.currentStepIndex;
   isFirstStep = this.installationFlowService.isFirstStep;
@@ -57,16 +58,25 @@ export class FlowContainer {
    * Navigate to the next step with nested step support
    */
   nextStep(): void {
-    // Check if we're on step1 (create-host) and it has internal sub-steps
+    /** Check if we're on step1 (create-host) and it has internal sub-steps */
     if (this.currentStep()?.id === 'step1' && this.createHostComponent) {
-      // If not on the last sub-step, advance to next sub-step
+      /** If not on the last sub-step, advance to next sub-step */
       if (!this.createHostComponent.isLastSubStep()) {
         this.createHostComponent.nextSubStep();
         return;
       }
     }
     
-    // Otherwise, advance to next main step
+    /** Check if we're on step2 (create-screen) and it has internal sub-steps */
+    if (this.currentStep()?.id === 'step2' && this.createScreenComponent) {
+      /** If not on the last sub-step, advance to next sub-step */
+      if (!this.createScreenComponent.isLastSubStep()) {
+        this.createScreenComponent.nextSubStep();
+        return;
+      }
+    }
+    
+    /** Otherwise, advance to next main step */
     this.installationFlowService.nextStep();
   }
 
@@ -74,16 +84,25 @@ export class FlowContainer {
    * Navigate to the previous step with nested step support
    */
   previousStep(): void {
-    // Check if we're on step1 (create-host) and it has internal sub-steps
+    /** Check if we're on step1 (create-host) and it has internal sub-steps */
     if (this.currentStep()?.id === 'step1' && this.createHostComponent) {
-      // If not on the first sub-step, go back to previous sub-step
+      /** If not on the first sub-step, go back to previous sub-step */
       if (!this.createHostComponent.isFirstSubStep()) {
         this.createHostComponent.previousSubStep();
         return;
       }
     }
     
-    // Otherwise, go back to previous main step
+    /** Check if we're on step2 (create-screen) and it has internal sub-steps */
+    if (this.currentStep()?.id === 'step2' && this.createScreenComponent) {
+      /** If not on the first sub-step, go back to previous sub-step */
+      if (!this.createScreenComponent.isFirstSubStep()) {
+        this.createScreenComponent.previousSubStep();
+        return;
+      }
+    }
+    
+    /** Otherwise, go back to previous main step */
     this.installationFlowService.previousStep();
   }
 

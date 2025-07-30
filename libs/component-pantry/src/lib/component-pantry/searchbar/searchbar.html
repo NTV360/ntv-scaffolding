@@ -1,0 +1,99 @@
+<div class="searchbar-container">
+  <div class="searchbar-wrapper">
+    <ntv-input
+      type="text"
+      [placeholder]="placeholder()"
+      [size]="size()"
+      [borderRadius]="borderRadius()"
+      [clearable]="true"
+      [variant]="variant()"
+      [disabled]="disabled()"
+      [(ngModel)]="searchValue"
+      (ngModelChange)="onSearchValueChange($event)"
+      (keydown)="onKeyPress($event)"
+      (blur)="onInputBlur()"
+      class="searchbar-input"
+    >
+      <!-- Search icon on the left -->
+      <svg
+        left-icon
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="text-gray-400"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+
+      <!-- Helper text on the right -->
+      @if (searchValue().length === 0 || searchValue().length < minCharacters())
+      {
+      <span right-icon class="helper-text"
+        >Enter at least {{ minCharacters() }} characters to search</span
+      >
+      }
+    </ntv-input>
+
+    <button
+      type="button"
+      class="searchbar-button"
+      [class]="buttonClasses()"
+      [disabled]="isSearchDisabled()"
+      (click)="onSearch()"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <span>Search</span>
+    </button>
+  </div>
+
+  <!-- Search Results Dropdown -->
+  @if (showResults()) {
+  <div class="search-results">
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <span class="loading-text">Searching...</span>
+    </div>
+    } @else {
+    <!-- Actual Results -->
+    @if (searchResults().length > 0) { @for (location of searchResults(); track
+    location.id) {
+    <div
+      class="search-result-item"
+      tabindex="0"
+      (click)="onLocationSelect(location)"
+      (keydown.enter)="onLocationSelect(location)"
+      (keydown.space)="onLocationSelect(location)"
+    >
+      <div class="result-main">
+        <span class="result-name">{{ location.title }}</span>
+      </div>
+      <div class="result-details">
+        <span class="result-country">{{ location.description }}</span>
+        <span class="result-separator">•</span>
+      </div>
+    </div>
+    } } @else if (searchValue().length >= minCharacters() && data().length > 0)
+    {
+    <div class="no-results">
+      <span>No results found for "{{ searchValue() }}"</span>
+    </div>
+    } }
+  </div>
+  }
+</div>

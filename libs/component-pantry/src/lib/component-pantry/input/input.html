@@ -1,6 +1,6 @@
 <ng-container>
+  @if (mergedLabel()) {
   <div class="input__header">
-    @if (mergedLabel()) {
     <label
       [for]="inputId()"
       [attr.id]="labelId()"
@@ -8,10 +8,11 @@
     >
       {{ mergedLabel() }}
     </label>
-    }
 
     <!-- Info or Error Message -->
-    <div [class]="(mergedError() && mergedShowError()) || mergedInfo() ? 'input-message ' : ''">
+    <div
+      [class]="(mergedError() && mergedShowError()) || mergedInfo() ? 'input-message ' : ''"
+    >
       @if (mergedError() && mergedShowError()) {
       <p class="text-sm text-red-600">{{ mergedError() }}</p>
       } @else if (mergedInfo()) {
@@ -19,6 +20,7 @@
       }
     </div>
   </div>
+  }
 
   <div class="input__wrapper" [class]="inputClasses()">
     <div class="flex items-center gap-2 relative w-full">
