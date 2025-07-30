@@ -71,9 +71,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: main
     if: ${{ !cancelled() }}
-    env:
-      # 🎭 E2E specific optimizations
-      PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -120,10 +117,11 @@ jobs:
       - name: 🔍 Set up Nx SHAs
         uses: nrwl/nx-set-shas@v4
 
-      # 🧪 Run E2E tests with optimizations
+      # 🧪 Run E2E tests - use run-many instead of affected to avoid "No additional tasks detected"
       - name: 🧪 Run E2E tests
-        run: npx nx affected -t e2e-ci --parallel=1
+        run: npx nx run-many -t e2e-ci --parallel=1
         env:
+          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: e2e-results.xml
 
       # 📁 Enhanced artifact upload
