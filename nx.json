@@ -45,7 +45,8 @@
     "@angular/build:application": {
       "cache": true,
       "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "inputs": ["production", "^production"],
+      "outputs": ["{options.outputPath}"]
     },
     "@nx/eslint:lint": {
       "cache": true,
@@ -56,7 +57,8 @@
         "{workspaceRoot}/eslint.config.mjs",
         "{projectRoot}/.eslintrc.json",
         "{projectRoot}/eslint.config.mjs"
-      ]
+      ],
+      "outputs": ["{options.outputFile}"]
     },
     "@nx/jest:jest": {
       "cache": true,
@@ -65,6 +67,10 @@
         "testFiles",
         "^production",
         "{workspaceRoot}/jest.preset.js"
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}",
+        "{options.outputFile}"
       ],
       "options": {
         "passWithNoTests": true
@@ -76,9 +82,20 @@
         }
       }
     },
+    "@nx/playwright:playwright": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
+    },
     "build": {
       "cache": true,
-      "inputs": ["production", "^production"]
+      "inputs": ["production", "^production"],
+      "outputs": ["{options.outputPath}"]
     },
     "build-storybook": {
       "cache": true,
@@ -87,7 +104,28 @@
         "^production",
         "{projectRoot}/.storybook/**/*",
         "{projectRoot}/tsconfig.storybook.json"
-      ]
+      ],
+      "outputs": ["{options.outputDir}"]
+    },
+    "e2e": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
+    },
+    "e2e-ci": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
     }
   },
   "plugins": [

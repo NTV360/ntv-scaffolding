@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: 🚀 CI
 
 on:
   push:
@@ -14,265 +14,127 @@ on:
 permissions:
   actions: read
   contents: read
-  checks: write
-  pull-requests: write
 
 env:
-  NODE_VERSION: '20'
+  # ☁️ Nx Cloud optimizations
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  NX_CLOUD_DISTRIBUTED_EXECUTION_AGENT_COUNT: 3
+  NX_BRANCH: ${{ github.event.number || github.ref_name }}
+  NX_RUN_GROUP: ${{ github.run_id }}-${{ github.run_attempt }}
+  # 🧠 Performance optimizations
+  NODE_OPTIONS: --max_old_space_size=4096
+  # 💾 Cache optimizations
+  HUSKY: 0
 
 jobs:
-  setup:
-    name: 🔧 Setup & Cache Dependencies
+  main:
     runs-on: ubuntu-latest
-    outputs:
-      node-cache-hit: ${{ steps.node-cache.outputs.cache-hit }}
-      playwright-cache-hit: ${{ steps.playwright-cache.outputs.cache-hit }}
     steps:
-      - name: 📥 Checkout Repository
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
 
-      - name: 🔧 Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: 'npm'
 
-      - name: 📦 Cache Node Modules
-        id: node-cache
+      # 📦 Enhanced npm cache
+      - name: 💾 Cache node modules
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            node-modules-${{ runner.os }}-
+            ${{ runner.os }}-node-
 
-      - name: 🎭 Cache Playwright Browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/ms-playwright
-            ~/Library/Caches/ms-playwright
-            %USERPROFILE%\AppData\Local\ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      - name: 📦 Install Dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "::group::Installing npm dependencies"
-          npm ci --legacy-peer-deps --prefer-offline --no-audit
-          echo "::endgroup::"
-
-      - name: 🎭 Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "::group::Installing Playwright browsers"
-          npx playwright install --with-deps chromium
-          echo "::endgroup::"
-
-  lint-and-test:
-    name: 🔍 Lint & Test
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          filter: tree:0
-          fetch-depth: 0
-
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Restore Node Modules Cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
-
-      - name: 📦 Install Dependencies (if cache miss)
-        if: needs.setup.outputs.node-cache-hit != 'true'
+      - name: 📦 Install dependencies
         run: npm ci --legacy-peer-deps --prefer-offline --no-audit
 
-      - name: 🔧 Setup Nx Cloud
-        run: |
-          echo "::group::Starting Nx Cloud CI run"
-          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
-          echo "::endgroup::"
-
-      - name: 🔧 Set Nx SHAs
+      - name: 🔍 Set up Nx SHAs
         uses: nrwl/nx-set-shas@v4
 
-      - name: 🔍 Run Linting
-        run: |
-          echo "::group::Running ESLint on affected projects"
-          npx nx affected -t lint --parallel=3 --verbose
-          echo "::endgroup::"
+      # ☁️ This enables task distribution via Nx Cloud
+      # Run this command as early as possible, after dependencies are installed
+      # Learn more at https://nx.dev/ci/reference/nx-cloud-cli#npx-nxcloud-startcirun
+      - name: ☁️ Start Nx Cloud CI run
+        run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
 
-      - name: 🧪 Run Unit Tests
-        run: |
-          echo "::group::Running Jest tests on affected projects"
-          npx nx affected -t test --parallel=3 --verbose --coverage --ci
-          echo "::endgroup::"
-
-      - name: 📊 Upload Test Coverage
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          directory: ./coverage
-          flags: unittests
-          name: codecov-umbrella
-
-  build:
-    name: 🏗️ Build Applications
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          filter: tree:0
-          fetch-depth: 0
-
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Restore Node Modules Cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
-
-      - name: 📦 Install Dependencies (if cache miss)
-        if: needs.setup.outputs.node-cache-hit != 'true'
-        run: npm ci --legacy-peer-deps --prefer-offline --no-audit
-
-      - name: 🔧 Set Nx SHAs
-        uses: nrwl/nx-set-shas@v4
-
-      - name: 🏗️ Build Applications
-        run: |
-          echo "::group::Building affected applications"
-          npx nx affected -t build --parallel=3 --verbose
-          echo "::endgroup::"
-
-      - name: 📦 Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build-artifacts
-          path: |
-            dist/
-            !dist/**/*.map
-          retention-days: 7
+      # ⚡ Nx Affected runs only tasks affected by the changes in this PR/commit
+      # Learn more: https://nx.dev/ci/features/affected
+      - name: ⚡ Run lint, test, and build
+        run: npx nx affected -t lint test build --parallel=3 --max-parallel=3
 
   e2e:
-    name: 🎭 End-to-End Tests
     runs-on: ubuntu-latest
-    needs: [setup, build]
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2]
+    needs: main
+    if: ${{ !cancelled() }}
+    env:
+      # 🎭 E2E specific optimizations
+      PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
     steps:
-      - name: 📥 Checkout Repository
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
 
-      - name: 🔧 Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: 'npm'
 
-      - name: 📦 Restore Node Modules Cache
+      # 📦 Enhanced npm cache (reuse from main job)
+      - name: 💾 Cache node modules
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            node-modules-${{ runner.os }}-
+            ${{ runner.os }}-node-
 
-      - name: 🎭 Restore Playwright Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/ms-playwright
-            ~/Library/Caches/ms-playwright
-            %USERPROFILE%\AppData\Local\ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      - name: 📦 Install Dependencies (if cache miss)
-        if: needs.setup.outputs.node-cache-hit != 'true'
+      - name: 📦 Install dependencies
         run: npm ci --legacy-peer-deps --prefer-offline --no-audit
 
-      - name: 🎭 Install Playwright (if cache miss)
-        if: needs.setup.outputs.playwright-cache-hit != 'true'
+      # 🎭 Enhanced Playwright browser caching
+      - name: 🔍 Get Playwright version
+        id: playwright-version
+        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
+
+      - name: 🎭 Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-chromium
+          restore-keys: |
+            playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-
+            playwright-${{ runner.os }}-
+
+      - name: 🎭 Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: 📦 Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist/
-
-      - name: 🔧 Set Nx SHAs
+      - name: 🔍 Set up Nx SHAs
         uses: nrwl/nx-set-shas@v4
 
-      - name: 🎭 Run E2E Tests
-        run: |
-          echo "::group::Running E2E tests (Shard ${{ matrix.shard }}/2)"
-          npx nx affected -t e2e-ci --verbose --shard=${{ matrix.shard }}/2
-          echo "::endgroup::"
+      # 🧪 Run E2E tests with optimizations
+      - name: 🧪 Run E2E tests
+        run: npx nx affected -t e2e-ci --parallel=1
+        env:
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: e2e-results.xml
 
-      - name: 📊 Upload E2E Test Results
+      # 📁 Enhanced artifact upload
+      - name: 📁 Upload E2E test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e2e-results-shard-${{ matrix.shard }}
+          name: e2e-results-${{ github.run_id }}
           path: |
-            test-results/
-            playwright-report/
+            dist/.playwright/
+            **/e2e-results.xml
+            **/test-results/
           retention-days: 7
-
-  summary:
-    name: 📋 CI Summary
-    runs-on: ubuntu-latest
-    needs: [lint-and-test, build, e2e]
-    if: always()
-    steps:
-      - name: 📋 Generate Summary
-        run: |
-          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 Lint & Test | ${{ needs.lint-and-test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🏗️ Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🎭 E2E Tests | ${{ needs.e2e.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📊 Performance Optimizations Applied:" >> $GITHUB_STEP_SUMMARY
-          echo "- ⚡ Parallel job execution with dependency caching" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎭 Playwright browser caching (saves ~2-3 minutes)" >> $GITHUB_STEP_SUMMARY
-          echo "- 📦 Smart dependency installation with cache restoration" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔄 Nx Cloud distributed execution" >> $GITHUB_STEP_SUMMARY
+          compression-level: 6
