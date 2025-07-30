@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-review-information',
+  selector: 'ntv-review-information',
   imports: [],
   templateUrl: './review-information.html',
-  styleUrl: './review-information.css'
+  styleUrl: './review-information.css',
 })
-export class ReviewInformation {
-
-}
+export class ReviewInformation {}
