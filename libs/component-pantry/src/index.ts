@@ -13,5 +13,8 @@ export * from './lib/component-pantry/stepper/stepper';
 export type * from './lib/component-pantry/stepper/stepper.types';
 export * from './lib/component-pantry/popover/popover';
 export * from './lib/component-pantry/popover/popover.types';
-
-export * from './lib/component-pantry/text-demo/text-demo.component';
+export * from './lib/component-pantry/thumbnail-gallery/thumbnail.types';
+export * from './lib/component-pantry/thumbnail-gallery/thumbnail-gallery';
+export * from './lib/component-pantry/thumbnail-item/thumbnail-item';
+export * from './lib/component-pantry/template/template.component';
+export * from './lib/component-pantry/template/zone/zone.component';

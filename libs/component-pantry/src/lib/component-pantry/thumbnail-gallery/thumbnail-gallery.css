@@ -1,0 +1,498 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Thumbnail Gallery Component Styles */
+
+/* Container Styles */
+.thumbnail-gallery {
+  @apply w-full relative;
+}
+
+/* Grid Layout */
+.thumbnail-gallery--grid {
+  @apply grid p-4;
+  gap: var(--gap, 1rem);
+  grid-template-columns: repeat(var(--columns, 4), 1fr);
+}
+
+/* Drag and Drop Flex Layout */
+.thumbnail-drop-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px;
+  border: solid 1px #ccc;
+  min-height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Size variants for drag container */
+.thumbnail-drop-list.thumbnail-gallery--sm {
+  --thumbnail-size: 120px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--md {
+  --thumbnail-size: 160px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--lg {
+  --thumbnail-size: 200px;
+}
+
+.thumbnail-drop-list.thumbnail-gallery--xl {
+  --thumbnail-size: 240px;
+}
+
+.thumbnail-drag-item {
+  display: inline-block;
+  box-sizing: border-box;
+  cursor: move;
+  flex: 0 0 auto;
+  width: var(--thumbnail-size, 160px);
+  height: var(--thumbnail-size, 160px);
+}
+
+/* List Layout Styles */
+.thumbnail-list-draggable,
+.thumbnail-list-static {
+  @apply w-full overflow-hidden;
+  min-height: 60px;
+}
+
+.thumbnail-list-item {
+  @apply bg-white transition-colors duration-150;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.thumbnail-list-item:last-child {
+  @apply border-b-0;
+}
+
+.thumbnail-list-item:hover {
+  @apply bg-gray-50;
+}
+
+.thumbnail-list-item:focus {
+  @apply bg-accent-50;
+}
+
+.thumbnail-list-item:focus-visible {
+  @apply bg-accent-50;
+}
+
+.thumbnail-list-item.selected {
+  @apply bg-accent-50 border-accent-200;
+}
+
+.thumbnail-gallery--list .thumbnail-list-item.cdk-drag-preview {
+  @apply rounded bg-white;
+  border: 2px solid var(--accent-500);
+  transform: rotate(2deg);
+  opacity: 0.95;
+  width: 400px !important;
+  height: auto !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-height: none;
+}
+
+.thumbnail-list-item.cdk-drag-placeholder {
+  @apply opacity-0;
+}
+
+.thumbnail-list-item.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.thumbnail-list-draggable.cdk-drop-list-dragging {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.thumbnail-list-item:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.list-item-content {
+  @apply flex items-center justify-between w-full;
+}
+
+.list-item-icon {
+  @apply flex-shrink-0 mr-3;
+  width: 40px;
+  height: 40px;
+}
+
+.list-thumbnail {
+  @apply w-full h-full object-cover rounded;
+}
+
+.list-file-icon {
+  @apply w-full h-full flex items-center justify-center text-2xl bg-gray-100 rounded;
+}
+
+.list-item-details {
+  @apply flex-1 min-w-0;
+}
+
+.list-item-name {
+  @apply font-medium text-gray-900 truncate;
+  font-size: 14px;
+}
+
+.list-item-metadata {
+  @apply flex gap-4 mt-1 text-sm text-gray-500;
+}
+
+.list-item-size,
+.list-item-modified {
+  @apply flex-shrink-0;
+}
+
+.list-item-actions {
+  @apply flex gap-2 ml-4;
+}
+
+/* Draggable list specific styles */
+.thumbnail-list-draggable .thumbnail-list-item {
+  cursor: move;
+}
+
+.thumbnail-list-draggable .thumbnail-list-item .action-button {
+  cursor: pointer;
+}
+
+/* Size variants now only affect thumbnail item sizes, not grid columns */
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-16 px-4 text-center;
+}
+
+.empty-icon {
+  @apply text-6xl mb-4 opacity-50;
+}
+
+.empty-message {
+  @apply text-lg font-medium text-gray-600 mb-2;
+}
+
+.empty-description {
+  @apply text-sm text-gray-500;
+}
+
+/* Context Menu */
+.thumbnail-context-menu {
+  @apply fixed z-[1000] bg-white rounded-lg shadow-xl border border-black/10 min-w-[220px] max-w-[280px] overflow-hidden;
+  animation: contextMenuFadeIn 0.15s ease-out;
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes contextMenuFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+}
+
+.thumbnail-context-menu.closing {
+  animation: contextMenuFadeOut 0.15s ease-in forwards;
+}
+
+.context-menu-header {
+  @apply px-4 pt-3 pb-2 border-b border-gray-200 bg-gray-50 flex items-center justify-between;
+}
+
+.context-menu-title {
+  @apply text-sm font-semibold text-gray-700 block whitespace-nowrap overflow-hidden text-ellipsis flex-1;
+}
+
+.context-menu-close {
+  @apply ml-2 p-1 rounded-md hover:bg-gray-200 transition-colors duration-150 flex items-center justify-center text-gray-500 hover:text-gray-700;
+}
+
+.context-menu-close:focus {
+  @apply outline-none ring-2 ring-accent-500 ring-offset-1;
+}
+
+.context-menu-content {
+  @apply py-1;
+}
+
+.context-menu-item-wrapper {
+  @apply relative;
+}
+
+.context-menu-item {
+  @apply flex items-center w-full px-4 py-2 border-0 bg-transparent cursor-pointer transition-colors duration-150 text-left text-sm text-gray-700;
+}
+
+.context-menu-item:hover {
+  @apply bg-accent-500 text-white;
+}
+
+.context-menu-item:active {
+  @apply bg-accent-600 text-white;
+}
+
+.context-menu-item.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.context-menu-item.has-submenu:hover {
+  @apply bg-accent-50;
+}
+
+.menu-item-icon {
+  @apply w-5 h-5 flex items-center justify-center mr-3 text-base flex-shrink-0;
+}
+
+.menu-item-label {
+  @apply flex-1 whitespace-nowrap overflow-hidden text-ellipsis;
+}
+
+.menu-item-arrow {
+  @apply ml-2 text-xs text-gray-400 transition-transform duration-150;
+}
+
+.context-menu-item.has-submenu:hover .menu-item-arrow {
+  @apply translate-x-0.5;
+}
+
+.context-menu-divider {
+  @apply h-px bg-gray-200 my-1;
+}
+
+/* Submenu */
+.context-submenu {
+  @apply absolute left-full top-0 bg-white rounded-lg shadow-xl border border-black/10 min-w-[180px] z-[1001];
+  animation: submenuSlideIn 0.15s ease-out;
+}
+
+@keyframes submenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.submenu-item {
+  @apply px-3 py-1.5 text-[13px];
+}
+
+.submenu-item .menu-item-icon {
+  @apply w-4 h-4 mr-2 text-sm;
+}
+
+/* Action Buttons Overlay */
+.thumbnail-actions-overlay {
+  @apply absolute top-2 right-2 opacity-0 transition-opacity duration-200 pointer-events-none z-20;
+}
+
+.thumbnail-gallery:hover .thumbnail-actions-overlay {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.action-buttons {
+  @apply flex gap-1 bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/50 p-1 shadow-lg;
+}
+
+.action-button {
+  @apply flex items-center justify-center w-8 h-8 border-0 bg-transparent cursor-pointer transition-all duration-150 text-gray-600 text-sm hover:bg-gray-100 hover:text-gray-800 active:bg-gray-200 rounded;
+}
+
+.action-button--more {
+  @apply w-7 h-7 p-1.5;
+}
+
+.action-button--more svg {
+  @apply w-4 h-4;
+}
+
+/* List Item Checkbox */
+.list-item-checkbox {
+  @apply flex items-center mr-3;
+}
+
+.list-item-checkbox input[type="checkbox"] {
+  @apply w-4 h-4 text-accent-600 bg-gray-100 border-gray-300 rounded focus:ring-accent-500 focus:ring-2 cursor-pointer;
+}
+
+.list-item-checkbox input[type="checkbox"]:checked {
+  @apply bg-accent-600 border-accent-600;
+}
+
+.list-item-checkbox input[type="checkbox"]:hover {
+  @apply border-accent-400;
+}
+
+.list-item-checkbox input[type="checkbox"]:focus {
+  @apply ring-2 ring-accent-500 ring-offset-1;
+}
+
+.action-button.disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.action-button--more {
+  @apply font-bold;
+}
+
+.action-button--more:hover {
+  @apply bg-accent-50 text-accent-600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .thumbnail-gallery--grid {
+    @apply gap-3 p-3;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--sm {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--md {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--lg {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--xl {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-gallery--grid {
+    @apply gap-2 p-2;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--sm {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--md {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--lg {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .thumbnail-gallery--grid.thumbnail-gallery--xl {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .empty-state {
+    @apply py-12;
+  }
+
+  .empty-icon {
+    @apply text-4xl mb-3;
+  }
+
+  .empty-message {
+    @apply text-base;
+  }
+
+  .action-buttons {
+    @apply scale-90;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .empty-message {
+    @apply text-gray-300;
+  }
+
+  .empty-description {
+    @apply text-gray-400;
+  }
+
+  .action-buttons {
+    @apply bg-gray-800/95 border-white/10;
+  }
+
+  .action-button {
+    @apply text-gray-300;
+  }
+
+  .action-button:hover {
+    @apply bg-accent-500/20 text-accent-400;
+  }
+
+  .thumbnail-context-menu {
+    @apply bg-gray-800 border-white/10;
+  }
+
+  .context-menu-header {
+    @apply bg-gray-900 border-white/10;
+  }
+
+  .context-menu-title {
+    @apply text-gray-100;
+  }
+}
+
+/* CDK Drag and Drop Styles */
+.thumbnail-gallery--grid .cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.5rem; /* Same as rounded-lg used in thumbnail items */
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  width: var(--thumbnail-size, 160px) !important;
+  height: var(--thumbnail-size, 160px) !important;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+  width: var(--thumbnail-size, 160px);
+  height: var(--thumbnail-size, 160px);
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.context-menu-item:hover {
+  @apply bg-accent-500 text-white;
+}
+
+.context-menu-item:active {
+  @apply bg-accent-600 text-white;
+}
+
+.context-menu-divider {
+  @apply bg-white/10;
+}
+
+.context-submenu {
+  @apply bg-gray-800 border-white/10;
+}
