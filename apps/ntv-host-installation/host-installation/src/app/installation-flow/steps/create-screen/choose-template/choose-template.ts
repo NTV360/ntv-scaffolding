@@ -1,10 +1,30 @@
 import { Component } from '@angular/core';
 
-//LOCAL
+// LOCAL
 import { mockLayouts } from '../template-mockup.constant';
 
-//GLOBAL
+// GLOBAL
 import { Card, Template } from '@ntv-scaffolding/component-pantry';
+
+// Import the interface
+interface LayoutZone {
+  name: string;
+  backgroundColor: string;
+  width: number;
+  height: number;
+  xPos: number;
+  yPos: number;
+  zIndex: number;
+  containerHeight: number;
+  containerWidth: number;
+  playlistId: string;
+}
+
+interface TemplateLayout {
+  name: string;
+  description: string;
+  layout: LayoutZone[];
+}
 
 const components = [Card, Template];
 
@@ -16,9 +36,9 @@ const components = [Card, Template];
 })
 export class ChooseTemplate {
   sampleTemplatedata = mockLayouts;
-  selectedTemplate: any = null;
+  selectedTemplate: TemplateLayout | null = null;
 
-  selectTemplate(template: any) {
+  selectTemplate(template: TemplateLayout) {
     this.selectedTemplate = template;
   }
 }

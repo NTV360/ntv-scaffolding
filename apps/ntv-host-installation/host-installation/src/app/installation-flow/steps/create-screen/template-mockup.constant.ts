@@ -1,8 +1,23 @@
-export const mockLayouts: {
+interface LayoutZone {
+  name: string;
+  backgroundColor: string;
+  width: number;
+  height: number;
+  xPos: number;
+  yPos: number;
+  zIndex: number;
+  containerHeight: number;
+  containerWidth: number;
+  playlistId: string;
+}
+
+interface TemplateLayout {
   name: string;
   description: string;
-  layout: any[];
-}[] = [
+  layout: LayoutZone[];
+}
+
+export const mockLayouts: TemplateLayout[] = [
   {
     name: 'Standard Layout',
     description: 'This is a standard layout',

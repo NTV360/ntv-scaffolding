@@ -5,7 +5,7 @@ import {
   HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -25,14 +25,14 @@ export class BaseService {
   protected getRequest<T>(
     url: string,
     headers: { [key: string]: string } = {},
-    withCredentials: boolean = false
+    withCredentials = false
   ): Observable<T> {
     const httpOptions = {
       headers: new HttpHeaders(headers),
       withCredentials,
     };
 
-    let request = this.http.get<T>(url, httpOptions);
+    const request = this.http.get<T>(url, httpOptions);
 
     return request;
   }
@@ -47,9 +47,9 @@ export class BaseService {
    */
   protected postRequest<T>(
     url: string,
-    body: any,
+    body: unknown,
     headers: { [key: string]: string } = {},
-    withCredentials: boolean = false
+    withCredentials = false
   ): Observable<T> {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -74,9 +74,9 @@ export class BaseService {
    */
   protected putRequest<T>(
     url: string,
-    body: any,
+    body: unknown,
     headers: { [key: string]: string } = {},
-    withCredentials: boolean = false
+    withCredentials = false
   ): Observable<T> {
     const httpOptions = {
       headers: new HttpHeaders({
@@ -101,7 +101,7 @@ export class BaseService {
   protected deleteRequest<T>(
     url: string,
     headers: { [key: string]: string } = {},
-    withCredentials: boolean = false
+    withCredentials = false
   ): Observable<T> {
     const httpOptions = {
       headers: new HttpHeaders(headers),
