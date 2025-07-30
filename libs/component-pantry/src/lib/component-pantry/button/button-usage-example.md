@@ -1,32 +1,17 @@
 # Button Component - DRY Usage Examples
 
-## ✨ NEW: Super DRY Usage with Config Object
+## ✨ NEW: Super DRY Usage with Config Objects
 
 ### Before (Verbose):
+
 ```html
-<lib-button 
-  [variant]="buttonConfig.variant" 
-  [size]="buttonConfig.size" 
-  [color]="buttonConfig.color" 
-  [customColor]="buttonConfig.customColor" 
-  [disabled]="buttonConfig.disabled" 
-  [loading]="buttonConfig.loading" 
-  [fullWidth]="buttonConfig.fullWidth" 
-  [rounded]="buttonConfig.rounded" 
-  [shadow]="buttonConfig.shadow" 
-  [type]="buttonConfig.type" 
-  (buttonClick)="handleClick($event)"> 
-  Submit Form 
-</lib-button>
+<lib-button [variant]="buttonConfig.variant" [size]="buttonConfig.size" [color]="buttonConfig.color" [customColor]="buttonConfig.customColor" [disabled]="buttonConfig.disabled" [loading]="buttonConfig.loading" [fullWidth]="buttonConfig.fullWidth" [rounded]="buttonConfig.rounded" [shadow]="buttonConfig.shadow" [type]="buttonConfig.type" (buttonClick)="handleClick($event)"> Submit Form </lib-button>
 ```
 
 ### After (DRY & Clean):
+
 ```html
-<lib-button 
-  [config]="buttonConfig" 
-  (buttonClick)="handleClick($event)">
-  Submit Form
-</lib-button>
+<lib-button [config]="buttonConfig" (buttonClick)="handleClick($event)"> Submit Form </lib-button>
 ```
 
 ## Component Setup
@@ -49,11 +34,11 @@ export class MyComponent {
     fullWidth: true,
     rounded: 'lg',
     shadow: true,
-    type: 'submit'
+    type: 'submit',
   };
-  
+
   isProcessing = false;
-  
+
   handleClick(event: Event) {
     console.log('Button clicked!', event);
   }
@@ -69,18 +54,18 @@ export class MyComponent {
     variant: 'primary',
     color: 'green',
     loading: this.isSaving,
-    type: 'submit'
+    type: 'submit',
   };
-  
+
   cancelButtonConfig: ButtonConfig = {
     variant: 'secondary',
-    color: 'gray'
+    color: 'gray',
   };
-  
+
   deleteButtonConfig: ButtonConfig = {
     variant: 'danger',
     color: 'red',
-    loading: this.isDeleting
+    loading: this.isDeleting,
   };
 }
 ```
