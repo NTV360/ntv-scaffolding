@@ -3,7 +3,7 @@
 }
 
 .template-content {
-  @apply w-full h-[250px] pb-3 transition-all duration-300 hover:scale-105;
+  @apply w-full h-[250px] pb-3 transition-all duration-300;
 }
 
 .template-body {

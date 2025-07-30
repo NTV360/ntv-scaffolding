@@ -2,7 +2,7 @@
   <div class="assign-playlist-main">
     <div class="assign-playlist__card">
       <ntv-card>
-        <div class="card-body">
+        <div class="assign-playlist__content template-card">
           <h2 class="template-title">Standard Template</h2>
           <div class="template">
             <ntv-template
@@ -10,13 +10,27 @@
               style="width: 100%; height: 100%"
             ></ntv-template>
           </div>
+
+          <div class="select-playlist">
+            <ntv-autocomplete
+              [label]="'Select a Playlist'"
+              [options]="options"
+              [config]="{placeholder: 'Select a dealer...', searchable: true, clearable: true}"
+              [size]="'md'"
+              [variant]="'default'"
+            ></ntv-autocomplete>
+
+            <ntv-button>
+              <p class="add-btn-title">Create New Playlist</p>
+            </ntv-button>
+          </div>
         </div>
       </ntv-card>
     </div>
     <div class="assign-playlist__card">
-      <div class="card-body">
-        <ntv-card> Assign Playlist </ntv-card>
-      </div>
+      <ntv-card>
+        <div class="assign-playlist__content">Assign Playlist</div>
+      </ntv-card>
     </div>
   </div>
 </div>

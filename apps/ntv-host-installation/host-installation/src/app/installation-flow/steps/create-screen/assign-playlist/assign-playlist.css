@@ -1,19 +1,38 @@
+/* .assign-playlist {
+  @apply flex gap-5;
+} */
+
 .assign-playlist-main {
-  @apply flex;
+  @apply flex gap-5;
 }
 
 .assign-playlist__card {
-  flex: 1;
+  @apply flex-1;
+}
+
+.assign-playlist__content {
+  @apply p-5;
 }
 
 .template {
   height: 300px;
 }
 
+.template-card {
+  @apply flex flex-col gap-4;
+}
+
 .template-title {
-  @apply mb-4;
 }
 
 .card-body {
   @apply p-[25px];
+}
+
+.select-playlist {
+  @apply flex gap-4;
+}
+
+.add-btn-title {
+  @apply text-sm;
 }
