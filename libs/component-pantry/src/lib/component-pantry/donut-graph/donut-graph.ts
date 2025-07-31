@@ -7,6 +7,7 @@ import {
   AfterViewInit,
   ElementRef,
   inject,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ChartComponent } from 'ng-apexcharts';
@@ -55,7 +56,7 @@ import { FILE_ICONS } from '../../utils/file-icons';
   standalone: true,
   imports: [CommonModule, NgApexchartsModule],
 })
-export class DonutGraphComponent implements AfterViewInit {
+export class DonutGraphComponent implements AfterViewInit, OnDestroy {
   @ViewChild('chart') chart!: ChartComponent;
   public elementRef = inject(ElementRef);
 
@@ -64,6 +65,14 @@ export class DonutGraphComponent implements AfterViewInit {
 
   // Hover state management
   readonly hoveredIndex = signal<number | null>(null);
+
+  // Container size tracking for auto size mode
+  private resizeObserver?: ResizeObserver;
+  private windowResizeHandler?: () => void;
+  private containerSize = signal<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
 
   // SVG
   public readonly raspberryIcon: SafeHtml;
@@ -83,12 +92,14 @@ export class DonutGraphComponent implements AfterViewInit {
   readonly chartOptions = computed<Partial<DonutChartOptions>>(() => {
     const chartData = this.data();
     const config = this.config();
+    const containerSize = this.containerSize();
 
     return {
       series: chartData.map((item) => item.total),
       chart: {
         type: DONUT_GRAPH_CHART_TYPE,
-        height: '100%',
+        height: this.isAuto() ? this.getAutoChartHeight() : '100%',
+        width: this.isAuto() ? this.getAutoChartWidth() : '100%',
         fontFamily: DONUT_GRAPH_DEFAULTS.fontFamily,
         toolbar: {
           show: DONUT_GRAPH_DEFAULTS.showToolbar,
@@ -97,53 +108,12 @@ export class DonutGraphComponent implements AfterViewInit {
         offsetY: 0,
       },
       colors: getColors(chartData, config),
-      labels: chartData.map((item) => item.label),
+      labels: [], // Disable labels to prevent text on chart segments
       dataLabels: {
-        enabled: false,
-        style: {
-          fontSize: DONUT_GRAPH_DEFAULTS.dataLabelFontSize,
-          fontFamily: DONUT_GRAPH_DEFAULTS.fontFamily,
-          fontWeight: DONUT_GRAPH_DEFAULTS.dataLabelFontWeight,
-          colors: ['#ffffff'],
-        },
-        formatter: (val: number, opts: any) => {
-          return opts.w.globals.series[opts.seriesIndex];
-        },
-        dropShadow: {
-          enabled: true,
-          color: '#000',
-          top: 1,
-          left: 1,
-          blur: 2,
-          opacity: 0.3,
-        },
+        enabled: false, // Always disable data labels - we use our custom legend
       },
       legend: {
-        show: config.showLegend !== false,
-        position: config.legendPosition || DONUT_GRAPH_DEFAULTS.legendPosition,
-        fontSize: DONUT_GRAPH_DEFAULTS.legendFontSize,
-        fontFamily: DONUT_GRAPH_DEFAULTS.fontFamily,
-        fontWeight: DONUT_GRAPH_DEFAULTS.legendFontWeight,
-        itemMargin: DONUT_GRAPH_DEFAULTS.legendItemMargin,
-        onItemClick: {
-          toggleDataSeries: false,
-        },
-        height: undefined,
-        width: undefined,
-        floating: false,
-        offsetX: 0,
-        offsetY: 0,
-        formatter: function (seriesName: string, opts: any) {
-          const percentage = (
-            (opts.w.globals.series[opts.seriesIndex] /
-              opts.w.globals.seriesTotals.reduce(
-                (a: number, b: number) => a + b,
-                0
-              )) *
-            100
-          ).toFixed(0);
-          return `${seriesName} ${percentage}%`;
-        },
+        show: false, // Always disable built-in legend - we use our custom legend
       },
       plotOptions: {
         pie: {
@@ -266,6 +236,30 @@ export class DonutGraphComponent implements AfterViewInit {
   readonly isAuto = computed(() => this.size() === 'auto');
 
   /**
+   * Whether the current viewport is mobile
+   */
+  readonly isMobile = computed(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768;
+  });
+
+  /**
+   * Legend position with mobile detection
+   */
+  readonly legendPosition = computed(() => {
+    const config = this.config();
+    const isMobile = this.isMobile();
+
+    // If mobile and no specific position is set, default to bottom
+    if (isMobile && !config.legendPosition) {
+      return 'bottom';
+    }
+
+    // Use config position or default to right
+    return config.legendPosition || 'right';
+  });
+
+  /**
    * Container styles based on size configuration
    */
   readonly containerStyles = computed(() => {
@@ -307,6 +301,101 @@ export class DonutGraphComponent implements AfterViewInit {
     updateCustomSize(this);
     this.chart?.updateOptions(this.chartOptions(), true, true);
     this.setupChartHoverListeners();
+    this.setupResizeObserver();
+  }
+
+  /**
+   * Component lifecycle hook - called on component destruction
+   */
+  ngOnDestroy(): void {
+    this.cleanupResizeObserver();
+  }
+
+  /**
+   * Sets up ResizeObserver to track parent container size changes
+   */
+  private setupResizeObserver(): void {
+    if (!this.isAuto()) return;
+
+    // Observe the parent container instead of the component itself
+    const parentContainer = this.elementRef.nativeElement.parentElement;
+    if (!parentContainer) return;
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        this.containerSize.set({ width, height });
+        this.updateChartSize();
+      }
+    });
+
+    this.resizeObserver.observe(parentContainer);
+
+    // Initial size measurement
+    const rect = parentContainer.getBoundingClientRect();
+    this.containerSize.set({ width: rect.width, height: rect.height });
+
+    // Set up window resize listener for mobile detection
+    this.windowResizeHandler = () => {
+      // Force recomputation of mobile state
+      this.isMobile();
+      this.legendPosition();
+    };
+
+    window.addEventListener('resize', this.windowResizeHandler);
+  }
+
+  /**
+   * Cleans up ResizeObserver and window resize handler
+   */
+  private cleanupResizeObserver(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = undefined;
+    }
+
+    if (this.windowResizeHandler) {
+      window.removeEventListener('resize', this.windowResizeHandler);
+      this.windowResizeHandler = undefined;
+    }
+  }
+
+  /**
+   * Updates chart size based on container dimensions
+   */
+  private updateChartSize(): void {
+    if (!this.isAuto() || !this.chart) return;
+
+    const newOptions = this.chartOptions();
+    this.chart.updateOptions(newOptions, true, true);
+  }
+
+  /**
+   * Gets the chart width for auto size mode
+   */
+  private getAutoChartWidth(): string {
+    const containerSize = this.containerSize();
+    const width = containerSize.width;
+
+    if (width <= 0) return '100%';
+
+    // For auto size, use the full available width
+    // The chart will be constrained by the container's CSS
+    return '100%';
+  }
+
+  /**
+   * Gets the chart height for auto size mode
+   */
+  private getAutoChartHeight(): string {
+    const containerSize = this.containerSize();
+    const height = containerSize.height;
+
+    if (height <= 0) return '100%';
+
+    // For auto size, use the full available height
+    // The chart will be constrained by the container's CSS
+    return '100%';
   }
 
   /**

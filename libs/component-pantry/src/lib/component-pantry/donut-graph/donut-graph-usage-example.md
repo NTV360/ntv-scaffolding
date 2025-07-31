@@ -212,15 +212,55 @@ this.analyticsService.getTrafficSources().then((data) => {
 const containerData = signal<DonutChartItem[]>([]);
 const containerConfig: DonutChartConfig = {
   title: 'Resource Usage',
-  size: 'auto', // Adapts to container size
+  size: 'auto', // Adapts to parent container size
   showLegend: true,
-  legendPosition: 'right',
+  // legendPosition: 'right', // Optional - will default to 'bottom' on mobile
 };
 
 // Perfect for responsive layouts
 this.systemService.getResourceUsage().then((data) => {
   containerData.set(data);
 });
+```
+
+**Auto Size Features:**
+
+- **Parent Container Responsive**: Automatically adjusts chart size based on parent container dimensions
+- **ResizeObserver**: Uses ResizeObserver to detect parent container size changes in real-time
+- **Dynamic Sizing**: Chart fills the available space in the parent container
+- **Custom Legend Only**: Uses only the custom legend component - no built-in chart legend
+- **Legend Adaptation**: Legend adjusts to available space and becomes scrollable if needed
+- **Mobile Legend**: Automatically moves legend to bottom on mobile devices (≤768px)
+- **Minimum Sizes**: Ensures chart remains usable with minimum dimensions (200px width/height)
+- **Real-time Updates**: Chart updates immediately when parent container is resized
+
+### Practical Auto Size Examples
+
+#### Dashboard Widget
+
+```html
+<!-- Chart adapts to widget container -->
+<div class="dashboard-widget" style="width: 300px; height: 250px;">
+  <ntv-donut-graph [data]="widgetData" [config]="{ size: 'auto' }"></ntv-donut-graph>
+</div>
+```
+
+#### Responsive Sidebar
+
+```html
+<!-- Chart adapts to sidebar width -->
+<div class="sidebar" style="width: 250px; height: 100vh;">
+  <ntv-donut-graph [data]="sidebarData" [config]="{ size: 'auto' }"></ntv-donut-graph>
+</div>
+```
+
+#### Full-Width Container
+
+```html
+<!-- Chart fills entire container -->
+<div class="full-width-container" style="width: 100%; height: 400px;">
+  <ntv-donut-graph [data]="fullData" [config]="{ size: 'auto' }"></ntv-donut-graph>
+</div>
 ```
 
 ### Custom Sized Chart
@@ -303,6 +343,7 @@ async loadDataWithErrorHandling() {
 - **Reactive Data Binding**: Automatically updates when data changes using Angular signals
 - **API-Ready**: Designed to work seamlessly with REST API responses
 - **Responsive Design**: Automatically adapts to different screen sizes and container dimensions
+- **Container Responsive**: Auto size mode uses ResizeObserver to adapt to container changes
 - **Auto-Color Assignment**: Automatically assigns colors from a predefined palette
 - **Custom Styling**: Support for custom colors, sizes, and appearance options
 - **Interactive**: Hover effects and dynamic value display

@@ -25,11 +25,11 @@
     <div
       class="donut-chart-layout"
       [ngClass]="{
-        'legend-right': config().legendPosition === 'right' || !config().legendPosition,
-        'legend-left': config().legendPosition === 'left',
-        'legend-bottom': config().legendPosition === 'bottom',
-        'legend-top': config().legendPosition === 'top'
-      }"
+            'legend-right': legendPosition() === 'right',
+            'legend-left': legendPosition() === 'left',
+            'legend-bottom': legendPosition() === 'bottom',
+            'legend-top': legendPosition() === 'top'
+          }"
     >
       <div class="donut-chart-area">
         <div class="donut-chart-container">
@@ -40,7 +40,7 @@
             [colors]="chartOptions().colors!"
             [labels]="chartOptions().labels!"
             [dataLabels]="chartOptions().dataLabels!"
-            [legend]="{ show: false }"
+            [legend]="chartOptions().legend!"
             [plotOptions]="chartOptions().plotOptions!"
             [stroke]="chartOptions().stroke!"
             [title]="chartOptions().title!"

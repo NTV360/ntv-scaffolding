@@ -80,7 +80,10 @@ export const DONUT_GRAPH_RESPONSIVE_CONFIG = [
         height: 300,
       },
       legend: {
-        position: 'bottom' as const,
+        show: false, // Always disable built-in legend
+      },
+      dataLabels: {
+        enabled: false, // Always disable data labels
       },
     },
   },
