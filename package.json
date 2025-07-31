@@ -10,26 +10,29 @@
     "build:host": "nx build host-installation --configuration=production",
     "build:host:dev": "nx build host-installation --configuration=development",
     "build:host:prod": "nx build host-installation --configuration=production",
-    
     "// === COMPONENT PANTRY LIBRARY ===": "",
     "build:pantry": "nx build component-pantry",
     "build:pantry:dev": "nx build component-pantry --configuration=development",
     "build:pantry:prod": "nx build component-pantry --configuration=production",
-    
     "// === STORYBOOK ===": "",
     "storybook": "nx storybook component-pantry",
     "storybook:pantry": "nx storybook component-pantry",
     "build:storybook": "nx build-storybook component-pantry",
     "build:storybook:dev": "nx build-storybook component-pantry --configuration=development",
     "build:storybook:prod": "nx build-storybook component-pantry --configuration=production",
-    
     "// === TESTING ===": "",
     "test": "nx test",
     "lint": "nx lint",
     "e2e": "nx e2e host-installation-e2e",
     "e2e:ui": "nx e2e host-installation-e2e --ui",
     "e2e:headed": "nx e2e host-installation-e2e --headed",
-    "e2e:report": "nx e2e host-installation-e2e --reporter=html && npx playwright show-report"
+    "e2e:report": "nx e2e host-installation-e2e --reporter=html && npx playwright show-report",
+    "// === WORKSPACE MANAGEMENT ===": "",
+    "open:host": "code workspace-configs/host-installation-only.code-workspace",
+    "open:pantry": "code workspace-configs/component-pantry-only.code-workspace",
+    "open:custom": "code workspace-configs/custom-workspace.code-workspace",
+    "open:full": "code .",
+    "open:workspace": "node -e \"console.log('Available workspaces:'); console.log('npm run open:host    - Host Installation only'); console.log('npm run open:pantry  - Component Pantry only'); console.log('npm run open:custom  - Both Host + Pantry'); console.log('npm run open:full    - Full project');\""
   },
   "private": true,
   "dependencies": {
