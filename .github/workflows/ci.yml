@@ -58,6 +58,8 @@ jobs:
         run: |
           host=$(npx nx show projects --affected --target=build | grep host-installation || true)
           component=$(npx nx show projects --affected --target=build | grep component-pantry || true)
+          echo "host_installation_changed=${host}" >> $GITHUB_ENV
+          echo "component_pantry_changed=${component}" >> $GITHUB_ENV
           echo "host_installation_changed=${host}" >> $GITHUB_OUTPUT
           echo "component_pantry_changed=${component}" >> $GITHUB_OUTPUT
 
@@ -72,7 +74,7 @@ jobs:
 
       - name: 🎭 Get Playwright version
         id: playwright-version
-        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
+        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies[\"@playwright/test\"].version')" >> $GITHUB_OUTPUT
 
       - name: 🎭 Cache Playwright browsers
         uses: actions/cache@v4
@@ -85,7 +87,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: 🦪 Run E2E tests
+      - name: 🪲 Run E2E tests
         run: npx nx affected -t e2e --parallel=1
         env:
           PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
