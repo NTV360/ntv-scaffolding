@@ -151,11 +151,19 @@ export function getDonutSize(component: DonutGraphComponent): string {
  * @param component - The DonutGraphComponent instance
  * @returns Percentage as a string
  */
+/**
+ * Calculates percentage for a given value ensuring all percentages sum to 100%
+ * @param value - The value to calculate percentage for
+ * @param component - The DonutGraphComponent instance
+ * @returns Percentage as a string
+ */
 export function calculatePercentage(
   value: number,
   component: DonutGraphComponent
 ): string {
   const total = component.totalCount();
+  const data = component.data();
+
   if (total === 0) return '0%';
 
   if (value < 0) {
@@ -168,11 +176,185 @@ export function calculatePercentage(
     return '0%';
   }
 
+  // Find the index of this value in the data array
+  const valueIndex = data.findIndex((item) => item.total === value);
+
+  // If we can't find the value or there's only one item, use simple calculation
+  if (valueIndex === -1 || data.length === 1) {
+    const percent = (value / total) * 100;
+    if (percent > 0 && percent < 1) {
+      return percent.toFixed(1) + '%';
+    }
+    return Math.round(percent) + '%';
+  }
+
+  // Calculate all percentages to ensure they sum to 100%
+  const percentages = calculateAllPercentages(data, total);
+
+  return percentages[valueIndex];
+}
+
+/**
+ * Calculates all percentages ensuring they sum to exactly 100%
+ * @param data - Array of chart data items
+ * @param total - Total count
+ * @returns Array of percentage strings
+ */
+function calculateAllPercentages(
+  data: DonutChartItem[],
+  total: number
+): string[] {
+  if (total === 0) return data.map(() => '0%');
+
+  // Calculate raw percentages
+  const rawPercentages = data.map((item) => (item.total / total) * 100);
+
+  // Round all percentages
+  const roundedPercentages = rawPercentages.map((p) => Math.round(p));
+
+  // Calculate the difference from 100%
+  const sum = roundedPercentages.reduce((acc, p) => acc + p, 0);
+  const difference = 100 - sum;
+
+  // Adjust percentages to sum to 100%
+  if (difference !== 0) {
+    // Find items to adjust (prefer larger values for positive adjustments)
+    const adjustmentTargets = rawPercentages
+      .map((raw, index) => ({
+        index,
+        raw,
+        rounded: roundedPercentages[index],
+        diff: raw - roundedPercentages[index],
+      }))
+      .sort((a, b) => (difference > 0 ? b.diff - a.diff : a.diff - b.diff));
+
+    // Apply adjustments
+    let remainingAdjustment = Math.abs(difference);
+    for (
+      let i = 0;
+      i < adjustmentTargets.length && remainingAdjustment > 0;
+      i++
+    ) {
+      const target = adjustmentTargets[i];
+      const adjustment = difference > 0 ? 1 : -1;
+
+      // Don't adjust below 0%
+      if (roundedPercentages[target.index] + adjustment >= 0) {
+        roundedPercentages[target.index] += adjustment;
+        remainingAdjustment--;
+      }
+    }
+  }
+
+  // Convert to strings with appropriate precision
+  return roundedPercentages.map((p, index) => {
+    const raw = rawPercentages[index];
+    // Use decimal precision for very small percentages
+    if (raw > 0 && raw < 1 && p === 0) {
+      return raw.toFixed(1) + '%';
+    }
+    return p + '%';
+  });
+}
+
+/**
+ * Alternative simpler approach - calculate percentage for single value
+ * Use this if you don't need guaranteed 100% sum
+ * @param value - The value to calculate percentage for
+ * @param total - Total count
+ * @returns Percentage as a string
+ */
+export function calculateSimplePercentage(
+  value: number,
+  total: number
+): string {
+  if (total === 0) return '0%';
+
+  if (value < 0) {
+    console.warn('calculateSimplePercentage: Negative value provided:', value);
+    return '0%';
+  }
+
+  if (total < 0) {
+    console.warn('calculateSimplePercentage: Negative total count:', total);
+    return '0%';
+  }
+
   const percent = (value / total) * 100;
+
+  // For very small percentages, show one decimal place
   if (percent > 0 && percent < 1) {
     return percent.toFixed(1) + '%';
   }
+
+  // For percentages less than 10%, show one decimal if it makes a difference
+  if (percent < 10) {
+    const rounded = Math.round(percent);
+    const oneDecimal = Math.round(percent * 10) / 10;
+    if (rounded !== oneDecimal) {
+      return oneDecimal.toFixed(1) + '%';
+    }
+  }
+
   return Math.round(percent) + '%';
+}
+
+/**
+ * Utility function to get all percentages that sum to 100%
+ * Useful for legend display or validation
+ * @param data - Array of chart data items
+ * @param total - Total count
+ * @returns Object with percentages and validation info
+ */
+export function getAllPercentagesWithValidation(
+  data: DonutChartItem[],
+  total: number
+) {
+  const percentages = calculateAllPercentages(data, total);
+
+  // Extract numeric values for validation
+  const numericPercentages = percentages.map((p) =>
+    parseFloat(p.replace('%', ''))
+  );
+  const sum = numericPercentages.reduce((acc, p) => acc + p, 0);
+
+  return {
+    percentages,
+    numericPercentages,
+    sum,
+    isValid: Math.abs(sum - 100) < 0.1, // Allow small floating point errors
+    data: data.map((item, index) => ({
+      ...item,
+      percentage: percentages[index],
+      numericPercentage: numericPercentages[index],
+    })),
+  };
+}
+
+// Test function to verify the calculation works correctly
+export function testPercentageCalculation() {
+  const testCases = [
+    { data: [33, 33, 34], total: 100 },
+    { data: [10, 10, 10], total: 30 },
+    { data: [1, 2, 3], total: 6 },
+    { data: [7, 13, 23], total: 43 },
+    { data: [0.1, 0.2, 0.7], total: 1 },
+  ];
+
+  testCases.forEach((testCase, index) => {
+    const mockData = testCase.data.map((val, i) => ({
+      label: `Item ${i}`,
+      total: val,
+    }));
+
+    const result = getAllPercentagesWithValidation(mockData, testCase.total);
+    console.log(`Test Case ${index + 1}:`, {
+      input: testCase.data,
+      percentages: result.percentages,
+      sum: result.sum,
+      isValid: result.isValid,
+    });
+  });
 }
 
 /**
