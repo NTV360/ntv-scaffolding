@@ -59,21 +59,18 @@ jobs:
           host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
           component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
 
-          if [ -n "$host" ]; then
+          if [[ -n "$host" ]]; then
             echo "host_installation_changed=true" >> $GITHUB_OUTPUT
-            echo "Building host-installation..."
-            npx nx build host-installation
           else
             echo "host_installation_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          if [ -n "$component" ]; then
+          if [[ -n "$component" ]]; then
             echo "component_pantry_changed=true" >> $GITHUB_OUTPUT
-            echo "Building component-pantry storybook..."
-            npm run build:storybook:dev
           else
             echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
           fi
+
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
