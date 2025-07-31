@@ -22,7 +22,7 @@ env:
 
 jobs:
   ci-checks:
-    name: 🔍 CI Checks
+    name: 🔍 CI Build Test Lint
     runs-on: ubuntu-latest
     outputs:
       host_installation_changed: ${{ steps.setvars.outputs.host_installation_changed }}
@@ -80,6 +80,15 @@ jobs:
 
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
+
+      - name: 🛠️ Build Component Pantry Storybook
+        if: steps.setvars.outputs.component_pantry_changed == 'true'
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
+            npm run build:storybook:prod
+          else
+            npm run build:storybook:dev
+          fi
       
       - name: ⬆️ Upload Host Installation Build
         if: steps.setvars.outputs.host_installation_changed == 'true'
