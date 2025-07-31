@@ -59,17 +59,24 @@ jobs:
           host=$(npx nx show projects --affected --target=build | grep host-installation || true)
           component=$(npx nx show projects --affected --target=build | grep component-pantry || true)
 
-          if [ -n "$host" ]; then
-            echo "host_installation_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "host_installation_changed=false" >> $GITHUB_OUTPUT
+          # Run build manually and check if output folders exist
+          if [[ -n "$host" ]]; then
+            echo "Building host-installation..."
+            npx nx build host-installation
           fi
 
-          if [ -n "$component" ]; then
-            echo "component_pantry_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
+          if [[ -n "$component" ]]; then
+            echo "Building component-pantry storybook..."
+            npm run build:storybook:dev
           fi
+
+          [[ -d dist/apps/ntv-host-installation/host-installation/browser ]] \
+            && echo "host_installation_changed=true" >> $GITHUB_OUTPUT \
+            || echo "host_installation_changed=false" >> $GITHUB_OUTPUT
+
+          [[ -d dist/storybook/component-pantry ]] \
+            && echo "component_pantry_changed=true" >> $GITHUB_OUTPUT \
+            || echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
 
 
       - name: ☁️ Start Nx Cloud CI run
