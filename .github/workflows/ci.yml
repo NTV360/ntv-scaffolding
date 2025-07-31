@@ -56,28 +56,24 @@ jobs:
       - name: 🔍 Detect affected projects
         id: setvars
         run: |
-          host=$(npx nx show projects --affected --target=build | grep host-installation || true)
-          component=$(npx nx show projects --affected --target=build | grep component-pantry || true)
+          host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
+          component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
 
-          # Run build manually and check if output folders exist
-          if [[ -n "$host" ]]; then
+          if [ -n "$host" ]; then
+            echo "host_installation_changed=true" >> $GITHUB_OUTPUT
             echo "Building host-installation..."
             npx nx build host-installation
+          else
+            echo "host_installation_changed=false" >> $GITHUB_OUTPUT
           fi
 
-          if [[ -n "$component" ]]; then
+          if [ -n "$component" ]; then
+            echo "component_pantry_changed=true" >> $GITHUB_OUTPUT
             echo "Building component-pantry storybook..."
             npm run build:storybook:dev
+          else
+            echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
           fi
-
-          [[ -d dist/apps/ntv-host-installation/host-installation/browser ]] \
-            && echo "host_installation_changed=true" >> $GITHUB_OUTPUT \
-            || echo "host_installation_changed=false" >> $GITHUB_OUTPUT
-
-          [[ -d dist/storybook/component-pantry ]] \
-            && echo "component_pantry_changed=true" >> $GITHUB_OUTPUT \
-            || echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
-
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
