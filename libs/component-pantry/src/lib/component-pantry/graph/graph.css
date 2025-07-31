@@ -1,0 +1,797 @@
+.graph-container {
+  @apply w-full h-full box-border bg-white rounded-[12px] shadow-md;
+  @apply flex flex-col;
+}
+
+.graph-header {
+  @apply p-5 flex-shrink-0;
+}
+
+.header-row {
+  @apply flex items-center justify-between gap-2 flex-wrap w-full;
+}
+
+.title-section {
+  @apply flex flex-col gap-2 min-w-[150px] flex-shrink-0;
+}
+
+.title {
+  @apply text-[20px] font-semibold text-[#333333];
+}
+
+.sub-title {
+  @apply text-[14px] font-normal text-[#666666] mt-1;
+}
+
+.metrics-row {
+  @apply flex gap-3 flex-wrap overflow-x-auto pb-1;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.metrics-row::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+.metric-item {
+  @apply flex items-center gap-1 whitespace-nowrap;
+}
+
+.metric-label {
+  @apply text-[12px] text-[#091635] font-semibold;
+}
+
+.metric-value {
+  @apply text-[16px] font-semibold;
+}
+
+.controls {
+  @apply flex items-center gap-2 flex-wrap flex-shrink-0;
+}
+
+.legend {
+  @apply flex items-center gap-2 flex-wrap;
+}
+
+.legend-item {
+  @apply flex items-center gap-1;
+}
+
+.legend-marker {
+  @apply w-[10px] h-[10px] rounded-full;
+}
+
+.legend-text {
+  @apply text-[12px] text-[#091635] font-semibold;
+}
+
+.filters {
+  @apply flex gap-2 flex-wrap items-center;
+}
+
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  @apply relative inline-block;
+}
+
+.dropdown-trigger {
+  @apply flex w-[100px] h-[30px] px-[10px] py-[5px] items-center justify-between
+         rounded-[5px] border-[0.5px] border-[#D9D9D9] bg-[#FAFAFA] text-[#333]
+         outline-none cursor-pointer text-[12px] font-medium;
+  transition: all 0.2s ease;
+}
+
+.dropdown-trigger:hover {
+  @apply border-[#D9D9D9] bg-[#F5F5F5];
+}
+
+.dropdown-trigger.active {
+  @apply border-[#095af3] bg-white;
+}
+
+.dropdown-arrow {
+  @apply transition-transform duration-200 ease-in-out;
+}
+
+.dropdown-trigger.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  @apply absolute top-full left-0 mt-1 bg-white rounded-[6px] shadow-lg border border-[#E5E5E5]
+         min-w-[120px] z-50 py-2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e5e5;
+}
+
+.dropdown-item {
+  @apply flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#F8F9FA]
+         transition-colors duration-150 ease-in-out;
+}
+
+.dropdown-item:hover {
+  @apply bg-[#F8F9FA];
+}
+
+.checkbox-input {
+  @apply sr-only;
+}
+
+.checkbox-custom {
+  @apply w-4 h-4 border border-[#D9D9D9] rounded-sm bg-white flex-shrink-0
+         transition-all duration-150 ease-in-out;
+  position: relative;
+  border-radius: 2px;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  @apply bg-[#8DCB2C] border-[#8DCB2C];
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '';
+  @apply absolute top-1/2 left-1/2 w-2 h-2 bg-white rounded-sm;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+}
+
+.item-label {
+  @apply text-[12px] text-[#666666] font-medium;
+  line-height: 1.2;
+}
+
+.dropdown-item:hover .item-label {
+  @apply text-[#333333];
+}
+
+.filter-select-wrapper {
+  @apply relative inline-block;
+}
+
+.filter-select {
+  @apply flex w-[100px] h-[30px] px-[10px] py-[5px] items-center gap-[59px]
+         rounded-[5px] border-[0.5px] border-[#D9D9D9] bg-[#FAFAFA] text-[#333]
+         outline-none cursor-pointer text-[12px] font-medium appearance-none;
+}
+
+.filter-arrow {
+  @apply absolute right-[10px] top-1/2 transform -translate-y-1/2 pointer-events-none;
+  transition: transform 0.2s ease;
+}
+.filter-select:focus {
+  @apply border-[#095af3] bg-white;
+}
+.filter-select:hover {
+  @apply border-[#D9D9D9] bg-[#F5F5F5];
+}
+.filter-select:hover + .filter-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.switch-button {
+  @apply flex w-[100px] h-[30px] px-[10px] py-[5px] items-center gap-[59px]
+  rounded-[5px] border-[0.5px] border-[#D9D9D9] bg-[#FAFAFA] text-[#333]
+  outline-none cursor-pointer text-[12px] font-medium appearance-none;
+}
+.switch-button:hover {
+  @apply border-[#D9D9D9] bg-[#F5F5F5];
+}
+.switch-button:active {
+  @apply bg-[#F0F0F0];
+}
+
+.graph-content {
+  @apply w-full h-full flex-1 flex items-center justify-center py-0;
+  @apply min-h-[250px];
+}
+
+.dropdown-text {
+  @apply truncate;
+}
+
+.button-text {
+  @apply truncate;
+}
+
+/* Enhanced Responsive styles */
+@media (max-width: 1200px) {
+  .title {
+    @apply text-[18px];
+  }
+
+  .sub-title {
+    @apply text-[13px];
+  }
+
+  .metric-value {
+    @apply text-[14px];
+  }
+
+  .legend-text {
+    @apply text-[11px];
+  }
+
+  .dropdown-trigger {
+    @apply w-[90px] h-[28px] text-[11px];
+  }
+
+  .switch-button {
+    @apply w-[90px] h-[28px] text-[11px];
+  }
+}
+
+@media (max-width: 768px) {
+  .graph-container {
+    @apply p-3;
+  }
+
+  .graph-header {
+    @apply p-3;
+  }
+
+  .header-row {
+    @apply flex-col items-start gap-3;
+  }
+
+  .title {
+    @apply text-[16px];
+  }
+
+  .sub-title {
+    @apply text-[12px];
+  }
+
+  .metric-label {
+    @apply text-[11px];
+  }
+
+  .metric-value {
+    @apply text-[13px];
+  }
+
+  .controls {
+    @apply w-full justify-start gap-3;
+  }
+
+  .legend {
+    @apply w-full justify-start gap-2;
+  }
+
+  .legend-text {
+    @apply text-[10px];
+  }
+
+  .filters {
+    @apply w-full gap-2;
+  }
+
+  .dropdown-trigger {
+    @apply w-[80px] h-[26px] px-[8px] py-[4px] text-[10px];
+  }
+
+  .switch-button {
+    @apply w-[80px] h-[26px] px-[8px] py-[4px] text-[10px];
+  }
+
+  .dropdown-menu {
+    @apply min-w-[100px] py-1;
+  }
+
+  .dropdown-item {
+    @apply px-2 py-1;
+  }
+
+  .item-label {
+    @apply text-[10px];
+  }
+}
+
+@media (max-width: 480px) {
+  .graph-container {
+    @apply p-2;
+  }
+
+  .graph-header {
+    @apply p-2;
+  }
+
+  .title {
+    @apply text-[14px];
+  }
+
+  .sub-title {
+    @apply text-[11px];
+  }
+
+  .metric-label {
+    @apply text-[10px];
+  }
+
+  .metric-value {
+    @apply text-[12px];
+  }
+
+  .metrics-row {
+    @apply flex-col items-start gap-1;
+  }
+
+  .legend {
+    @apply flex-col items-start gap-1;
+  }
+
+  .legend-text {
+    @apply text-[9px];
+  }
+
+  .legend-marker {
+    @apply w-[8px] h-[8px];
+  }
+
+  .filters {
+    @apply flex-col gap-1;
+  }
+
+  .dropdown-trigger {
+    @apply w-[70px] h-[24px] px-[6px] py-[3px] text-[9px];
+  }
+
+  .switch-button {
+    @apply w-[70px] h-[24px] px-[6px] py-[3px] text-[9px];
+  }
+
+  .dropdown-menu {
+    @apply min-w-[80px] py-1;
+  }
+
+  .dropdown-item {
+    @apply px-1 py-1;
+  }
+
+  .checkbox-custom {
+    @apply w-3 h-3;
+  }
+
+  .checkbox-input:checked + .checkbox-custom::after {
+    @apply w-1.5 h-1.5;
+  }
+
+  .item-label {
+    @apply text-[9px];
+  }
+}
+
+@media (max-width: 360px) {
+  .title {
+    @apply text-[12px];
+  }
+
+  .sub-title {
+    @apply text-[10px];
+  }
+
+  .metric-label {
+    @apply text-[9px];
+  }
+
+  .metric-value {
+    @apply text-[11px];
+  }
+
+  .legend-text {
+    @apply text-[8px];
+  }
+
+  .dropdown-trigger {
+    @apply w-[60px] h-[22px] px-[4px] py-[2px] text-[8px];
+  }
+
+  .switch-button {
+    @apply w-[60px] h-[22px] px-[4px] py-[2px] text-[8px];
+  }
+
+  .item-label {
+    @apply text-[8px];
+  }
+}
+
+/* Small size adjustments */
+.graph-small {
+  @apply p-2 w-full h-full;
+}
+
+.graph-small .graph-header {
+  @apply p-2 flex-shrink-0;
+}
+
+.graph-small .header-row {
+  @apply gap-1;
+}
+
+.graph-small .title {
+  @apply text-[14px] font-semibold;
+}
+
+.graph-small .sub-title {
+  @apply text-[11px] font-normal;
+}
+
+.graph-small .metrics-row {
+  @apply gap-2;
+}
+
+.graph-small .metric-label {
+  @apply text-[10px] font-semibold;
+}
+
+.graph-small .metric-value {
+  @apply text-[14px] font-semibold;
+}
+
+.graph-small .controls {
+  @apply gap-1;
+}
+
+.graph-small .legend {
+  @apply gap-1;
+}
+
+.graph-small .legend-item {
+  @apply text-[px] mr-1;
+}
+
+.graph-small .legend-marker {
+  @apply w-[6px] h-[6px] mr-1;
+}
+
+.graph-small .legend-text {
+  @apply text-[10px] font-medium;
+}
+
+.graph-small .filters {
+  @apply gap-1;
+}
+
+.graph-small .filter-select {
+  @apply w-[100px] h-[26px] px-[5px] py-[2px] text-[10px];
+}
+
+.graph-small .switch-button {
+  @apply w-[80px] h-[26px] px-[8px] py-[4px] text-[10px];
+}
+
+.graph-small .graph-content {
+  @apply min-h-[150px] flex-1;
+}
+
+.graph-container .legend-item {
+  @apply text-[15px] mr-3;
+}
+.graph-large .legend-item {
+  @apply text-[20px] mr-4;
+}
+
+/* Small size adjustments for dropdowns */
+.graph-small .dropdown-trigger {
+  @apply w-[80px] h-[26px] px-[8px] py-[4px] text-[10px];
+}
+
+.graph-small .dropdown-menu {
+  @apply min-w-[100px] py-1;
+}
+
+.graph-small .dropdown-item {
+  @apply px-2 py-1;
+}
+
+.graph-small .checkbox-custom {
+  @apply w-3 h-3;
+}
+
+.graph-small .checkbox-input:checked + .checkbox-custom::after {
+  @apply w-1.5 h-1.5;
+}
+
+.graph-small .item-label {
+  @apply text-[10px];
+}
+
+/* Fullscreen styles */
+.graph-fullscreen {
+  @apply w-full h-full bg-white;
+  min-height: 600px;
+  box-shadow: none !important;
+}
+
+.graph-fullscreen .graph-header {
+  @apply p-6 flex-shrink-0;
+}
+
+.graph-fullscreen .header-row {
+  @apply gap-4;
+}
+
+.graph-fullscreen .title {
+  @apply text-[20px] font-bold;
+}
+
+.graph-fullscreen .sub-title {
+  @apply text-[16px] font-normal;
+}
+
+.graph-fullscreen .metrics-row {
+  @apply gap-4;
+}
+
+.graph-fullscreen .metric-label {
+  @apply text-[14px] font-semibold;
+}
+
+.graph-fullscreen .metric-value {
+  @apply text-[18px] font-bold;
+}
+
+.graph-fullscreen .controls {
+  @apply gap-4;
+}
+
+.graph-fullscreen .legend {
+  @apply gap-2;
+}
+
+.graph-fullscreen .legend-item {
+  @apply text-[14px] mr-1;
+}
+
+.graph-fullscreen .legend-marker {
+  @apply w-[12px] h-[12px] mr-1;
+}
+
+.graph-fullscreen .legend-text {
+  @apply text-[14px] font-semibold;
+}
+
+.graph-fullscreen .filters {
+  @apply gap-3;
+}
+
+.graph-fullscreen .dropdown-trigger {
+  @apply w-[120px] h-[40px] px-[12px] py-[8px] text-[12px] font-medium;
+}
+
+.graph-fullscreen .dropdown-menu {
+  @apply min-w-[140px] py-3;
+}
+
+.graph-fullscreen .dropdown-item {
+  @apply px-2 py-1;
+}
+
+.graph-fullscreen .checkbox-custom {
+  @apply w-5 h-5;
+}
+
+.graph-fullscreen .checkbox-input:checked + .checkbox-custom::after {
+  @apply w-2.5 h-2.5;
+}
+
+.graph-fullscreen .item-label {
+  @apply text-[14px] font-medium;
+}
+
+.graph-fullscreen .switch-button {
+  @apply w-[120px] h-[40px] px-[12px] py-[8px] text-[14px] font-medium;
+}
+
+.graph-fullscreen .graph-content {
+  @apply min-h-0 flex-1;
+}
+
+/* Fullscreen responsive adjustments */
+@media (max-width: 1024px) {
+  .graph-fullscreen .graph-header {
+    @apply p-4;
+  }
+
+  .graph-fullscreen .title {
+    @apply text-[20px];
+  }
+
+  .graph-fullscreen .sub-title {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .metric-label {
+    @apply text-[12px];
+  }
+
+  .graph-fullscreen .metric-value {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .legend-item {
+    @apply text-[12px] mr-3;
+  }
+
+  .graph-fullscreen .legend-text {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .dropdown-trigger {
+    @apply w-[100px] h-[36px] text-[12px];
+  }
+
+  .graph-fullscreen .switch-button {
+    @apply w-[100px] h-[36px] text-[12px];
+  }
+}
+
+@media (max-width: 768px) {
+  .graph-fullscreen .header-row {
+    @apply flex-col items-start gap-3;
+  }
+
+  .graph-fullscreen .title {
+    @apply text-[20px];
+  }
+
+  .graph-fullscreen .sub-title {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .metric-label {
+    @apply text-[12px];
+  }
+
+  .graph-fullscreen .metric-value {
+    @apply text-[16px];
+  }
+
+  .graph-fullscreen .controls {
+    @apply w-full justify-start;
+  }
+
+  .graph-fullscreen .legend {
+    @apply w-full justify-start;
+  }
+
+  .graph-fullscreen .legend-text {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .filters {
+    @apply w-full;
+  }
+
+  .graph-fullscreen .dropdown-trigger {
+    @apply w-[80px] h-[32px] text-[11px];
+  }
+
+  .graph-fullscreen .switch-button {
+    @apply w-[80px] h-[32px] text-[11px];
+  }
+}
+
+@media (max-width: 480px) {
+  .graph-fullscreen .graph-header {
+    @apply p-4;
+  }
+
+  .graph-fullscreen .title {
+    @apply text-[16px];
+  }
+
+  .graph-fullscreen .sub-title {
+    @apply text-[12px];
+  }
+
+  .graph-fullscreen .metric-label {
+    @apply text-[10px];
+  }
+
+  .graph-fullscreen .metric-value {
+    @apply text-[14px];
+  }
+
+  .graph-fullscreen .legend-text {
+    @apply text-[12px];
+  }
+
+  .graph-fullscreen .dropdown-trigger {
+    @apply w-[70px] h-[28px] text-[10px];
+  }
+
+  .graph-fullscreen .switch-button {
+    @apply w-[70px] h-[28px] text-[10px];
+  }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (max-width: 768px) {
+  .dropdown-trigger,
+  .switch-button {
+    min-height: 44px; /* iOS recommended touch target */
+    min-width: 44px;
+  }
+
+  .dropdown-item {
+    min-height: 44px;
+    @apply flex items-center;
+  }
+
+  .checkbox-custom {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dropdown-trigger,
+  .switch-button {
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  .dropdown-item {
+    min-height: 40px;
+  }
+
+  .checkbox-custom {
+    min-width: 18px;
+    min-height: 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dropdown-trigger,
+  .switch-button {
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  .dropdown-item {
+    min-height: 36px;
+  }
+
+  .checkbox-custom {
+    min-width: 16px;
+    min-height: 16px;
+  }
+}
+
+/* Prevent text selection on buttons for better mobile experience */
+.dropdown-trigger,
+.switch-button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Improve focus states for accessibility */
+.dropdown-trigger:focus,
+.switch-button:focus {
+  @apply outline-none ring-2 ring-[#8DCB2C] ring-opacity-50;
+}
+
+/* Smooth transitions for all interactive elements */
+.dropdown-trigger,
+.switch-button,
+.dropdown-item {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced hover states for desktop */
+@media (hover: hover) {
+  .dropdown-trigger:hover,
+  .switch-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Active states for touch devices */
+.dropdown-trigger:active,
+.switch-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
