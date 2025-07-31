@@ -1,0 +1,90 @@
+name: Deploy Component Pantry Storybook
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - development
+      - feature/ci-cd-deployment
+    paths:
+      - 'libs/component-pantry/**'
+      - '.github/workflows/deploy-component-pantry-storybook.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set Nx affected SHAs
+        uses: nrwl/nx-set-shas@v4
+        with:
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Check if component-pantry is affected
+        id: affected
+        run: |
+          npx nx show projects --affected --target=build | grep component-pantry \
+            && echo "affected=true" >> $GITHUB_OUTPUT \
+            || echo "affected=false" >> $GITHUB_OUTPUT
+
+      - name: Set deployment variables
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PROD }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
+          else
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: Build Storybook (only if affected)
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
+            npm run build:storybook:prod
+          else
+            npm run build:storybook:dev
+          fi
+
+      - name: Configure AWS credentials
+        if: steps.affected.outputs.affected == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy Storybook to S3 and Invalidate CloudFront
+        if: steps.affected.outputs.affected == 'true'
+        run: |
+          aws s3 sync dist/storybook/component-pantry s3://$S3_BUCKET --delete
+          aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
