@@ -201,7 +201,6 @@ jobs:
           name: component-pantry-storybook
           path: dist/storybook/component-pantry
 
-
       - name: Deploy Storybook to S3 and Invalidate CloudFront
         run: |
           aws s3 sync dist/storybook/component-pantry s3://$S3_BUCKET --delete
