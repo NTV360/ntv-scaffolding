@@ -25,21 +25,21 @@ jobs:
     name: 🔍 CI Checks
     runs-on: ubuntu-latest
     outputs:
-      host_installation_changed: ${{ steps.detect.outputs.host_installation_changed }}
-      component_pantry_changed: ${{ steps.detect.outputs.component_pantry_changed }}
+      host_installation_changed: ${{ steps.setvars.outputs.host_installation_changed }}
+      component_pantry_changed: ${{ steps.setvars.outputs.component_pantry_changed }}
     steps:
-      - name: 📥 Checkout
+      - name: 📅 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🟢 Setup Node.js
+      - name: 🔘 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: 💾 Cache node modules
+      - name: 📂 Cache node modules
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -54,12 +54,12 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: 🔍 Detect affected projects
-        id: detect
+        id: setvars
         run: |
-          HOST=$(npx nx show projects --affected --target=build | grep host-installation || true)
-          COMPONENT=$(npx nx show projects --affected --target=build | grep component-pantry || true)
-          echo "host_installation_changed=${{ !!HOST }}" >> $GITHUB_OUTPUT
-          echo "component_pantry_changed=${{ !!COMPONENT }}" >> $GITHUB_OUTPUT
+          host=$(npx nx show projects --affected --target=build | grep host-installation || true)
+          component=$(npx nx show projects --affected --target=build | grep component-pantry || true)
+          echo "host_installation_changed=${host}" >> $GITHUB_OUTPUT
+          echo "component_pantry_changed=${component}" >> $GITHUB_OUTPUT
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
@@ -70,9 +70,9 @@ jobs:
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
 
-      - name: 🔍 Get Playwright version
+      - name: 🎭 Get Playwright version
         id: playwright-version
-        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies[\"@playwright/test\"].version')" >> $GITHUB_OUTPUT
+        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
 
       - name: 🎭 Cache Playwright browsers
         uses: actions/cache@v4
@@ -85,7 +85,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: 🧪 Run E2E tests
+      - name: 🦪 Run E2E tests
         run: npx nx affected -t e2e --parallel=1
         env:
           PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
@@ -93,7 +93,7 @@ jobs:
   deploy-host-installation:
     name: 🚀 Deploy Host Installation
     needs: ci-checks
-    if: needs.ci-checks.outputs.host_installation_changed == 'true'
+    if: needs.ci-checks.outputs.host_installation_changed != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,7 +131,7 @@ jobs:
   deploy-component-pantry:
     name: 📘 Deploy Component Pantry Storybook
     needs: ci-checks
-    if: needs.ci-checks.outputs.component_pantry_changed == 'true'
+    if: needs.ci-checks.outputs.component_pantry_changed != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
