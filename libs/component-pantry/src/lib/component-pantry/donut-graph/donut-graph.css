@@ -114,37 +114,23 @@
 
 /* Size-specific chart area sizing */
 .donut-graph-small .donut-chart-area {
-  min-width: 150px;
-  max-width: 250px;
-  min-height: 200px;
+  @apply min-w-[150px] max-w-[250px] min-h-[200px];
 }
 
 .donut-graph-medium .donut-chart-area {
-  min-width: 200px;
-  max-width: 350px;
-  min-height: 300px;
+  @apply min-w-[200px] max-w-[350px] min-h-[300px];
 }
 
 .donut-graph-large .donut-chart-area {
-  @apply p-0;
-  min-width: 350px;
-  max-width: 450px;
-  min-height: 400px;
+  @apply p-0 min-w-[350px] max-w-[450px] min-h-[400px];
 }
 
 .donut-graph-fullscreen .donut-chart-area {
-  @apply flex-none flex items-center justify-center;
-  min-width: 500px;
-  max-width: 600px;
-  min-height: 500px;
-  height: 500px;
+  @apply flex-none flex items-center justify-center min-w-[500px] max-w-[600px] min-h-[500px] h-[500px];
 }
 
 .donut-legend {
-  @apply flex flex-col bg-transparent rounded-none font-extrabold items-start flex-1 overflow-y-auto overflow-x-hidden;
-  min-width: 200px;
-  max-width: 250px;
-  max-height: 100%;
+  @apply flex flex-col bg-transparent rounded-none font-extrabold items-start flex-1 overflow-y-auto overflow-x-hidden min-w-[200px] max-w-[250px] max-h-full;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -160,27 +146,19 @@
 
 /* Legend position specific styles */
 .legend-right .donut-legend {
-  @apply flex-col ml-5;
-  min-width: 200px;
-  max-width: 250px;
+  @apply flex-col ml-5 min-w-[200px] max-w-[250px];
 }
 
 .legend-left .donut-legend {
-  @apply flex-col mr-5;
-  min-width: 200px;
-  max-width: 250px;
+  @apply flex-col mr-5 min-w-[200px] max-w-[250px];
 }
 
 .legend-bottom .donut-legend {
-  @apply flex-row flex-wrap justify-center mt-5 gap-5;
-  min-width: 100%;
-  max-width: none;
+  @apply flex-row flex-wrap justify-center mt-5 gap-5 min-w-full max-w-none;
 }
 
 .legend-top .donut-legend {
-  @apply flex-row flex-wrap justify-center mb-5 gap-5;
-  min-width: 100%;
-  max-width: none;
+  @apply flex-row flex-wrap justify-center mb-5 gap-5 min-w-full max-w-none;
 }
 
 .legend-item {
@@ -190,8 +168,7 @@
 /* Bottom and top legend items */
 .legend-bottom .legend-item,
 .legend-top .legend-item {
-  @apply w-auto px-2 py-1;
-  min-width: 150px;
+  @apply w-auto px-2 py-1 min-w-[150px];
 }
 
 .legend-marker {
@@ -199,8 +176,7 @@
 }
 
 .legend-label-row {
-  @apply flex justify-between w-full items-center;
-  gap: 40px;
+  @apply flex justify-between w-full items-center gap-10;
 }
 
 .legend-label {
@@ -268,8 +244,7 @@
 
 /* Ensure small size has appropriate styling */
 .donut-graph-small .donut-graph-container {
-  min-width: 350px;
-  min-height: 200px;
+  @apply min-w-[350px] min-h-[200px];
 }
 
 .donut-graph-medium .donut-graph-content {
@@ -294,8 +269,7 @@
 
 /* Ensure medium size has appropriate styling */
 .donut-graph-medium .donut-graph-container {
-  min-width: 500px;
-  min-height: 300px;
+  @apply min-w-[500px] min-h-[300px];
 }
 
 .donut-graph-large .donut-graph-content {
@@ -320,36 +294,24 @@
 
 /* Ensure large size has more prominent styling */
 .donut-graph-large .donut-graph-container {
-  min-width: 1000px;
-  min-height: 300px;
+  @apply min-w-[1000px] min-h-[300px];
 }
 
 /* Auto size styles - make legend scrollable based on chart height */
 .donut-graph-auto {
-  @apply h-auto w-auto;
-  min-height: 300px;
-  min-width: 500px;
+  @apply h-auto w-auto min-h-[300px] min-w-[500px];
 }
 
 .donut-graph-auto .donut-graph-content {
-  @apply h-auto flex items-center justify-center;
-  min-height: 300px;
-  max-height: 500px;
+  @apply h-auto flex items-center justify-center min-h-[300px] max-h-[500px];
 }
 
 .donut-graph-auto .donut-chart-area {
-  @apply flex-none;
-  min-width: 200px;
-  max-width: 350px;
-  min-height: 250px;
-  max-height: 350px;
+  @apply flex-none min-w-[200px] max-w-[350px] min-h-[250px] max-h-[350px];
 }
 
 .donut-graph-auto .donut-legend {
-  @apply flex-1 overflow-y-auto overflow-x-hidden pr-2;
-  max-height: 350px;
-  min-width: 200px;
-  max-width: 250px;
+  @apply flex-1 overflow-y-auto overflow-x-hidden pr-2 min-w-[200px] max-w-[250px] max-h-[350px];
 }
 
 /* Custom scrollbar for auto size legend */
@@ -386,15 +348,11 @@
 
 /* Auto size chart container adjustments */
 .donut-graph-auto .donut-chart-container {
-  @apply w-full h-full;
-  min-height: 250px;
-  max-height: 350px;
+  @apply w-full h-full min-h-[250px] max-h-[350px];
 }
 
 .donut-graph-auto apx-chart {
-  @apply w-full h-full;
-  min-height: 250px;
-  max-height: 350px;
+  @apply w-full h-full min-h-[250px] max-h-[350px];
 }
 
 .donut-graph-auto .donut-center-total {
