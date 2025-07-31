@@ -18,5 +18,3 @@ export * from './lib/component-pantry/thumbnail-gallery/thumbnail-gallery';
 export * from './lib/component-pantry/thumbnail-item/thumbnail-item';
 export * from './lib/component-pantry/template/template.component';
 export * from './lib/component-pantry/template/zone/zone.component';
-
-// Trigger Storybook deploy only for component-pantry
