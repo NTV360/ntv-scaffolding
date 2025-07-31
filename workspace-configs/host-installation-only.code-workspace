@@ -17,7 +17,8 @@
       "**/.nx": true
     },
     "terminal.integrated.cwd": "${workspaceFolder}/../../..",
-    "terminal.integrated.defaultProfile.windows": "Command Prompt"
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "nxConsole.generateAiAgentRules": true
   },
   "extensions": {
     "recommendations": [
