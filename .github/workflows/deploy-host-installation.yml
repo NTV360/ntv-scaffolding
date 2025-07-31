@@ -6,7 +6,7 @@ on:
       - main
       - staging
       - development
-      - feature/ci-cd-deployment
+      - feature/merge-ci-and-deployment
 
 permissions:
   contents: read
@@ -14,11 +14,8 @@ permissions:
 
 jobs:
   deploy:
+    needs: ci-checks
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +40,13 @@ jobs:
             && echo "affected=true" >> $GITHUB_OUTPUT \
             || echo "affected=false" >> $GITHUB_OUTPUT
 
+      - name: Download host-installation build artifact
+        if: steps.affected.outputs.affected == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: host-installation-build
+          path: dist/apps/ntv-host-installation/host-installation/browser
+
       - name: Set deployment variables
         if: steps.affected.outputs.affected == 'true'
         run: |
@@ -53,23 +57,14 @@ jobs:
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_PROD }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "staging" ]]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
-            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
-            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STAGING }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_STAGING }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_STAGING }}" >> $GITHUB_ENV
           else
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
-          fi
-
-      - name: Build host-installation (only if affected)
-        if: steps.affected.outputs.affected == 'true'
-        run: |
-          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
-            npm run build:host:prod
-          else
-            npm run build:host:dev
           fi
 
       - name: Configure AWS credentials

@@ -22,7 +22,7 @@ env:
   HUSKY: 0
 
 jobs:
-  main:
+  ci-checks:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout
@@ -62,6 +62,14 @@ jobs:
 
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
+      
+      - name: 📁 Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 1
 
       # 🎭 Install Playwright browsers before E2E (only if needed)
       - name: 🔍 Get Playwright version
