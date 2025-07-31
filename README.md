@@ -23,11 +23,12 @@
 <td width="50%">
 
 ### 🎯 Applications
+
 ```
 📱 host-installation
    └── Main Angular app for installation flow
-   
-🧪 host-installation-e2e  
+
+🧪 host-installation-e2e
    └── Playwright E2E tests
 ```
 
@@ -35,6 +36,7 @@
 <td width="50%">
 
 ### 📚 Libraries
+
 ```
 🧩 component-pantry
    ├── Reusable Angular components
@@ -84,12 +86,14 @@ npm run lint          # ESLint code quality checks
 <td width="50%">
 
 ### 🎯 **UI & Form Components**
+
 - 🔘 **Button** - Multi-variant interactive buttons
 - 🃏 **Card** - Flexible content containers
 - 📝 **Input** - Form input controls
 - 🔍 **Autocomplete** - Smart search inputs
 
 ### 🧭 **Navigation & Interaction**
+
 - 📊 **Stepper** - Multi-step workflows
 - 📋 **Accordion** - Collapsible content panels
 - 🪟 **Modal** - Overlay dialogs
@@ -99,14 +103,17 @@ npm run lint          # ESLint code quality checks
 <td width="50%">
 
 ### 📊 **Data Display**
+
 - 🗂️ **Table** - Feature-rich data tables
 - 🖼️ **Thumbnail Gallery** - Image galleries
 
 ### 🏗️ **Layout & Structure**
+
 - 📐 **Template** - Page templates
 - 🏠 **Layout** - Application layouts
 
 ### ✨ **And More...**
+
 - 🎛️ **Offcanvas** - Slide-out panels
 - 🔧 **Utility Components** - Helper components
 
@@ -118,12 +125,7 @@ npm run lint          # ESLint code quality checks
 <summary><strong>💻 Usage Example</strong></summary>
 
 ```typescript
-import { 
-  Button, 
-  Card, 
-  Table, 
-  Stepper 
-} from '@ntv-scaffolding/component-pantry';
+import { Button, Card, Table, Stepper } from '@ntv-scaffolding/component-pantry';
 
 @Component({
   selector: 'app-example',
@@ -132,7 +134,7 @@ import {
     <lib-card>
       <lib-button variant="primary">Click me!</lib-button>
     </lib-card>
-  `
+  `,
 })
 export class ExampleComponent {}
 ```
@@ -166,6 +168,7 @@ npx nx g @nx/storybook:story my-component --project=component-pantry
 **Install the [Nx Console extension](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) for VS Code**
 
 ✨ **Features:**
+
 - 🖱️ Visual interface for running commands
 - 🎨 Code generation wizards
 - 📊 Workspace dependency graph
@@ -184,12 +187,14 @@ npx nx g @nx/storybook:story my-component --project=component-pantry
 ### 📱 **Host Installation App**
 
 **🔧 Development Environment**
+
 ```bash
 Build: npm run build:host:dev
 Output: dist/apps/ntv-host-installation/host-installation/browser
 ```
 
 **🚀 Production Environment**
+
 ```bash
 Build: npm run build:host:prod
 Output: dist/apps/ntv-host-installation/host-installation/browser
@@ -198,12 +203,14 @@ Output: dist/apps/ntv-host-installation/host-installation/browser
 ### 📚 **Storybook Documentation**
 
 **🔧 Development**
+
 ```bash
 Build: npm run build:storybook:dev
 Output: dist/storybook/component-pantry
 ```
 
 **🚀 Production**
+
 ```bash
 Build: npm run build:storybook:prod
 Output: dist/storybook/component-pantry
@@ -217,6 +224,7 @@ Output: dist/storybook/component-pantry
 **🚀 Quick Setup (Choose one method):**
 
 **Method 1: CLI Setup (Recommended)**
+
 ```bash
 # 1. Connect to Nx Cloud (free tier available)
 npx nx connect
@@ -228,6 +236,7 @@ npx nx g ci-workflow --ci=github  # or gitlab, azure, etc.
 ```
 
 **Method 2: Web Dashboard Setup**
+
 ```bash
 # 1. Visit https://cloud.nx.app
 # 2. Sign in with GitHub/GitLab
@@ -236,6 +245,7 @@ npx nx g ci-workflow --ci=github  # or gitlab, azure, etc.
 ```
 
 **🎯 Key Benefits:**
+
 - ⚡ **Remote Caching** - Share build artifacts across team and CI
 - 🔄 **Distributed Task Execution** - Run tasks in parallel across multiple agents
 - 🧪 **Intelligent Test Splitting** - Automatically distribute tests for faster execution
@@ -244,6 +254,7 @@ npx nx g ci-workflow --ci=github  # or gitlab, azure, etc.
 - 💰 **Cost Reduction** - Significantly reduce CI/CD pipeline costs
 
 **📈 Performance Impact:**
+
 - Up to 10x faster CI/CD pipelines
 - 70% reduction in compute costs
 - Instant local cache hits for unchanged code
@@ -302,22 +313,47 @@ npm run lint          # ✅ ESLint code quality
 
 </details>
 
+<details>
+<summary><strong>🖥️ Workspace Management</strong></summary>
+
+```bash
+# 🎯 Open focused workspaces (clean file view + root terminal)
+npm run open:host      # Host Installation app only
+npm run open:pantry    # Component Pantry library only
+npm run open:custom    # Both Host Installation + Component Pantry
+npm run open:full      # Full project view
+npm run open:workspace # Show all workspace options
+
+# 📁 Alternative methods
+scripts\open-workspace.bat    # Windows batch script with menu
+scripts\open-workspace.ps1    # PowerShell script with menu
+```
+
+**💡 Benefits:**
+
+- ✨ **Clean Interface** - Only see files relevant to your current work
+- ⚡ **Better Performance** - VSCode loads faster with fewer files
+- 🎯 **Improved Focus** - Less distraction from unrelated code
+- 🔧 **Root Terminal** - Terminal opens in project root for nx/npm commands
+
+</details>
+
 ---
 
 ## 🛠️ Tech Stack
 
 <div align="center">
 
-| Category | Technology | Version |
-|----------|------------|-----------|
-| 🎯 **Framework** | Angular | 20+ |
-| 🏗️ **Build System** | Nx | 21.2.2 |
-| 🎨 **Styling** | Tailwind CSS | 3.0+ |
-| 🧪 **Unit Testing** | Jest | Latest |
-| 🎭 **E2E Testing** | Playwright | Latest |
-| 📚 **Documentation** | Storybook | 8+ |
-| 📦 **Package Manager** | npm | Latest |
-| 💻 **Language** | TypeScript | 5.0+ |
+| Category               | Technology   | Version |
+| ---------------------- | ------------ | ------- |
+| 🎯 **Framework**       | Angular      | 20+     |
+| 🏗️ **Build System**    | Nx           | 21.2.2  |
+| 🎨 **Styling**         | Tailwind CSS | 3.0+    |
+| 🧪 **Unit Testing**    | Jest         | Latest  |
+| 🎭 **E2E Testing**     | Playwright   | Latest  |
+| 📚 **Documentation**   | Storybook    | 8+      |
+| 📦 **Package Manager** | npm          | Latest  |
+| 💻 **Language**        | TypeScript   | 5.0+    |
 
 </div>
 
@@ -340,6 +376,6 @@ npm run lint          # ✅ ESLint code quality
 
 **Made with ❤️ using Angular & Nx**
 
-*Happy coding! 🚀*
+_Happy coding! 🚀_
 
 </div>
