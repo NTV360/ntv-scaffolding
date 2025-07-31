@@ -1248,5 +1248,3 @@ export class Table implements AfterViewInit {
     }
   }
 }
-
-//Trigger ci cd
