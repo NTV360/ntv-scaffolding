@@ -1,0 +1,78 @@
+<div class="date__picker">
+  <!-- Date Picker Trigger -->
+  <button class="date__picker--trigger" (click)="datePicker.toggle($event)">
+    <span>{{ getInputLabel() }}</span>
+    <span [innerHTML]="calendarIcon" class="date__picker--trigger-icon"></span>
+  </button>
+
+  <!-- Date Picker Content -->
+  <ntv-popover #datePicker maxWidth="430px" [offset]="20">
+    <div class="date__picker--content">
+      @if(showYearsList()) {
+      <div class="date__picker--header">
+        <button (click)="goPrevYears()" [innerHTML]="arrowLeftIcon"></button>
+        <span>{{ currentYear()}}</span>
+        <button (click)="goNextYears()" [innerHTML]="arrowRightIcon"></button>
+      </div>
+      <div class="year-picker-list">
+        @for(year of availableYears(); track year) {
+        <button
+          class="year-item"
+          [class.currentYear]="year === currentYear()"
+          (click)="toggleSelectYear(year); $event.stopPropagation()"
+        >
+          {{ year }}
+        </button>
+        }
+      </div>
+      } @else {
+      <div class="date__picker--header">
+        <button [innerHTML]="arrowLeftIcon" (click)="goPrev()"></button>
+        <div class="date__picker--header-middle">
+          <span class="month-text"
+            >{{ months[currentViewingMonth().getMonth()] }}
+          </span>
+          <button
+            class="year-btn"
+            (click)="toggleSelectYear(); $event.stopPropagation()"
+          >
+            <span> {{ currentViewingMonth().getFullYear()}}</span>
+            <span [innerHTML]="arrowDown"></span>
+          </button>
+        </div>
+
+        <button [innerHTML]="arrowRightIcon" (click)="goNext()"></button>
+      </div>
+      <div class="date__picker--header-weekdays">
+        @for(weekDay of weekDays; track $index) {
+        <p>{{ weekDay }}</p>
+        }
+      </div>
+      <div class="date__picker--month-view">
+        @for(week of monthOfWeeks(); track $index) { @for (day of week; track
+        day.date.toISOString()) {
+        <div
+          class="day"
+          [class.day--end-range-day]="isSameDay(day.date, endDate())"
+          [class.day--other-month]="!day.isCurrentMonth"
+          [class.day--date-range-invalid]="variant() === 'date-range' &&  isDateRangeInvalid(day.date) && startDate() !== null"
+          [class.day--start-range-day]="variant() === 'date-range' && isSameDay(day.date, getStartDate()) && hasSelectedStartDate()"
+          [class.day--in-range]="variant() === 'date-range' &&  isInRange(day.date, getStartDate(), endDate()) "
+          [class.day--today]="day.isToday"
+          [class.day--isSelected]="selectedDate().toISOString() === day.date.toISOString()"
+          [class.day--isPast]="day.isPast && variant() === 'events'"
+          [class.day--invalid-selectable-start-date]="variant() === 'date-range' && isInvalidSelectableStartDate(day.date)"
+          role="button"
+          tabindex="0"
+          (click)="onSelectDate(day.date, $event)"
+          (keyup.space)="onSelectDate(day.date,$any($event))"
+          (keyup.enter)="onSelectDate(day.date, $any($event))"
+        >
+          {{ day.date.getDate() }}
+        </div>
+        } }
+      </div>
+      }
+    </div>
+  </ntv-popover>
+</div>

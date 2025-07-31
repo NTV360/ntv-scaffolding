@@ -26,6 +26,13 @@ module.exports = {
         ],
       },
       colors: {
+        // Temp still need validation
+        porcelain: '#F3F3F5',
+        platinum: '#E6E7EA', //currently used by hover stroke,
+        lightGrey: '#D8DADF',
+        milkWhite: 'FCFCFC', // used by: date in next month
+        iron: '#C9CCD2', // used by: past date text,
+
         // Default theme colors (matching global.css variables)
         default: {
           DEFAULT: '#c0c4cc',

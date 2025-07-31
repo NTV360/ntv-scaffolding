@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.date__picker {
+  @apply w-[290px] rounded border border-gray-200 py-2 px-3 text-black;
+}
+
+.date__picker--trigger {
+  @apply w-full flex items-center justify-between;
+}
+
+.date__picker--content {
+  @apply flex flex-col gap-3;
+}
+
+.date__picker--header {
+  @apply flex items-center gap-5 justify-between;
+}
+
+.date__picker--header-middle {
+  @apply flex items-center gap-2 text-base font-semibold;
+}
+
+.date__picker .year-btn {
+  @apply flex items-center gap-1;
+}
+
+.date__picker--header-weekdays {
+  @apply mt-1.5 grid grid-cols-7 pb-1.5 border-b-[1.2px] border-gray-200;
+}
+
+.date__picker--header-weekdays > * {
+  @apply font-semibold text-sm text-center;
+}
+
+.date__picker--trigger-icon {
+  @apply bg-orange-500;
+}
+
+.date__picker--month-view {
+  @apply grid grid-cols-7 gap-[1px];
+}
+
+.date__picker--month-view .day {
+  @apply border-2 p-3 font-semibold grid place-items-center aspect-square transition-colors duration-100 rounded-sm cursor-pointer hover:border-accent-500;
+}
+
+/* .date__picker--month-view .day:nth-child(7),
+.day:nth-child(21),
+.day:nth-child(28),
+.day:last-child {
+  @apply !border-r-2;
+} */
+
+/* Date is not in the current viewing month */
+.date__picker--month-view .day--other-month {
+  @apply text-gray-400;
+}
+
+.date__picker--month-view .day--isPast {
+  @apply pointer-events-none hover:bg-none bg-gray-50 text-gray-400;
+}
+
+.date__picker--month-view .day--today {
+  @apply border-accent-500 text-accent-500;
+}
+
+/* Used in date range, disable previous date based on the inputDate */
+.date__picker--month-view .day--date-range-invalid {
+  @apply pointer-events-none hover:bg-none bg-gray-50 text-gray-400;
+}
+
+.date__picker--month-view .day.day--today.day--date-range-invalid {
+  @apply border-gray-200;
+}
+
+/** Used if day is between startDate and endDate */
+.date__picker--month-view .day.day--in-range {
+  @apply bg-accent-200 text-gray-500;
+}
+
+.date__picker--month-view .day--isSelected,
+.day--start-range-day {
+  @apply !bg-accent-500 !text-white pointer-events-none;
+}
+
+.date__picker .year-picker-list {
+  @apply w-[341.5px] grid grid-cols-4 gap-1;
+}
+
+.date__picker .year-item {
+  @apply px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200 border-none bg-transparent cursor-pointer;
+}
+
+.date__picker .year-picker-list .currentYear {
+  @apply bg-accent-500 text-white;
+}
+
+/* Only apply this styling to a end date picker which has date-end-date-picker data attribute 
+   So it will prevent the selection of startDate ahead of the already selected endDate. ONLY if endDate was selected first
+*/
+:host:not([data-end-date-picker]) .day--invalid-selectable-start-date {
+  @apply pointer-events-none text-gray-400;
+}
