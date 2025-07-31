@@ -1,36 +1,146 @@
 <div class="assign-playlist">
   <div class="assign-playlist-main">
+    <!-- Template Selection Card -->
     <div class="assign-playlist__card">
       <ntv-card>
         <div class="assign-playlist__content template-card">
-          <h2 class="template-title">Standard Template</h2>
+          <h2 class="template-title">{{ selectedTemplateName() }}</h2>
+
+          @if (selectedTemplate()) {
           <div class="template">
             <ntv-template
-              [zones]="sampleTemplatedata[0].layout"
+              [zones]="selectedTemplateZones()"
+              [availablePlaylists]="playlists"
+              [showZoneInfo]="true"
+              (zoneSelected)="onZoneSelected($event)"
               style="width: 100%; height: 100%"
             ></ntv-template>
           </div>
-
+          } @else {
+          <div class="no-template-message">
+            <p>Please select a template first from the previous step.</p>
+          </div>
+          } @if (selectedZone()) {
           <div class="select-playlist">
+            <h3>Assign Playlist to: {{ selectedZone() }}</h3>
+
             <ntv-autocomplete
               [label]="'Select a Playlist'"
-              [options]="options"
-              [config]="{placeholder: 'Select a dealer...', searchable: true, clearable: true}"
+              [options]="playlistSuggestions()"
+              [config]="{placeholder: 'Select a playlist...', searchable: true, clearable: true}"
               [size]="'md'"
               [variant]="'default'"
+              (selectionChange)="onPlaylistSelected($event)"
             ></ntv-autocomplete>
 
-            <ntv-button>
+            <ntv-button (click)="onCreatePlaylist()">
               <p class="add-btn-title">Create New Playlist</p>
             </ntv-button>
           </div>
+          } @else {
+          <div class="zone-instruction">
+            <p>Click on a zone in the template above to assign a playlist.</p>
+          </div>
+          }
         </div>
       </ntv-card>
     </div>
+
+    <!-- Playlist Contents Card -->
     <div class="assign-playlist__card">
       <ntv-card>
-        <div class="assign-playlist__content">Assign Playlist</div>
+        <div class="assign-playlist__content">
+          <h3>{{ selectedPlaylistName() }}</h3>
+
+          @if (selectedPlaylist()) {
+          <ntv-thumbnail-gallery
+            [items]="thumbnailItems()"
+            [size]="'sm'"
+            [variant]="'default'"
+            [layout]="'grid'"
+            [columns]="4"
+            [selectable]="false"
+            [showLabels]="true"
+            [showMetadata]="true"
+            [hoverEffects]="true"
+            [clickable]="false"
+            [showActionButtons]="false"
+            [draggable]="true"
+            (itemsReorder)="onItemsReorder($event)"
+          ></ntv-thumbnail-gallery>
+          } @else {
+          <div class="no-playlist-message">
+            <p>Select a zone and playlist to view contents.</p>
+          </div>
+          }
+        </div>
       </ntv-card>
     </div>
   </div>
+
+  <!-- Create Playlist Modal -->
+  @if (showCreatePlaylistModal()) {
+  <div
+    class="modal-overlay"
+    tabindex="0"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    (click)="onCloseModal()"
+    (keydown.escape)="onCloseModal()"
+    (keydown.enter)="onCloseModal()"
+    (keydown.space)="onCloseModal()"
+  >
+    <div
+      class="modal-content"
+      role="document"
+      (click)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <h3 id="modal-title">Create New Playlist</h3>
+        <button
+          type="button"
+          class="close-button"
+          (click)="onCloseModal()"
+          (keydown.enter)="onCloseModal()"
+          (keydown.space)="onCloseModal()"
+          aria-label="Close modal"
+        >
+          ×
+        </button>
+      </div>
+
+      <form [formGroup]="createPlaylistForm" (ngSubmit)="onSavePlaylist()">
+        <div class="modal-body">
+          <ntv-input
+            label="Playlist Name"
+            formControlName="name"
+            placeholder="Enter playlist name"
+            [required]="true"
+          ></ntv-input>
+
+          <ntv-input
+            label="Description (Optional)"
+            formControlName="description"
+            placeholder="Enter playlist description"
+          ></ntv-input>
+        </div>
+
+        <div class="modal-footer">
+          <ntv-button
+            type="button"
+            variant="secondary"
+            (click)="onCloseModal()"
+          >
+            Cancel
+          </ntv-button>
+          <ntv-button type="submit" [disabled]="!createPlaylistForm.valid">
+            Create Playlist
+          </ntv-button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
 </div>

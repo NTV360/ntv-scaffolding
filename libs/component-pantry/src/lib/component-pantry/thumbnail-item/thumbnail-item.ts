@@ -4,6 +4,8 @@ import {
   output,
   computed,
   signal,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -42,44 +44,52 @@ export class ThumbnailItemComponent {
   // Signal outputs
   itemClick = output<ThumbnailClickEvent>();
   selectionToggle = output<ThumbnailItem>();
-  contextMenuRequest = output<{item: ThumbnailItem, event: Event}>();
+  contextMenuRequest = output<{ item: ThumbnailItem; event: Event }>();
   mouseEnter = output<ThumbnailItem>();
   mouseLeave = output<void>();
 
+  // ViewChild for video element
+  @ViewChild('videoElement', { static: false })
+  videoElementRef?: ElementRef<HTMLVideoElement>;
+
   // Internal state
   isHovered = signal<boolean>(false);
+  isImageLoading = signal<boolean>(true);
+  isVideoLoading = signal<boolean>(true);
+  imageError = signal<boolean>(false);
+  videoError = signal<boolean>(false);
 
   readonly itemClasses = computed(() => {
     const classes = ['thumbnail-item'];
-    
+
     // Layout
     classes.push(`thumbnail-item--${this.layout()}`);
-    
+
     // Size
     if (this.layout() === 'grid') {
       classes.push(`thumbnail-container--${this.size()}`);
     }
-    
+
     // Variant
     if (this.variant() !== 'default') {
       classes.push(`thumbnail-item--${this.variant()}`);
     }
-    
+
     // Selection
     if (this.item().selected) {
       classes.push('thumbnail-item--selected');
     }
-    
+
     // Clickable
     if (this.clickable()) {
       classes.push('thumbnail-item--clickable');
     }
-    
+
     // Hover effects
     if (this.hoverEffects()) {
       classes.push('thumbnail-item--hover');
     }
-    
+
     return classes.join(' ');
   });
 
@@ -92,32 +102,42 @@ export class ThumbnailItemComponent {
       const thumbnailEvent: ThumbnailClickEvent = {
         item: this.item(),
         index: this.index(),
-        event
+        event,
       };
-      
+
       this.itemClick.emit(thumbnailEvent);
     }
   }
 
   onContextMenu(event: Event): void {
     event.preventDefault();
-    this.contextMenuRequest.emit({item: this.item(), event});
+    this.contextMenuRequest.emit({ item: this.item(), event });
   }
 
   onMoreOptionsClick(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    this.contextMenuRequest.emit({item: this.item(), event});
+    this.contextMenuRequest.emit({ item: this.item(), event });
   }
 
   onMouseEnter(): void {
     this.isHovered.set(true);
     this.mouseEnter.emit(this.item());
+
+    // Start video playback on hover if it's a video
+    if (this.item().type === 'video') {
+      this.playVideo();
+    }
   }
 
   onMouseLeave(): void {
     this.isHovered.set(false);
     this.mouseLeave.emit();
+
+    // Pause video on mouse leave
+    if (this.item().type === 'video') {
+      this.pauseVideo();
+    }
   }
 
   onImageError(event: Event): void {
@@ -125,11 +145,49 @@ export class ThumbnailItemComponent {
     if (target) {
       target.style.display = 'none';
     }
+    this.imageError.set(true);
+    this.isImageLoading.set(false);
+  }
+
+  onImageLoad(): void {
+    this.isImageLoading.set(false);
+    this.imageError.set(false);
+  }
+
+  onVideoError(): void {
+    this.videoError.set(true);
+    this.isVideoLoading.set(false);
+  }
+
+  onVideoLoad(): void {
+    this.isVideoLoading.set(false);
+    this.videoError.set(false);
+  }
+
+  private playVideo(): void {
+    const videoElement = this.videoElementRef?.nativeElement;
+    if (videoElement && !this.videoError()) {
+      videoElement.currentTime = 0;
+      videoElement.play().catch(() => {
+        // Ignore play errors (e.g., user hasn't interacted with page yet)
+        console.log('Video play failed for:', this.item().id);
+      });
+    }
+  }
+
+  private pauseVideo(): void {
+    const videoElement = this.videoElementRef?.nativeElement;
+    if (videoElement) {
+      videoElement.pause();
+      videoElement.currentTime = 0;
+    }
   }
 
   getFileIcon(): string {
     const item = this.item();
-    return item.icon || FILE_TYPE_ICONS[item.type] || FILE_TYPE_ICONS['unknown'];
+    return (
+      item.icon || FILE_TYPE_ICONS[item.type] || FILE_TYPE_ICONS['unknown']
+    );
   }
 
   getFileTypeColor(): string {
@@ -138,37 +196,37 @@ export class ThumbnailItemComponent {
 
   formatFileSize(size: string | undefined): string {
     if (!size) return '';
-    
+
     // Simple formatting for common file size formats
     if (/^\d+(\.\d+)?\s*(KB|MB|GB|TB)$/i.test(size)) {
       return size;
     }
-    
+
     // Try to parse as number of bytes
     const bytes = parseInt(size, 10);
     if (isNaN(bytes)) return size;
-    
+
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let i = 0;
     let value = bytes;
-    
+
     while (value >= 1024 && i < units.length - 1) {
       value /= 1024;
       i++;
     }
-    
+
     return `${value.toFixed(1)} ${units[i]}`;
   }
 
   formatDate(date: Date | undefined): string {
     if (!date) return '';
-    
+
     // Check if it's already a Date object
     const dateObj = date instanceof Date ? date : new Date(date);
-    
+
     // Check if date is valid
     if (isNaN(dateObj.getTime())) return '';
-    
+
     // Format: MMM DD, YYYY
     return dateObj.toLocaleDateString('en-US', {
       month: 'short',

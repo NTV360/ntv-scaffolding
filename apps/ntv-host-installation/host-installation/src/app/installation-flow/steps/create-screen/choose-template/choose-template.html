@@ -1,19 +1,18 @@
 <div class="template">
   <h2>Click on a template to select it</h2>
   <div class="template-main">
-    @for (template of sampleTemplatedata; track $index) {
+    @for (template of mockLayouts; track $index) {
     <ntv-card>
       <div
         class="template-body"
-        [class.selected]="selectedTemplate === template"
-        (click)="selectTemplate(template)"
-        (keydown.enter)="selectTemplate(template)"
-        (keydown.space)="selectTemplate(template)"
+        [class.selected]="selectedTemplate() === template.name"
+        (click)="selectTemplate(template.name)"
+        (keydown)="onTemplateCardKeydown($event, template.name)"
         tabindex="0"
         role="button"
         [attr.aria-label]="'Select template: ' + template.name"
       >
-        @if (selectedTemplate === template) {
+        @if (selectedTemplate() === template.name) {
         <div class="selected-tag">
           <span class="selected-icon">✓</span>
           <span class="selected-text">SELECTED</span>

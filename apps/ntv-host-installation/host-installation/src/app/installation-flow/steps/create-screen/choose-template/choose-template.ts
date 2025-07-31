@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 // LOCAL
 import { mockLayouts } from '../template-mockup.constant';
 
 // GLOBAL
 import { Card, Template } from '@ntv-scaffolding/component-pantry';
+
+// SERVICES
+import { InstallationFlowStateService } from '../../../../services/installation-flow-state.service';
 
 // Import the interface
 interface LayoutZone {
@@ -30,15 +33,39 @@ const components = [Card, Template];
 
 @Component({
   selector: 'ntv-choose-template',
+  standalone: true,
   imports: [components],
   templateUrl: './choose-template.html',
   styleUrl: './choose-template.css',
 })
 export class ChooseTemplate {
-  sampleTemplatedata = mockLayouts;
-  selectedTemplate: TemplateLayout | null = null;
+  private readonly stateService = inject(InstallationFlowStateService);
 
-  selectTemplate(template: TemplateLayout) {
-    this.selectedTemplate = template;
+  public readonly mockLayouts = mockLayouts;
+
+  get selectedTemplate() {
+    // Return a function that gets the current template value from the state
+    return () =>
+      this.stateService.getDraftState()()['createScreen']?.[
+        'selectedTemplate'
+      ] ?? null;
+  }
+
+  selectTemplate(name: string) {
+    const currentTemplate =
+      this.stateService.getDraftState()()['createScreen']?.['selectedTemplate'];
+    if (name !== currentTemplate) {
+      this.stateService.updateStepState('createScreen', {
+        selectedTemplate: name,
+        assignedPlaylists: {}, // Reset assigned playlists
+      });
+    }
+  }
+
+  onTemplateCardKeydown(event: KeyboardEvent, name: string) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectTemplate(name);
+    }
   }
 }

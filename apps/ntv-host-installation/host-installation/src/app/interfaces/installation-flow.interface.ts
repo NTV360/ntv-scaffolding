@@ -40,11 +40,13 @@ interface DealerName {
 
 //STEP 2
 export interface CreateScreenState {
-  screenName: string;
-  description: string;
-  screenTypeId: string;
-  templateId: string;
-  templateZones: TemplateZone[];
+  screenName?: string;
+  description?: string;
+  screenTypeId?: string;
+  templateId?: string;
+  templateZones?: TemplateZone[];
+  selectedTemplate?: string;
+  assignedPlaylists?: Record<string, string>;
 }
 
 interface TemplateZone {
