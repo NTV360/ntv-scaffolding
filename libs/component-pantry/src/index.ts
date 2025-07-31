@@ -15,3 +15,7 @@ export * from './lib/component-pantry/popover/popover';
 export * from './lib/component-pantry/popover/popover.types';
 
 export * from './lib/component-pantry/text-demo/text-demo.component';
+
+export * from './lib/component-pantry/donut-graph/donut-graph';
+export * from './lib/component-pantry/donut-graph/donut-graph.types';
+export * from './lib/component-pantry/donut-graph/donut-graph.constants';
