@@ -1,33 +1,35 @@
 <div
   class="donut-graph-container"
   [ngClass]="{
-  'donut-graph-small': isSmall(),
-  'donut-graph-medium': size() === 'medium',
-  'donut-graph-large': isLarge(),
-  'donut-graph-fullscreen': isFullscreen(),
-  'donut-graph-auto': isAuto()
-}"
+    'donut-graph-small': isSmall(),
+    'donut-graph-medium': size() === 'medium',
+    'donut-graph-large': isLarge(),
+    'donut-graph-fullscreen': isFullscreen(),
+    'donut-graph-auto': isAuto()
+  }"
 >
   <!-- Header Section -->
-  <div class="donut-graph-header" *ngIf="title()">
+  @if (title()) {
+  <div class="donut-graph-header">
     <div class="donut-graph-title-section">
       <div class="donut-graph-icon">
         <div [innerHTML]="raspberryIcon"></div>
       </div>
-      <div class="donut-graph-title" *ngIf="title()">{{ title() }}</div>
+      <div class="donut-graph-title">{{ title() }}</div>
     </div>
   </div>
+  }
 
   <!-- Chart Content -->
   <div class="donut-graph-content" [ngStyle]="containerStyles()">
     <div
       class="donut-chart-layout"
       [ngClass]="{
-           'legend-right': config().legendPosition === 'right' || !config().legendPosition,
-           'legend-left': config().legendPosition === 'left',
-           'legend-bottom': config().legendPosition === 'bottom',
-           'legend-top': config().legendPosition === 'top'
-         }"
+        'legend-right': config().legendPosition === 'right' || !config().legendPosition,
+        'legend-left': config().legendPosition === 'left',
+        'legend-bottom': config().legendPosition === 'bottom',
+        'legend-top': config().legendPosition === 'top'
+      }"
     >
       <div class="donut-chart-area">
         <div class="donut-chart-container">
@@ -47,17 +49,21 @@
             [tooltip]="chartOptions().tooltip!"
           >
           </apx-chart>
-          <div class="donut-center-content" *ngIf="displayValue()">
+
+          @if (displayValue()) {
+          <div class="donut-center-content">
             <div class="donut-center-total">{{ displayValue() }}</div>
           </div>
+          }
         </div>
       </div>
 
       <!-- Custom Legend -->
-      <div class="donut-legend" *ngIf="config().showLegend !== false">
+      @if (config().showLegend !== false) {
+      <div class="donut-legend">
+        @for (item of data(); track item.label; let i = $index) {
         <div
           class="legend-item"
-          *ngFor="let item of data(); let i = index"
           [class.legend-item-hovered]="hoveredIndex() === i"
           (mouseenter)="onLegendItemHover(i, true)"
           (mouseleave)="onLegendItemHover(i, false)"
@@ -75,7 +81,9 @@
             >
           </div>
         </div>
+        }
       </div>
+      }
     </div>
   </div>
 </div>
