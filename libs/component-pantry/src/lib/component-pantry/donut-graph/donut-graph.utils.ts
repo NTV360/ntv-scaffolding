@@ -331,32 +331,6 @@ export function getAllPercentagesWithValidation(
   };
 }
 
-// Test function to verify the calculation works correctly
-export function testPercentageCalculation() {
-  const testCases = [
-    { data: [33, 33, 34], total: 100 },
-    { data: [10, 10, 10], total: 30 },
-    { data: [1, 2, 3], total: 6 },
-    { data: [7, 13, 23], total: 43 },
-    { data: [0.1, 0.2, 0.7], total: 1 },
-  ];
-
-  testCases.forEach((testCase, index) => {
-    const mockData = testCase.data.map((val, i) => ({
-      label: `Item ${i}`,
-      total: val,
-    }));
-
-    const result = getAllPercentagesWithValidation(mockData, testCase.total);
-    console.log(`Test Case ${index + 1}:`, {
-      input: testCase.data,
-      percentages: result.percentages,
-      sum: result.sum,
-      isValid: result.isValid,
-    });
-  });
-}
-
 /**
  * Handles chart segment hover
  * @param index - Index of the hovered chart segment
