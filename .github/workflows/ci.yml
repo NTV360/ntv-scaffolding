@@ -81,14 +81,14 @@ jobs:
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
 
-      - name: 🛠️ Build Component Pantry Storybook
+      - name: 🏗️ Build host-installation
+        if: steps.setvars.outputs.host_installation_changed == 'true'
+        run: npx nx build host-installation
+
+      - name: 🏗️ Build component-pantry storybook
         if: steps.setvars.outputs.component_pantry_changed == 'true'
-        run: |
-          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
-            npm run build:storybook:prod
-          else
-            npm run build:storybook:dev
-          fi
+        run: npm run build:storybook:dev
+
       
       - name: ⬆️ Upload Host Installation Build
         if: steps.setvars.outputs.host_installation_changed == 'true'
