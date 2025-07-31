@@ -3,10 +3,10 @@ name: Deploy Component Pantry Storybook
 on:
   push:
     branches:
-      - main
-      - staging
-      - development
-      - feature/merge-ci-and-deployment
+      - main1
+      - staging1
+      - development1
+      - feature/merge-ci-and-deployment1
     paths:
       - 'libs/component-pantry/**'
       - '.github/workflows/deploy-component-pantry-storybook.yml'
@@ -17,13 +17,13 @@ permissions:
 
 jobs:
   deploy:
-    needs: ci-checks
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
 
       - uses: actions/setup-node@v4
         with:
@@ -38,19 +38,13 @@ jobs:
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Check if component-pantry is affected
         id: affected
         run: |
           npx nx show projects --affected --target=build | grep component-pantry \
             && echo "affected=true" >> $GITHUB_OUTPUT \
             || echo "affected=false" >> $GITHUB_OUTPUT
-
-      - name: Download component-pantry storybook artifact (optional)
-        if: steps.affected.outputs.affected == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: component-pantry-storybook
-          path: dist/storybook/component-pantry
 
       - name: Set deployment variables
         if: steps.affected.outputs.affected == 'true'
@@ -61,7 +55,7 @@ jobs:
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "staging" ]]; then
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STG }}" >> $GITHUB_ENV
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
@@ -72,15 +66,13 @@ jobs:
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
           fi
 
-      - name: Build Storybook (fallback if no artifact)
-        if: steps.affected.outputs.affected == 'true' && !cancelled()
+      - name: Build Storybook (only if affected)
+        if: steps.affected.outputs.affected == 'true'
         run: |
-          if [[ ! -d "dist/storybook/component-pantry" ]]; then
-            if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
-              npm run build:storybook:prod
-            else
-              npm run build:storybook:dev
-            fi
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "staging" ]]; then
+            npm run build:storybook:prod
+          else
+            npm run build:storybook:dev
           fi
 
       - name: Configure AWS credentials
