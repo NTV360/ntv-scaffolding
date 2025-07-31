@@ -17,7 +17,7 @@ import { Playlist, ZoneComponent, ZoneData } from './zone/zone.component';
   styleUrl: './template.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush, // ✅ Add OnPush
 })
-export class TemplateComponent {
+export class Template {
   public readonly zones = input<ZoneData[]>();
   public readonly availablePlaylists = input<Playlist[]>([]);
   public readonly showZoneInfo = input<boolean>(false);

@@ -1,41 +1,85 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultBase": "master",
+  "defaultBase": "development",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s",
-      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
-      "!{projectRoot}/.storybook/**/*",
-      "!{projectRoot}/tsconfig.storybook.json"
+    "default": [
+      "{projectRoot}/src/**/*",
+      "{projectRoot}/*.json",
+      "{projectRoot}/*.js",
+      "{projectRoot}/*.ts",
+      "sharedGlobals"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "production": [
+      "{projectRoot}/src/**/*.ts",
+      "{projectRoot}/src/**/*.js",
+      "{projectRoot}/src/**/*.html",
+      "{projectRoot}/src/**/*.css",
+      "{projectRoot}/src/**/*.scss",
+      "{projectRoot}/package.json",
+      "{projectRoot}/tsconfig*.json",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+      "!{projectRoot}/**/*-usage-example.md",
+      "!{projectRoot}/**/*.md"
+    ],
+    "sourceFiles": [
+      "{projectRoot}/src/**/*.ts",
+      "{projectRoot}/src/**/*.js",
+      "{projectRoot}/src/**/*.html",
+      "{projectRoot}/src/**/*.css",
+      "{projectRoot}/src/**/*.scss"
+    ],
+    "e2eFiles": [
+      "{projectRoot}/e2e/**/*.ts",
+      "{projectRoot}/e2e/**/*.js",
+      "{projectRoot}/playwright.config.ts",
+      "{projectRoot}/playwright.config.js"
+    ],
+    "testFiles": [
+      "{projectRoot}/src/**/*.spec.ts",
+      "{projectRoot}/src/**/*.test.ts",
+      "{projectRoot}/jest.config.ts",
+      "{projectRoot}/tsconfig.spec.json"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/tsconfig.base.json"
+    ]
   },
   "targetDefaults": {
     "@angular/build:application": {
       "cache": true,
       "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "inputs": ["production", "^production"],
+      "outputs": ["{options.outputPath}"]
     },
     "@nx/eslint:lint": {
       "cache": true,
       "inputs": [
-        "default",
+        "sourceFiles",
+        "e2eFiles",
         "{workspaceRoot}/.eslintrc.json",
         "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.mjs"
-      ]
+        "{workspaceRoot}/eslint.config.mjs",
+        "{projectRoot}/.eslintrc.json",
+        "{projectRoot}/eslint.config.mjs",
+        "{projectRoot}/tsconfig*.json"
+      ],
+      "outputs": ["{options.outputFile}"]
     },
     "@nx/jest:jest": {
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "sourceFiles",
+        "testFiles",
+        "^production",
+        "{workspaceRoot}/jest.preset.js"
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}",
+        "{options.outputFile}"
+      ],
       "options": {
         "passWithNoTests": true
       },
@@ -46,14 +90,50 @@
         }
       }
     },
+    "@nx/playwright:playwright": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
+    },
+    "build": {
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "outputs": ["{options.outputPath}"]
+    },
     "build-storybook": {
       "cache": true,
       "inputs": [
-        "default",
+        "sourceFiles",
         "^production",
         "{projectRoot}/.storybook/**/*",
         "{projectRoot}/tsconfig.storybook.json"
-      ]
+      ],
+      "outputs": ["{options.outputDir}"]
+    },
+    "e2e": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
+    },
+    "e2e-ci": {
+      "cache": true,
+      "inputs": [
+        "sourceFiles",
+        "^production",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e/**/*"
+      ],
+      "outputs": ["{workspaceRoot}/dist/.playwright", "{options.outputDir}"]
     }
   },
   "plugins": [

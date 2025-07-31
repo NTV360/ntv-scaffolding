@@ -1,0 +1,15 @@
+.search-host__inputs {
+  @apply flex items-center gap-3 mb-4 w-full;
+}
+
+.search-host__map {
+  @apply rounded-lg overflow-auto;
+}
+
+.autocomplete {
+  @apply w-[400px];
+}
+
+.searchbar {
+  @apply flex-1;
+}

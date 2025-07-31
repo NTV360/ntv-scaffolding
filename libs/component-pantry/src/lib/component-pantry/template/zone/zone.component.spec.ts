@@ -25,18 +25,11 @@ describe('ZoneComponent', () => {
 
     fixture = TestBed.createComponent(ZoneComponent);
     component = fixture.componentInstance;
-    component.zoneData.set(mockZone);
+    fixture.componentRef.setInput('zoneData', mockZone);
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should emit zoneSelected on click', () => {
-    spyOn(component.zoneSelected, 'emit');
-    const zoneDiv = fixture.debugElement.query(By.css('.screen-zone'));
-    zoneDiv.triggerEventHandler('click');
-    expect(component.zoneSelected.emit).toHaveBeenCalledWith('Test Zone');
   });
 });

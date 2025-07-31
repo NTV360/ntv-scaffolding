@@ -9,3 +9,17 @@
   @apply p-0 m-0;
   font-family: 'Nunito', sans-serif;
 }
+
+.step-main {
+  @apply space-y-6;
+}
+
+.stepper-card {
+  @apply bg-white rounded-lg shadow-sm;
+}
+
+.step-content {
+  @apply rounded-lg p-6;
+  background: #fff;
+  box-shadow: 2px 2px 32px 0 rgba(208, 210, 218, 0.25);
+}

@@ -1,6 +1,6 @@
 # Accordion Component Usage Examples
 
-The Accordion component is a simple, highly configurable component that provides collapsible content panels with smooth animations and accessibility features using ng-content projection.
+The Accordion component is a simple, highly configurable component that provides collapsible content panels with smooth animations and accessibility features using ng-content projections.
 
 ## Basic Usage
 
@@ -13,9 +13,7 @@ import { Accordion } from '@ntv/component-pantry';
   standalone: true,
   imports: [Accordion],
   template: `
-    <ntv-accordion 
-      variant="bordered"
-      (accordionToggle)="onAccordionToggle($event)">
+    <ntv-accordion variant="bordered" (accordionToggle)="onAccordionToggle($event)">
       <div slot="header">
         <div class="flex items-center space-x-2">
           <span>📚</span>
@@ -26,7 +24,7 @@ import { Accordion } from '@ntv/component-pantry';
         <p>Learn the basics of our platform and how to get up and running quickly.</p>
       </div>
     </ntv-accordion>
-  `
+  `,
 })
 export class ExampleComponent {
   onAccordionToggle(isOpen: boolean) {
@@ -48,7 +46,7 @@ import { AccordionConfig } from '@ntv/component-pantry';
       <div slot="header">Configuration Example</div>
       <div slot="body">This accordion uses a config object for cleaner templates.</div>
     </ntv-accordion>
-  `
+  `,
 })
 export class ConfigExampleComponent {
   accordionConfig: AccordionConfig = {
@@ -56,7 +54,7 @@ export class ConfigExampleComponent {
     size: 'lg',
     animated: true,
     showIcons: true,
-    initialOpen: false
+    initialOpen: false,
   };
 }
 ```
@@ -64,6 +62,7 @@ export class ConfigExampleComponent {
 ## Variants
 
 ### Default Variant
+
 ```html
 <ntv-accordion variant="default">
   <div slot="header">Default Header</div>
@@ -72,6 +71,7 @@ export class ConfigExampleComponent {
 ```
 
 ### Bordered Variant
+
 ```html
 <ntv-accordion variant="bordered">
   <div slot="header">Bordered Header</div>
@@ -80,6 +80,7 @@ export class ConfigExampleComponent {
 ```
 
 ### Flush Variant
+
 ```html
 <ntv-accordion variant="flush">
   <div slot="header">Flush Header</div>
@@ -112,6 +113,7 @@ export class ConfigExampleComponent {
 ## Advanced Features
 
 ### Exclusive Groups
+
 ```html
 <!-- Only one accordion in the group can be open at a time -->
 <ntv-accordion group="setup-wizard" variant="bordered">
@@ -131,6 +133,7 @@ export class ConfigExampleComponent {
 ```
 
 ### Without Icons
+
 ```html
 <ntv-accordion [showIcons]="false" variant="bordered">
   <div slot="header">Clean Header</div>
@@ -139,6 +142,7 @@ export class ConfigExampleComponent {
 ```
 
 ### Disable Animations
+
 ```html
 <ntv-accordion [animated]="false" variant="bordered">
   <div slot="header">Instant Toggle</div>
@@ -147,6 +151,7 @@ export class ConfigExampleComponent {
 ```
 
 ### Initially Open
+
 ```html
 <ntv-accordion [initialOpen]="true" variant="bordered">
   <div slot="header">Pre-opened Content</div>
@@ -174,13 +179,8 @@ The accordion supports any Angular content through ng-content projection:
       <li>Custom CSS classes and styling</li>
       <li>Interactive elements</li>
     </ul>
-    <div class="bg-blue-50 p-3 rounded-lg mt-3">
-      <strong>Note:</strong> Content is fully interactive Angular content
-    </div>
-    <button class="mt-2 px-3 py-1 bg-blue-500 text-white rounded" 
-            (click)="handleClick()">
-      Interactive Button
-    </button>
+    <div class="bg-blue-50 p-3 rounded-lg mt-3"><strong>Note:</strong> Content is fully interactive Angular content</div>
+    <button class="mt-2 px-3 py-1 bg-blue-500 text-white rounded" (click)="handleClick()">Interactive Button</button>
   </div>
 </ntv-accordion>
 ```
@@ -194,7 +194,7 @@ The accordion supports any Angular content through ng-content projection:
     <div slot="header">First Accordion</div>
     <div slot="body">This accordion works independently.</div>
   </ntv-accordion>
-  
+
   <ntv-accordion variant="bordered">
     <div slot="header">Second Accordion</div>
     <div slot="body">This accordion also works independently.</div>
@@ -207,7 +207,7 @@ The accordion supports any Angular content through ng-content projection:
     <div slot="header">FAQ Item 1</div>
     <div slot="body">Only one FAQ can be open at a time.</div>
   </ntv-accordion>
-  
+
   <ntv-accordion group="faq" variant="bordered">
     <div slot="header">FAQ Item 2</div>
     <div slot="body">Opening this will close the other FAQ items.</div>
@@ -232,9 +232,9 @@ export class EventExampleComponent {
 
   onStateChange(items: AccordionItem[]) {
     // Handle overall state changes
-    const openItems = items.filter(item => item.isOpen);
+    const openItems = items.filter((item) => item.isOpen);
     console.log(`${openItems.length} items are currently open`);
-    
+
     // Save state to localStorage
     localStorage.setItem('accordionState', JSON.stringify(items));
   }

@@ -76,16 +76,19 @@
 
 .input__wrapper:focus-within {
   @apply border-[var(--input-focus-color)] text-[var(--input-focus-color)];
-  box-shadow: 0 0 0 0px var(--input-background-color), 0 0 0 1px var(--input-focus-color);
+  box-shadow: 0 0 0 0px var(--input-background-color),
+    0 0 0 1px var(--input-focus-color);
   animation: focus-settle 0.3s ease-out forwards;
 }
 
 @keyframes focus-settle {
   0% {
-    box-shadow: 0 0 0 1px var(--input-background-color), 0 0 0 2px var(--input-focus-color);
+    box-shadow: 0 0 0 1px var(--input-background-color),
+      0 0 0 2px var(--input-focus-color);
   }
   100% {
-    box-shadow: 0 0 0 0px var(--input-background-color), 0 0 0 1px var(--input-focus-color);
+    box-shadow: 0 0 0 0px var(--input-background-color),
+      0 0 0 1px var(--input-focus-color);
   }
 }
 

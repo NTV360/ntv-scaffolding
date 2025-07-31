@@ -1,4 +1,6 @@
 import { Component, signal } from '@angular/core';
+
+//GLOBAL
 import {
   Card,
   Stepper,
@@ -6,6 +8,7 @@ import {
   StepData,
   StepClickEvent,
 } from '@ntv-scaffolding/component-pantry';
+
 import { SearchHostPlace } from './search-host-place/search-host-place';
 import { CreateHostPlace } from './create-host-place/create-host-place';
 
