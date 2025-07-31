@@ -58,10 +58,8 @@ jobs:
         run: |
           host=$(npx nx show projects --affected --target=build | grep host-installation || true)
           component=$(npx nx show projects --affected --target=build | grep component-pantry || true)
-          echo "host_installation_changed=${host}" >> $GITHUB_ENV
-          echo "component_pantry_changed=${component}" >> $GITHUB_ENV
-          echo "host_installation_changed=${host}" >> $GITHUB_OUTPUT
-          echo "component_pantry_changed=${component}" >> $GITHUB_OUTPUT
+          echo "host_installation_changed=${{ host != '' }}" >> $GITHUB_OUTPUT
+          echo "component_pantry_changed=${{ component != '' }}" >> $GITHUB_OUTPUT
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
@@ -95,7 +93,7 @@ jobs:
   deploy-host-installation:
     name: 🚀 Deploy Host Installation
     needs: ci-checks
-    if: needs.ci-checks.outputs.host_installation_changed != ''
+    if: needs.ci-checks.outputs.host_installation_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,7 +131,7 @@ jobs:
   deploy-component-pantry:
     name: 📘 Deploy Component Pantry Storybook
     needs: ci-checks
-    if: needs.ci-checks.outputs.component_pantry_changed != ''
+    if: needs.ci-checks.outputs.component_pantry_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
