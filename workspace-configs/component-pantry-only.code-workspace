@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "name": "Component Pantry Library",
+      "path": "../libs/component-pantry"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.nx": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.nx": true
+    },
+    "terminal.integrated.cwd": "${workspaceFolder}/../..",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt"
+  },
+  "extensions": {
+    "recommendations": [
+      "angular.ng-template",
+      "ms-vscode.vscode-typescript-next",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-eslint"
+    ]
+  }
+}
