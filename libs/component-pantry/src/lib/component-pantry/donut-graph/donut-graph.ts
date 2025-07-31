@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule, ChartComponent } from 'ng-apexcharts';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {
   DonutChartConfig,
   DonutChartItem,
@@ -33,6 +34,7 @@ import {
   onLegendItemHover as onLegendItemHoverUtil,
   updateChartHoverEffects as updateChartHoverEffectsUtil,
 } from './donut-graph.utils';
+import { FILE_ICONS } from '../../utils/file-icons';
 
 /**
  * Donut Graph component that renders interactive donut charts.
@@ -57,8 +59,14 @@ export class DonutGraphComponent implements AfterViewInit {
   @ViewChild('chart') chart!: ChartComponent;
   public elementRef = inject(ElementRef);
 
+  // Used to sanitize potentially unsafe HTML content for safe binding
+  private sanitizer = inject(DomSanitizer);
+
   // Hover state management
   readonly hoveredIndex = signal<number | null>(null);
+
+  // SVG
+  public readonly raspberryIcon: SafeHtml;
 
   // Inputs
   data = input.required<DonutChartItem[]>();
@@ -286,6 +294,9 @@ export class DonutGraphComponent implements AfterViewInit {
   });
 
   constructor() {
+    this.raspberryIcon = this.sanitizer.bypassSecurityTrustHtml(
+      FILE_ICONS['RASPBERRY']
+    );
     setupEffects(this);
   }
 
