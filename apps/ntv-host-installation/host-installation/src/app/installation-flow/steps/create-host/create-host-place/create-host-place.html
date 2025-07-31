@@ -7,10 +7,21 @@
         <ntv-autocomplete
           [label]="field.label"
           [options]="options"
-          [config]="{placeholder: 'Select a License...', searchable: true, clearable: true}"
+          [config]="{placeholder: 'Select technologies...', multiple: true, searchable: true, clearable: true, maxSelections: 5}"
           [size]="'md'"
           [variant]="'default'"
         ></ntv-autocomplete>
+
+        <ntv-button
+          [variant]="'accent'"
+          [size]="'md'"
+          [fullWidth]="true"
+          [rounded]="'full'"
+          [shadow]="true"
+          [type]="'submit'"
+        >
+          Generate
+        </ntv-button>
         } @else {
         <ntv-input
           [id]="field.name"

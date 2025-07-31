@@ -10,6 +10,7 @@
 }
 
 .div2 {
+  @apply flex items-end gap-3;
   grid-column: span 2 / span 2;
   grid-column-start: 3;
 }

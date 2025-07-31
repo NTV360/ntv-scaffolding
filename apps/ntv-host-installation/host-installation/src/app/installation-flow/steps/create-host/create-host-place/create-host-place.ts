@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 
 //GLOBAL
-import { Autocomplete, Input } from '@ntv-scaffolding/component-pantry';
+import { Autocomplete, Button, Input } from '@ntv-scaffolding/component-pantry';
 
 import { HOST_FORM_FIELDS } from '../../../../constants/form-field.constant';
 
 //COMPONENTS
-const components = [Autocomplete, Input];
+const components = [Autocomplete, Button, Input];
 @Component({
   selector: 'ntv-create-host-place',
   imports: [components],
@@ -22,6 +22,7 @@ export class CreateHostPlace {
     { value: 'dealer3', label: 'Dealer 3' },
     { value: 'dealer4', label: 'Dealer 4' },
     { value: 'dealer5', label: 'Dealer 5' },
+    { value: 'dealer6', label: 'Dealer 6' },
   ];
 
   /**
