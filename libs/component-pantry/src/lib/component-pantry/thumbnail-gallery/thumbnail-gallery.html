@@ -159,7 +159,7 @@
 <div
   cdkDropList
   cdkDropListOrientation="mixed"
-  class="thumbnail-drop-list"
+  [class]="containerClasses() + ' thumbnail-drop-list'"
   [ngStyle]="containerStyles()"
   (cdkDropListDropped)="onDrop($event)"
   role="grid"
