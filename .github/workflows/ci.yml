@@ -1,4 +1,4 @@
-name: 🚀 CI
+name: 🚀 CI & Deployment
 
 on:
   push:
@@ -6,38 +6,40 @@ on:
       - main
       - development
       - staging
+
   pull_request:
     branches:
       - main
       - development
 
 permissions:
-  actions: read
   contents: read
+  actions: read
 
 env:
-  # 🧠 Performance optimizations
   NODE_OPTIONS: --max_old_space_size=4096
-  # 💾 Cache optimizations
   HUSKY: 0
 
 jobs:
-  main:
+  ci-checks:
+    name: 🔍 CI Checks
     runs-on: ubuntu-latest
+    outputs:
+      host_installation_changed: ${{ steps.setvars.outputs.host_installation_changed }}
+      component_pantry_changed: ${{ steps.setvars.outputs.component_pantry_changed }}
     steps:
-      - name: 📥 Checkout
+      - name: 📅 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🟢 Setup Node.js
+      - name: 🔘 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      # 📦 Enhanced npm cache
-      - name: 💾 Cache node modules
+      - name: 📂 Cache node modules
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -48,25 +50,53 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci --legacy-peer-deps --prefer-offline --no-audit
 
-      - name: 🔍 Set up Nx SHAs
+      - name: 🔍 Set Nx SHAs
         uses: nrwl/nx-set-shas@v4
 
-      # ☁️ BEST PRACTICE: Single Nx Cloud run for all tasks including E2E
-      # This is the recommended approach from Nx team for maximum efficiency
+      - name: 🔍 Detect affected projects
+        id: setvars
+        run: |
+          echo "Detecting affected projects..."
+          echo "NX_BASE=$NX_BASE"
+          echo "NX_HEAD=$NX_HEAD"
+
+          echo "Affected projects:"
+          npx nx show projects --affected --target=build || echo "(none)"
+
+          host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
+          component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
+
+          echo "host: [$host]"
+          echo "component: [$component]"
+
+          if [[ -n "$host" ]]; then
+            echo "host_installation_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "host_installation_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ -n "$component" ]]; then
+            echo "component_pantry_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
 
-      # ⚡ Run all tasks in optimal order: lint -> test -> build -> e2e
       - name: ⚡ Run lint and test
         run: npx nx affected -t lint test --parallel=3
 
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
+      
+      - name: 🛠️ Build Component Pantry Storybook
+        if: steps.setvars.outputs.component_pantry_changed == 'true'
+        run: npm run build:storybook:prod
 
-      # 🎭 Install Playwright browsers before E2E (only if needed)
-      - name: 🔍 Get Playwright version
+      - name: 🍍 Get Playwright version
         id: playwright-version
-        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
+        run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies[\"@playwright/test\"].version')" >> $GITHUB_OUTPUT
 
       - name: 🎭 Cache Playwright browsers
         uses: actions/cache@v4
@@ -74,28 +104,116 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-chromium
-          restore-keys: |
-            playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-
-            playwright-${{ runner.os }}-
 
       - name: 🎭 Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      # 🧪 Run E2E tests as part of the same Nx Cloud run
-      - name: 🧪 Run E2E tests
+      - name: 🪲 Run E2E tests
         run: npx nx affected -t e2e --parallel=1
         env:
           PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
 
-      # 📁 Enhanced artifact upload with CORRECT paths
-      - name: 📁 Upload E2E test results
+      - name: ⬆️ Upload Host Installation Build
+        if: steps.setvars.outputs.host_installation_changed == 'true'
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: e2e-results-${{ github.run_id }}
-          path: |
-            dist/.playwright/apps/ntv-host-installation/host-installation-e2e/test-results/
-            dist/.playwright/apps/ntv-host-installation/host-installation-e2e/playwright-report/
-          retention-days: 7
-          compression-level: 6
+          name: host-installation-build
+          path: dist/apps/ntv-host-installation/host-installation/browser
+
+      - name: ⬆️ Upload Component Pantry Storybook
+        if: steps.setvars.outputs.component_pantry_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: component-pantry-storybook
+          path: dist/storybook/component-pantry
+
+  deploy-host-installation:
+    name: 🚀 Deploy Host Installation
+    needs: ci-checks
+    if: github.event_name == 'push' && needs.ci-checks.outputs.host_installation_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ↓ Download Host Installation Build
+        uses: actions/download-artifact@v4
+        with:
+          name: host-installation-build
+          path: dist/apps/ntv-host-installation/host-installation/browser
+
+      - name: Set deployment variables
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PROD }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_PROD }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_STG }}" >> $GITHUB_ENV
+          else
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3 and Invalidate CloudFront
+        run: |
+          aws s3 sync dist/apps/ntv-host-installation/host-installation/browser s3://$S3_BUCKET --delete
+          aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
+
+  deploy-component-pantry:
+    name: 📘 Deploy Component Pantry Storybook
+    needs: ci-checks
+    if: github.event_name == 'push' && needs.ci-checks.outputs.component_pantry_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ↓ Download Component Pantry Storybook
+        uses: actions/download-artifact@v4
+        with:
+          name: component-pantry-storybook
+          path: dist/storybook/component-pantry
+
+      - name: Set deployment variables
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_PROD }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_STG }}" >> $GITHUB_ENV
+          else
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
+            echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy Storybook to S3 and Invalidate CloudFront
+        run: |
+          aws s3 sync dist/storybook/component-pantry s3://$S3_BUCKET --delete
+          aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
