@@ -6,7 +6,7 @@ import { debounceTime, Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class HostInstallationApiService extends BaseService {
+export class InstallationDraftApiService extends BaseService {
   private _draftState = signal<InstallationFlowDraft>({});
   private _autoSaveSubject = new Subject<InstallationFlowDraft>();
   private _isSaving = signal<boolean>(false);
@@ -72,7 +72,7 @@ export class HostInstallationApiService extends BaseService {
       const stepData = { ...draft[step] };
       if (stepData && typeof stepData === 'object') {
         delete (stepData as any)[propertyKey];
-        
+
         // If the step becomes empty after removing the property, remove the entire step
         if (Object.keys(stepData).length === 0) {
           const newDraft = { ...draft };
@@ -98,13 +98,13 @@ export class HostInstallationApiService extends BaseService {
     try {
       this._isSaving.set(true);
       const currentDraft = this._draftState();
-      
+
       // TODO: Replace with actual API endpoint
       // await this.postRequest('/api/installation-flow/draft', currentDraft).toPromise();
-      
+
       // Simulate API call for now
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       this._lastSaved.set(new Date());
       console.log('Draft saved successfully:', currentDraft);
       return true;
@@ -124,11 +124,11 @@ export class HostInstallationApiService extends BaseService {
     try {
       // TODO: Replace with actual API endpoint
       // const draft = await this.getRequest<InstallationFlowDraft>('/api/installation-flow/draft').toPromise();
-      
+
       // Simulate API call for now
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       const draft: InstallationFlowDraft = {}; // Replace with actual API response
-      
+
       this._draftState.set(draft);
       return draft;
     } catch (error) {

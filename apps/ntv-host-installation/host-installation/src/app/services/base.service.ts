@@ -6,59 +6,98 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment, API_ENDPOINTS } from '../../environments';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BaseService {
   private http = inject(HttpClient);
+  protected baseUrl = environment.base_uri;
+  protected fastEdgeUrl = environment.fastedge;
+  protected apiEndpoints = API_ENDPOINTS;
+
+  protected headers = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      credentials: 'include',
+      Accept: 'application/json',
+    }),
+    withCredentials: true,
+  };
+
+  protected applicationOnlyHeaders = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    withCredentials: false,
+  };
 
   /**
    * Generic GET request method
-   * @param url - The complete URL for the request
-   * @param headers - Optional headers object
-   * @param withCredentials - Whether to include credentials
-   * @param retryOnError - Whether to retry on error
-   * @param suppressErrorHandling - Whether to suppress default error handling
+   * @param endpoint - The API endpoint (will be appended to base URL unless plain is true)
+   * @param options - Optional options object
+   * @param isApplicationRequestOnly - Whether to use application-only headers (no credentials)
+   * @param plain - Whether to use the endpoint as-is without prepending base URL (default: false)
    * @returns Observable of the response
    */
   protected getRequest<T>(
-    url: string,
-    headers: { [key: string]: string } = {},
-    withCredentials = false
+    endpoint: string,
+    options: any = null,
+    isApplicationRequestOnly = false,
+    plain = false
   ): Observable<T> {
+    const baseOptions = isApplicationRequestOnly ? this.applicationOnlyHeaders : this.headers;
+    
+    if (plain) return this.http.get<T>(endpoint);
+    
+    let headers = baseOptions.headers;
+    if (options) {
+      // Add new headers from options
+      Object.keys(options).forEach(key => {
+        headers = headers.set(key, options[key]);
+      });
+    }
+    
     const httpOptions = {
-      headers: new HttpHeaders(headers),
-      withCredentials,
+      headers,
+      withCredentials: baseOptions.withCredentials || false
     };
-
-    const request = this.http.get<T>(url, httpOptions);
-
-    return request;
+    
+    const url = `${this.baseUrl}${endpoint}`;
+    return this.http.get<T>(url, httpOptions).pipe(catchError(this.handleError));
   }
 
   /**
    * Generic POST request method
-   * @param url - The complete URL for the request
+   * @param endpoint - The API endpoint (will be appended to base URL unless plain is true)
    * @param body - The request body
-   * @param headers - Optional headers object
-   * @param withCredentials - Whether to include credentials
+   * @param options - Optional options object
+   * @param isApplicationRequestOnly - Whether to use application-only headers (no credentials)
+   * @param plain - Whether to use the endpoint as-is without prepending base URL (default: false)
    * @returns Observable of the response
    */
   protected postRequest<T>(
-    url: string,
+    endpoint: string,
     body: unknown,
-    headers: { [key: string]: string } = {},
-    withCredentials = false
+    options: any = null,
+    isApplicationRequestOnly = false,
+    plain = false
   ): Observable<T> {
+    const baseOptions = !isApplicationRequestOnly ? this.headers : this.applicationOnlyHeaders;
+    
+    let headers = baseOptions.headers;
+    if (options) {
+      // Add new headers from options
+      Object.keys(options).forEach(key => {
+        headers = headers.set(key, options[key]);
+      });
+    }
+    
     const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...headers,
-      }),
-      withCredentials,
+      headers,
+      withCredentials: baseOptions.withCredentials || false
     };
-
+    
+    const url = plain ? endpoint : `${this.baseUrl}${endpoint}`;
     return this.http
       .post<T>(url, body, httpOptions)
       .pipe(catchError(this.handleError));
@@ -66,26 +105,36 @@ export class BaseService {
 
   /**
    * Generic PUT request method
-   * @param url - The complete URL for the request
+   * @param endpoint - The API endpoint (will be appended to base URL unless plain is true)
    * @param body - The request body
-   * @param headers - Optional headers object
-   * @param withCredentials - Whether to include credentials
+   * @param options - Optional options object
+   * @param isApplicationRequestOnly - Whether to use application-only headers (no credentials)
+   * @param plain - Whether to use the endpoint as-is without prepending base URL (default: false)
    * @returns Observable of the response
    */
   protected putRequest<T>(
-    url: string,
+    endpoint: string,
     body: unknown,
-    headers: { [key: string]: string } = {},
-    withCredentials = false
+    options: any = null,
+    isApplicationRequestOnly = false,
+    plain = false
   ): Observable<T> {
+    const baseOptions = !isApplicationRequestOnly ? this.headers : this.applicationOnlyHeaders;
+    
+    let headers = baseOptions.headers;
+    if (options) {
+      // Add new headers from options
+      Object.keys(options).forEach(key => {
+        headers = headers.set(key, options[key]);
+      });
+    }
+    
     const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...headers,
-      }),
-      withCredentials,
+      headers,
+      withCredentials: baseOptions.withCredentials || false
     };
-
+    
+    const url = plain ? endpoint : `${this.baseUrl}${endpoint}`;
     return this.http
       .put<T>(url, body, httpOptions)
       .pipe(catchError(this.handleError));
@@ -93,24 +142,45 @@ export class BaseService {
 
   /**
    * Generic DELETE request method
-   * @param url - The complete URL for the request
-   * @param headers - Optional headers object
-   * @param withCredentials - Whether to include credentials
+   * @param endpoint - The API endpoint (will be appended to base URL unless plain is true)
+   * @param options - Optional options object
+   * @param isApplicationRequestOnly - Whether to use application-only headers (no credentials)
+   * @param plain - Whether to use the endpoint as-is without prepending base URL (default: false)
    * @returns Observable of the response
    */
   protected deleteRequest<T>(
-    url: string,
-    headers: { [key: string]: string } = {},
-    withCredentials = false
+    endpoint: string,
+    options: any = null,
+    isApplicationRequestOnly = false,
+    plain = false
   ): Observable<T> {
+    const baseOptions = !isApplicationRequestOnly ? this.headers : this.applicationOnlyHeaders;
+    
+    let headers = baseOptions.headers;
+    if (options) {
+      // Add new headers from options
+      Object.keys(options).forEach(key => {
+        headers = headers.set(key, options[key]);
+      });
+    }
+    
     const httpOptions = {
-      headers: new HttpHeaders(headers),
-      withCredentials,
+      headers,
+      withCredentials: baseOptions.withCredentials || false
     };
+    
+    const url = plain ? endpoint : `${this.baseUrl}${endpoint}`;
+    return this.http.delete<T>(url, httpOptions).pipe(catchError(this.handleError));
+  }
 
-    return this.http
-      .delete<T>(url, httpOptions)
-      .pipe(catchError(this.handleError));
+
+
+  /**
+   * Check if the application is running in production mode
+   * @returns boolean indicating if in production
+   */
+  protected isProduction(): boolean {
+    return environment.production;
   }
 
   /**

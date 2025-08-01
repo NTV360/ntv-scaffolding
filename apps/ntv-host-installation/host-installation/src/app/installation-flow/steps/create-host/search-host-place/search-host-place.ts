@@ -5,6 +5,7 @@ import {
   OnDestroy,
   ViewChild,
   AfterViewInit,
+  OnInit,
 } from '@angular/core';
 import { GoogleMap } from '@angular/google-maps';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -14,15 +15,27 @@ import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { Autocomplete, Searchbar } from '@ntv-scaffolding/component-pantry';
 
 // LOCAL
-import { Fastedge, HostInstallationApiService } from '../../../../services';
+import {
+  Fastedge,
+  HostInstallationApi,
+  InstallationDraftApiService,
+} from '../../../../services';
+import { CityState } from '../../../../interfaces';
 
 /**
  * Interface for search result data structure
+ * Contains all original data from Google Business Profile API
  */
 interface SearchResultData {
-  id: number;
+  id: string;
   title: string;
   description: string;
+  additionalData: {
+    type: string;
+    thumbnail: string;
+    latitude: number;
+    longitude: number;
+  };
 }
 
 const components = [Autocomplete, Searchbar] as const;
@@ -37,13 +50,15 @@ const components = [Autocomplete, Searchbar] as const;
   templateUrl: './search-host-place.html',
   styleUrl: './search-host-place.css',
 })
-export class SearchHostPlace implements AfterViewInit, OnDestroy {
+export class SearchHostPlace implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('searchbarRef') searchbarRef!: Searchbar;
   /** Service for making API calls to get business profile data */
   private readonly fastedgeService = inject(Fastedge);
 
+  private readonly installationAPI = inject(HostInstallationApi);
+
   /** Service for managing installation flow state and auto-save */
-  private readonly installationApiService = inject(HostInstallationApiService);
+  private readonly installationDraft = inject(InstallationDraftApiService);
 
   /** Subject for handling component destruction and unsubscribing from observables */
   private readonly destroy$ = new Subject<void>();
@@ -121,6 +136,11 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
   // Store pending location data to pin when map is ready
   private pendingLocationPin: { address: string; title: string } | null = null;
 
+  /** Stores the cities and states data from the API */
+  private citiesStateData: { data: CityState[] } = { data: [] };
+
+  isCanada = false;
+
   constructor() {
     // Subscribe to search control changes for auto-save
     this.searchControl.valueChanges
@@ -135,12 +155,12 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
       });
   }
 
-  // ngOnInit(): void {
-  //   // Initial setup - actual restoration happens in ngAfterViewInit
-  // }
+  ngOnInit(): void {
+    this.getAllCitiesState();
+  }
 
   ngAfterViewInit(): void {
-    const draft = this.installationApiService.getDraftState()();
+    const draft = this.installationDraft.getDraftState()();
 
     if (draft.createHost?.searchHostPlace) {
       const searchHostPlace = draft.createHost.searchHostPlace;
@@ -292,7 +312,10 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
    * @param event - Selected location event containing title and description
    */
   public selectedValue(event: SearchResultData): void {
-    console.log(event, 'selected');
+    this.getStoreHours(event.id);
+    this.splitLocationAddress(event.description);
+
+    console.log(event, 'babababba');
 
     if (event && event.description) {
       // Save selected place data and trigger auto-save
@@ -305,7 +328,7 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
       this.selectedPlace.set(selectedPlaceData);
 
       // Update installation flow state with selected place
-      this.installationApiService.updateStepState('createHost', {
+      this.installationDraft.updateStepState('createHost', {
         searchHostPlace: selectedPlaceData,
       });
 
@@ -318,7 +341,7 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
       // Log the current draft state
       console.log(
         'Draft state after place selection:',
-        this.installationApiService.getDraftState()()
+        this.installationDraft.getDraftState()()
       );
     } else {
       console.warn('Invalid event data:', event);
@@ -332,7 +355,9 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
    */
   public onButtonClick(): void {
     const searchQuery = this.searchKeyword();
-    let cpuntry;
+    let country = 'United States';
+
+    if (this.isCanada) country = 'Canada';
 
     if (!searchQuery.trim()) {
       console.warn('Search query is empty');
@@ -342,27 +367,28 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
     this.isLoading.set(true);
 
     this.fastedgeService
-      .get_google_business_profile(searchQuery)
+      .get_google_business_profile(searchQuery + ', ' + country)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
           console.log(response, 'uhu');
           if (response?.google_search && response.google_search.length > 0) {
             // Map the API response to the data array structure
+
             const mappedResults: SearchResultData[] =
-              response.google_search.map(
-                (item: any, index: number): SearchResultData => {
-                  return {
-                    id: index + 1,
-                    title: item.title || item.name || 'Unknown Name',
-                    description:
-                      item.address ||
-                      item.formatted_address ||
-                      item.country ||
-                      'Unknown Location',
-                  };
-                }
-              );
+              response.google_search.map((item: any): SearchResultData => {
+                return {
+                  id: item.placeId,
+                  title: item.title,
+                  description: item.address,
+                  additionalData: {
+                    type: item.type,
+                    thumbnail: item.thumbnail,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                  },
+                };
+              });
 
             // Replace data array with new results
             this.data = mappedResults;
@@ -394,7 +420,7 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
 
     // Save search keyword to installation flow state (including empty values)
     if (value.trim()) {
-      this.installationApiService.updateStepState('createHost', {
+      this.installationDraft.updateStepState('createHost', {
         searchHostPlace: {
           ...this.selectedPlace(),
           name: value,
@@ -404,7 +430,7 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
       });
     } else {
       // Remove the search host place property when input is empty
-      this.installationApiService.removeStepProperty(
+      this.installationDraft.removeStepProperty(
         'createHost',
         'searchHostPlace'
       );
@@ -417,7 +443,212 @@ export class SearchHostPlace implements AfterViewInit, OnDestroy {
     // Log the current draft state
     console.log(
       'Draft state after search input:',
-      this.installationApiService.getDraftState()()
+      this.installationDraft.getDraftState()()
     );
+  }
+
+  /**
+   * Retrieves store hours information for a given place ID.
+   *
+   * @private
+   * @param {string} placeId - The unique identifier for the place whose store hours are being requested.
+   * @returns {void}
+   *
+   * @remarks
+   * This method makes an HTTP request to fetch store hours using the installationAPI service.
+   * It logs the response or errors to the console.
+   */
+  private getStoreHours(placeId: string): void {
+    this.installationAPI.getStoreHoursInfo(placeId).subscribe({
+      next: (response: any) => {
+        console.log(response, 'uhu');
+      },
+      error: (error: Error) => {
+        console.error('Error getting store hours:', error);
+      },
+    });
+  }
+
+  /**
+   * Splits a full address string into its components: street address, city, state, and ZIP code.
+   * Now includes improved city search functionality.
+   *
+   * @private
+   * @param {string} address - The full address string (expected format: "Street, City, State ZIP").
+   * @example
+   * // For US address:
+   * splitLocationAddress("123 Main St, Toronto, ON M5H 2N2")
+   *
+   * // Returns:
+   * {
+   *   address: "123 Main St",
+   *   city: "Toronto",
+   *   state: "ON",
+   *   zip: "M5H2N2",
+   *   isCanada: true,
+   *   cityData: CityState | undefined
+   * }
+   *
+   * @remarks
+   * Assumes that Canadian ZIP codes have a space and require concatenation,
+   * whereas other addresses (e.g., US) may have simpler format.
+   * Now includes improved city search to find matching city data.
+   */
+  private splitLocationAddress(address: string) {
+    const sliced_address = address.split(', ');
+    const isCanada = address.includes('Canada');
+    const [addressPart, city, stateZip] = sliced_address;
+    const zipState = stateZip.split(' ');
+    const state = zipState[0];
+    const zip = isCanada ? `${zipState[1]}${zipState[2]}` : zipState[1];
+
+    // Use the improved city search functionality
+    const cityData = this.findCityData({ city, state });
+
+    const result = {
+      address: addressPart,
+      city: city,
+      state: state,
+      zip: zip,
+      isCanada: isCanada,
+      cityData: cityData,
+    };
+
+    console.log('Address parsing result:', result);
+
+    if (cityData) {
+      console.log('Found matching city data:', {
+        id: cityData.id,
+        city: cityData.city,
+        state: cityData.state,
+        abbreviation: cityData.abbreviation,
+        country: cityData.country,
+      });
+    } else {
+      console.warn('No matching city data found for:', { city, state });
+    }
+
+    return result;
+  }
+
+  /**
+   * Fetches a list of all cities and states from the backend service.
+   *
+   * @private
+   * @returns {void}
+   *
+   * @remarks
+   * This method calls the `installationAPI.getAllCitiesState()` method, subscribes to the result,
+   * and stores the response for city search functionality.
+   */
+  private getAllCitiesState(): void {
+    this.installationAPI.getAllCitiesState().subscribe({
+      next: (response: CityState[]) => {
+        this.citiesStateData = { data: response };
+        console.log(response, 'all cities state');
+      },
+      error: (error: Error) => {
+        console.error('Error getting cities state:', error);
+      },
+    });
+  }
+
+  /**
+   * Improved city search functionality that efficiently finds matching cities
+   * with better performance and cleaner logic.
+   *
+   * @private
+   * @param {object} data - Object containing city and state information
+   * @param {string} data.city - The city name to search for
+   * @param {string} data.state - The state abbreviation to match
+   * @returns {CityState | undefined} The matched city data or undefined if not found
+   *
+   * @remarks
+   * This method implements optimized search logic:
+   * 1. Uses case-insensitive comparison for better matching
+   * 2. Tries multiple matching strategies in order of specificity
+   * 3. Falls back to state abbreviation matching for disambiguation
+   * 4. Uses early return for better performance
+   */
+  private findCityData(data: {
+    city: string;
+    state: string;
+  }): CityState | undefined {
+    if (!this.citiesStateData.data.length || !data.city) {
+      return undefined;
+    }
+
+    const cityLower = data.city.toLowerCase().trim();
+    const stateLower = data.state?.toLowerCase().trim();
+
+    // Strategy 1: Find exact city name matches
+    const exactMatches = this.citiesStateData.data.filter(
+      (cityData) => cityData.city.toLowerCase() === cityLower
+    );
+
+    console.log(exactMatches, 'exact');
+
+    // If only one exact match, return it
+    if (exactMatches.length === 1) {
+      return exactMatches[0];
+    }
+
+    // Strategy 2: If multiple matches, try to disambiguate by state
+    if (exactMatches.length > 1 && stateLower) {
+      const stateMatch = exactMatches.find(
+        (city) => city.abbreviation.toLowerCase() === stateLower
+      );
+      if (stateMatch) {
+        return stateMatch;
+      }
+    }
+
+    // Strategy 3: Try "City, State" format matching
+    const cityStateFormats = [
+      `${cityLower}, ${stateLower}`,
+      `${cityLower},${stateLower}`, // Without space
+    ];
+
+    for (const format of cityStateFormats) {
+      const formatMatch = this.citiesStateData.data.find(
+        (cityData) =>
+          `${cityData.city.toLowerCase()}, ${cityData.state.toLowerCase()}` ===
+            format ||
+          `${cityData.city.toLowerCase()},${cityData.state.toLowerCase()}` ===
+            format
+      );
+      if (formatMatch) {
+        return formatMatch;
+      }
+    }
+
+    // Strategy 4: Fallback to first exact city match if no state disambiguation worked
+    if (exactMatches.length > 0) {
+      return exactMatches[0];
+    }
+
+    // No match found
+    return undefined;
+  }
+
+  /**
+   * Fetches a list of all categories from the backend service.
+   *
+   * @private
+   * @returns {void}
+   *
+   * @remarks
+   * This method calls the `installationAPI.getCategoryGeneral()` method, subscribes to the result,
+   * and stores the response for category search functionality.
+   */
+  private getAllCategories(category: string): void {
+    this.installationAPI.getCategoryGeneral(category).subscribe({
+      next: (response: any[]) => {
+        console.log(response, 'categories');
+      },
+      error: (error: Error) => {
+        console.error('Error getting categories:', error);
+      },
+    });
   }
 }

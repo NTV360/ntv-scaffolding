@@ -1,4 +1,4 @@
 /** EXPORT ALL ENVIRONMENT FILES HERE */
 
-export * from './environment.development';
+export * from './environment';
 export * from './api-endpoints';

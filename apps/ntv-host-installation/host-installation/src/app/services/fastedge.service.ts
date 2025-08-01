@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../environments/environment.development';
 import { BaseService } from './base.service';
 import { GoogleBusinessProfileResponse } from '../interfaces';
 
@@ -36,13 +35,18 @@ export class Fastedge extends BaseService {
    * - thumbnail: Business image URL
    * - latitude/longitude: Geographic coordinates
    */
-  get_google_business_profile(
+  public get_google_business_profile(
     data: string
   ): Observable<GoogleBusinessProfileResponse> {
     const key = 'kIwFkm6nVF5qYvAQfYKjB6h516yA918w5m1COWZA';
 
-    return this.getRequest(`${environment.fastedge}${data}`, {
-      'x-api-key': key,
-    });
+    return this.getRequest(
+      `${this.fastEdgeUrl}${data}`,
+      {
+        'x-api-key': key,
+      },
+      false,
+      true
+    );
   }
 }

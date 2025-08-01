@@ -10,17 +10,24 @@ interface ApiResponse<T> {
   data: T;
 }
 
+interface CategoryInfo {
+  categoryId: string;
+  gcid: string;
+  category: string;
+  generalCategory: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
-export class InstallationApi extends BaseService {
+export class HostInstallationApi extends BaseService {
   /**
    * Retrieves store hours information for a given Google Place ID.
    *
    * @param placeId - The unique identifier for the place from the Google Places API.
    * @returns An observable that emits the `StoreHoursInfo` for the specified place.
    */
-  getStoreHoursInfo(placeId: string): Observable<StoreHoursInfo> {
+  public getStoreHoursInfo(placeId: string): Observable<StoreHoursInfo> {
     return this.getRequest<ApiResponse<StoreHoursInfo>>(
       `${API_ENDPOINTS.get_google_store_hours}${placeId}`
     ).pipe(map((d) => d.data));
@@ -32,9 +39,20 @@ export class InstallationApi extends BaseService {
    * @returns An observable that emits an array of `CityState` objects.
    * Each object contains information about a city and its associated state.
    */
-  getCitiesState(): Observable<CityState[]> {
+  public getAllCitiesState(page = 1, search = ''): Observable<CityState[]> {
     return this.getRequest<ApiResponse<CityState[]>>(
-      `${API_ENDPOINTS.get_all_cities_state}`
+      `${API_ENDPOINTS.get_all_cities_state}?pageSize=31515&search=${search}&page=${page}`
+    ).pipe(map((d) => d.data));
+  }
+
+  /**
+   * Fetches a list of general categories from the API.
+   *
+   * @returns An Observable emitting an array of `CategoryInfo` objects.
+   */
+  public getCategoryGeneral(category: string): Observable<CategoryInfo[]> {
+    return this.getRequest<ApiResponse<CategoryInfo[]>>(
+      `${API_ENDPOINTS.get_category_general}${category}`
     ).pipe(map((d) => d.data));
   }
 }

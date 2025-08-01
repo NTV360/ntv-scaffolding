@@ -14,9 +14,10 @@ import { Input } from '../input/input';
 import { SearchbarVariant } from './searchbar.types';
 
 interface Location {
-  id: number;
+  id: string;
   title: string;
   description: string;
+  additionalData?: any;
 }
 
 @Component({
