@@ -6,7 +6,7 @@ on:
       - main
       - development
       - staging
-      - feature/merge-ci-and-deployment
+
   pull_request:
     branches:
       - main
