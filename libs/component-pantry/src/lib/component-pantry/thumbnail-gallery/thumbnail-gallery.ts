@@ -9,9 +9,15 @@ import {
   Renderer2,
   DOCUMENT,
   DestroyRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  CdkDragDrop,
+  CdkDrag,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { ThumbnailItemComponent } from '../thumbnail-item/thumbnail-item';
 import {
   ThumbnailItem,
@@ -31,9 +37,16 @@ import {
 @Component({
   selector: 'ntv-thumbnail-gallery',
   standalone: true,
-  imports: [CommonModule, DatePipe, ThumbnailItemComponent, CdkDropList, CdkDrag],
+  imports: [
+    CommonModule,
+    DatePipe,
+    ThumbnailItemComponent,
+    CdkDropList,
+    CdkDrag,
+  ],
   templateUrl: './thumbnail-gallery.html',
   styleUrls: ['./thumbnail-gallery.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThumbnailGalleryComponent {
   // Signal inputs
@@ -96,7 +109,7 @@ export class ThumbnailGalleryComponent {
   readonly mergedConfig = computed(() => {
     const baseConfig = { ...DEFAULT_THUMBNAIL_CONFIG };
     const inputConfig = this.config();
-    
+
     return {
       ...baseConfig,
       ...inputConfig,
@@ -113,40 +126,50 @@ export class ThumbnailGalleryComponent {
       clickable: inputConfig?.clickable ?? this.clickable(),
       columns: inputConfig?.columns || this.columns(),
       gap: inputConfig?.gap || this.gap(),
-      showActionButtons: inputConfig?.showActionButtons ?? this.showActionButtons(),
+      showActionButtons:
+        inputConfig?.showActionButtons ?? this.showActionButtons(),
     };
   });
 
   readonly containerClasses = computed(() => {
     const classes = ['thumbnail-gallery'];
     const config = this.mergedConfig();
-    
+
     // Layout
     classes.push(`thumbnail-gallery--${config.layout}`);
-    
+
     // Size
     classes.push(`thumbnail-gallery--${config.size}`);
-    
+
     return classes.join(' ');
   });
 
   readonly containerStyles = computed(() => {
     const config = this.mergedConfig();
     const styles: { [key: string]: string } = {};
-    
+
     if (config.layout === 'grid') {
       styles['--columns'] = config.columns?.toString() || '4';
       styles['--gap'] = config.gap || '1rem';
+
+      // Pre-calculate item width to avoid expensive calc() during drag operations
+      const columns = config.columns || 4;
+      const gapValue = config.gap || '1rem';
+      // Convert rem to a percentage-based calculation for better performance
+      const gapPercent = gapValue === '1rem' ? '1rem' : gapValue;
+      styles['--item-width'] = `calc((100% - (${
+        columns - 1
+      }) * ${gapPercent}) / ${columns})`;
     }
-    
+
     return styles;
   });
 
   readonly itemsWithSelection = computed(() => {
     const selectedSet = this.selectedItems();
-    return this.items().map(item => ({
+    return this.items().map((item) => ({
       ...item,
-      selected: selectedSet.has(item.id)
+      selected: selectedSet.has(item.id),
     }));
   });
 
@@ -154,7 +177,7 @@ export class ThumbnailGalleryComponent {
   onItemClick(event: ThumbnailClickEvent): void {
     // Emit click event
     this.itemClick.emit(event);
-    
+
     // Handle selection if not handled by item component
     if (this.mergedConfig().selectable) {
       this.toggleSelection(event.item, event.event);
@@ -165,14 +188,14 @@ export class ThumbnailGalleryComponent {
     this.toggleSelection(item, new Event('click'));
   }
 
-  onContextMenuRequest(data: {item: ThumbnailItem, event: Event}): void {
+  onContextMenuRequest(data: { item: ThumbnailItem; event: Event }): void {
     if (!this.showContextMenu()) return;
-    
+
     const event = data.event as MouseEvent;
     event.preventDefault();
-    
+
     this.contextMenuItem.set(data.item);
-    
+
     // Smart positioning to prevent menu from going off-screen
     // Note: Context menu uses position: fixed, so we work with viewport coordinates
     const menuWidth = 220; // Actual min-width from CSS
@@ -180,32 +203,32 @@ export class ThumbnailGalleryComponent {
     const margin = 20; // Margin from viewport edges
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
+
     let x = event.clientX;
     let y = event.clientY;
-    
+
     // Adjust horizontal position if menu would go off right edge
     if (x + menuWidth + margin > viewportWidth) {
       x = Math.max(margin, viewportWidth - menuWidth - margin);
     }
-    
+
     // Adjust vertical position if menu would go off bottom edge
     if (y + menuHeight + margin > viewportHeight) {
       y = Math.max(margin, viewportHeight - menuHeight - margin);
     }
-    
+
     // Ensure menu doesn't go off left or top edges
     x = Math.max(margin, x);
     y = Math.max(margin, y);
-    
+
     this.contextMenuPosition.set({ x, y });
     this.contextMenuVisible.set(true);
-    
+
     this.contextMenu.emit({
       item: data.item,
       x,
       y,
-      event
+      event,
     });
   }
 
@@ -217,21 +240,25 @@ export class ThumbnailGalleryComponent {
     this.hoveredItem.set(null);
   }
 
-  onActionClick(action: ThumbnailAction, item: ThumbnailItem, event: Event): void {
+  onActionClick(
+    action: ThumbnailAction,
+    item: ThumbnailItem,
+    event: Event
+  ): void {
     this.actionClick.emit({
       action: action.type,
       item,
       items: action.type.includes('bulk') ? this.getSelectedItems() : undefined,
-      event
+      event,
     });
-    
+
     // Hide context menu after action
     this.hideContextMenu();
   }
 
   hideContextMenu(): void {
     this.contextMenuClosing.set(true);
-    
+
     // Wait for animation to complete before hiding
     setTimeout(() => {
       this.contextMenuVisible.set(false);
@@ -251,36 +278,46 @@ export class ThumbnailGalleryComponent {
   // Private methods
   private setupDocumentListeners(): void {
     this.cleanupDocumentListeners();
-    
-    const clickListener = this.renderer.listen('document', 'click', (event: Event) => {
-      if (!this.contextMenuVisible()) return;
-      
-      const target = event.target as Element;
-      const contextMenu = this.document.querySelector('.thumbnail-context-menu');
-      
-      if (contextMenu && !contextMenu.contains(target)) {
-        this.hideContextMenu();
+
+    const clickListener = this.renderer.listen(
+      'document',
+      'click',
+      (event: Event) => {
+        if (!this.contextMenuVisible()) return;
+
+        const target = event.target as Element;
+        const contextMenu = this.document.querySelector(
+          '.thumbnail-context-menu'
+        );
+
+        if (contextMenu && !contextMenu.contains(target)) {
+          this.hideContextMenu();
+        }
       }
-    });
-    
-    const keyListener = this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && this.contextMenuVisible()) {
-        this.hideContextMenu();
+    );
+
+    const keyListener = this.renderer.listen(
+      'document',
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && this.contextMenuVisible()) {
+          this.hideContextMenu();
+        }
       }
-    });
-    
+    );
+
     this.documentListeners.push(clickListener, keyListener);
   }
 
   private cleanupDocumentListeners(): void {
-    this.documentListeners.forEach(cleanup => cleanup());
+    this.documentListeners.forEach((cleanup) => cleanup());
     this.documentListeners = [];
   }
 
   private toggleSelection(item: ThumbnailItem, event: Event): void {
     const config = this.mergedConfig();
     const currentSelection = new Set(this.selectedItems());
-    
+
     if (config.multiSelect) {
       // Multi-select mode
       if (currentSelection.has(item.id)) {
@@ -299,16 +336,18 @@ export class ThumbnailGalleryComponent {
         currentSelection.add(item.id);
       }
     }
-    
+
     this.selectedItems.set(currentSelection);
-    
+
     // Emit selection change
-    const selectedItemsList = this.items().filter(i => currentSelection.has(i.id));
+    const selectedItemsList = this.items().filter((i) =>
+      currentSelection.has(i.id)
+    );
     this.selectionChange.emit({
       selectedItems: selectedItemsList,
       item,
       selected: currentSelection.has(item.id),
-      event
+      event,
     });
   }
 
@@ -319,24 +358,24 @@ export class ThumbnailGalleryComponent {
       selectedItems: [],
       item: null,
       selected: false,
-      event: new Event('clear')
+      event: new Event('clear'),
     });
   }
 
   selectAll(): void {
-    const allIds = new Set(this.items().map(item => item.id));
+    const allIds = new Set(this.items().map((item) => item.id));
     this.selectedItems.set(allIds);
     this.selectionChange.emit({
       selectedItems: this.items(),
       item: null,
       selected: true,
-      event: new Event('selectAll')
+      event: new Event('selectAll'),
     });
   }
 
   getSelectedItems(): ThumbnailItem[] {
     const selectedSet = this.selectedItems();
-    return this.items().filter(item => selectedSet.has(item.id));
+    return this.items().filter((item) => selectedSet.has(item.id));
   }
 
   onDrop(event: CdkDragDrop<ThumbnailItem[]>) {

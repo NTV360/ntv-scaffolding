@@ -6,6 +6,7 @@ import {
   signal,
   ElementRef,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -24,6 +25,7 @@ import {
   imports: [CommonModule],
   templateUrl: './thumbnail-item.html',
   styleUrls: ['./thumbnail-item.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThumbnailItemComponent {
   // Signal inputs
