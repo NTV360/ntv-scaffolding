@@ -22,7 +22,7 @@ env:
 
 jobs:
   ci-checks:
-    name: 🔍 CI - Build Lint Test
+    name: 🔍 CI Checks
     runs-on: ubuntu-latest
     outputs:
       host_installation_changed: ${{ steps.setvars.outputs.host_installation_changed }}
@@ -56,8 +56,18 @@ jobs:
       - name: 🔍 Detect affected projects
         id: setvars
         run: |
+          echo "Detecting affected projects..."
+          echo "NX_BASE=$NX_BASE"
+          echo "NX_HEAD=$NX_HEAD"
+
+          echo "Affected projects:"
+          npx nx show projects --affected --target=build || echo "(none)"
+
           host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
           component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
+
+          echo "host: [$host]"
+          echo "component: [$component]"
 
           if [[ -n "$host" ]]; then
             echo "host_installation_changed=true" >> $GITHUB_OUTPUT
@@ -80,7 +90,7 @@ jobs:
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
 
-      - name: 🎭 Get Playwright version
+      - name: 🍍 Get Playwright version
         id: playwright-version
         run: echo "version=$(npm list @playwright/test --depth=0 --json | jq -r '.dependencies[\"@playwright/test\"].version')" >> $GITHUB_OUTPUT
 
