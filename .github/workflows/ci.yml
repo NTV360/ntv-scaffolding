@@ -60,11 +60,11 @@ jobs:
           echo "NX_BASE=$NX_BASE"
           echo "NX_HEAD=$NX_HEAD"
 
-          echo "Affected projects:"
-          npx nx show projects --affected --target=build || echo "(none)"
+          affected=$(npx nx show projects --affected --target=build --json)
+          echo "Raw affected: $affected"
 
-          host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
-          component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
+          host=$(echo "$affected" | jq -r '.[]' | grep '^host-installation$' || true)
+          component=$(echo "$affected" | jq -r '.[]' | grep '^component-pantry$' || true)
 
           echo "host: [$host]"
           echo "component: [$component]"
@@ -80,6 +80,7 @@ jobs:
           else
             echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
           fi
+
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
