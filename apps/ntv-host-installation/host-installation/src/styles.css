@@ -17,9 +17,3 @@
 .stepper-card {
   @apply bg-white rounded-lg shadow-sm;
 }
-
-.step-content {
-  @apply rounded-lg p-6;
-  background: #fff;
-  box-shadow: 2px 2px 32px 0 rgba(208, 210, 218, 0.25);
-}

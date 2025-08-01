@@ -3,15 +3,21 @@
 } */
 
 .assign-playlist-main {
-  @apply flex gap-5;
+  @apply flex gap-8;
 }
 
-.assign-playlist__card {
-  @apply flex-1;
+.assign-playlist__section {
+  @apply p-4;
 }
 
-.assign-playlist__content {
-  @apply p-5;
+.assign-playlist__section:first-child {
+  /* Template selection - smaller */
+  flex: 2;
+}
+
+.assign-playlist__section:last-child {
+  /* Playlist contents - wider but not too much */
+  flex: 3;
 }
 
 .template {
@@ -20,15 +26,8 @@
   overflow: hidden; /* Prevent overflow */
 }
 
-.template-card {
-  @apply flex flex-col gap-4;
-}
-
 .template-title {
-}
-
-.card-body {
-  @apply p-[25px];
+  @apply text-xl font-semibold mb-4;
 }
 
 .select-playlist {
@@ -43,40 +42,6 @@
 .zone-instruction,
 .no-playlist-message {
   @apply text-center py-8 text-gray-500;
-}
-
-/* Force 4 columns in thumbnail gallery regardless of responsive breakpoints */
-.assign-playlist__content ntv-thumbnail-gallery {
-  /* Ensure the container has enough width */
-  min-width: 500px;
-}
-
-.assign-playlist__content
-  ntv-thumbnail-gallery
-  ::ng-deep
-  .thumbnail-gallery--grid {
-  /* Force 4 columns using CSS custom property and grid-template-columns */
-  --columns: 4;
-  grid-template-columns: repeat(var(--columns, 4), 1fr) !important;
-}
-
-/* Override all responsive breakpoints for this specific gallery */
-@media (max-width: 768px) {
-  .assign-playlist__content
-    ntv-thumbnail-gallery
-    ::ng-deep
-    .thumbnail-gallery--grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .assign-playlist__content
-    ntv-thumbnail-gallery
-    ::ng-deep
-    .thumbnail-gallery--grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
 }
 
 /* Modal Styles */

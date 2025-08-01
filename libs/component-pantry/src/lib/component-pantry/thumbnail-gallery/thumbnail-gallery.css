@@ -22,9 +22,7 @@
   flex-wrap: wrap;
   gap: 15px;
   padding: 15px;
-  border: solid 1px #ccc;
   min-height: 60px;
-  border-radius: 4px;
   overflow: hidden;
   max-width: 100%;
 }
@@ -335,19 +333,19 @@
   @apply flex items-center mr-3;
 }
 
-.list-item-checkbox input[type="checkbox"] {
+.list-item-checkbox input[type='checkbox'] {
   @apply w-4 h-4 text-accent-600 bg-gray-100 border-gray-300 rounded focus:ring-accent-500 focus:ring-2 cursor-pointer;
 }
 
-.list-item-checkbox input[type="checkbox"]:checked {
+.list-item-checkbox input[type='checkbox']:checked {
   @apply bg-accent-600 border-accent-600;
 }
 
-.list-item-checkbox input[type="checkbox"]:hover {
+.list-item-checkbox input[type='checkbox']:hover {
   @apply border-accent-400;
 }
 
-.list-item-checkbox input[type="checkbox"]:focus {
+.list-item-checkbox input[type='checkbox']:focus {
   @apply ring-2 ring-accent-500 ring-offset-1;
 }
 

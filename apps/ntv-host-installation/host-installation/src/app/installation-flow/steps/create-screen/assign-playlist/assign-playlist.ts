@@ -18,7 +18,6 @@ import {
 import {
   Autocomplete,
   Button,
-  Card,
   Input,
   Template,
   ThumbnailGalleryComponent,
@@ -36,7 +35,6 @@ import { playlists, Playlist } from './assign-playlist.mock-data';
   imports: [
     Autocomplete,
     Button,
-    Card,
     FormsModule,
     Input,
     ReactiveFormsModule,

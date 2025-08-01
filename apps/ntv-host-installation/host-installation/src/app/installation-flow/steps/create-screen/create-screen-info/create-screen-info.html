@@ -1,17 +1,19 @@
-<div class="create-screen-info">
-  <form>
-    <div class="form-content">
-      @for (field of screenFormFields; track field; let i = $index) {
-      <div>
-        <ntv-input
-          [id]="field.name"
-          [label]="field.label"
-          [placeholder]="field.placeholder"
-          [type]="'text'"
-          variant="'accent'"
-        ></ntv-input>
+<ntv-card>
+  <div class="create-screen-info">
+    <form>
+      <div class="form-content">
+        @for (field of screenFormFields; track field; let i = $index) {
+        <div>
+          <ntv-input
+            [id]="field.name"
+            [label]="field.label"
+            [placeholder]="field.placeholder"
+            [type]="'text'"
+            variant="'accent'"
+          ></ntv-input>
+        </div>
+        }
       </div>
-      }
-    </div>
-  </form>
-</div>
+    </form>
+  </div>
+</ntv-card>

@@ -1,3 +1,7 @@
 .form-content {
   @apply flex flex-col gap-5;
 }
+
+.create-screen-info {
+  @apply p-6;
+}
