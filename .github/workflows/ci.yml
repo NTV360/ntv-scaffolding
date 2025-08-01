@@ -89,6 +89,10 @@ jobs:
 
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
+      
+      - name: 🛠️ Build Component Pantry Storybook
+        if: steps.setvars.outputs.component_pantry_changed == 'true'
+        run: npm run build:storybook:prod
 
       - name: 🍍 Get Playwright version
         id: playwright-version
