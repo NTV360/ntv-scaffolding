@@ -146,12 +146,6 @@ export function getDonutSize(component: DonutGraphComponent): string {
 }
 
 /**
- * Calculates percentage for a given value
- * @param value - The value to calculate percentage for
- * @param component - The DonutGraphComponent instance
- * @returns Percentage as a string
- */
-/**
  * Calculates percentage for a given value ensuring all percentages sum to 100%
  * @param value - The value to calculate percentage for
  * @param component - The DonutGraphComponent instance

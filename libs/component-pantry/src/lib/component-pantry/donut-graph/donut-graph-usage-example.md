@@ -226,13 +226,24 @@ this.systemService.getResourceUsage().then((data) => {
 **Auto Size Features:**
 
 - **Parent Container Responsive**: Automatically adjusts chart size based on parent container dimensions
-- **ResizeObserver**: Uses ResizeObserver to detect parent container size changes in real-time
-- **Dynamic Sizing**: Chart fills the available space in the parent container
+- **Dual ResizeObserver**: Observes both parent container and component for maximum responsiveness
+- **Responsive Breakpoints**: Different chart sizes based on container dimensions:
+  - Small containers (<300px): 250px width, 200px height
+  - Medium containers (<500px): 350px width, 300px height
+  - Large containers (<800px): 450px width, 400px height
+  - Extra large containers (≥800px): 600px width, 500px height
+- **Dynamic Sizing**: Chart dimensions update automatically when container resizes
 - **Custom Legend Only**: Uses only the custom legend component - no built-in chart legend
 - **Legend Adaptation**: Legend adjusts to available space and becomes scrollable if needed
-- **Mobile Legend**: Automatically moves legend to bottom on mobile devices (≤768px)
-- **Minimum Sizes**: Ensures chart remains usable with minimum dimensions (200px width/height)
-- **Real-time Updates**: Chart updates immediately when parent container is resized
+- **Mobile Legend:**
+
+- **Automatic Bottom Position**: Legend automatically moves to bottom on mobile devices (≤768px)
+- **Scrollable Legend**: Legend becomes scrollable with reduced height (100px on mobile, 80px on extra small devices)
+- **Smaller Chart Size**: Chart dimensions are significantly reduced for mobile:
+  - Mobile (≤768px): 120-200px width, 100-160px height
+  - Extra small (≤480px): 120px width, 100px height
+- **Optimized Spacing**: Reduced padding and gaps for better mobile experience
+- **Responsive Typography**: Smaller font sizes for titles and legend items on mobile
 
 ### Practical Auto Size Examples
 

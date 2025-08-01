@@ -13,13 +13,68 @@ export const DONUT_GRAPH_DEFAULT_COLORS = [
 ] as string[];
 
 /**
- * Size presets for donut graph component
+ * Enhanced size presets for donut graph component with better space utilization
  */
 export const DONUT_GRAPH_SIZE_PRESETS = {
-  small: { width: '468px', height: '293px' },
-  medium: { width: '700px', height: '400px' },
-  large: { width: '1000px', height: '500px' },
-  fullscreen: { width: '100%', height: '600px' },
+  small: {
+    width: '468px',
+    height: '293px',
+    chartSize: 'small',
+    legendColumns: 1,
+    chartToLegendRatio: '1.2:1',
+  },
+  medium: {
+    width: '600px',
+    height: '400px',
+    chartSize: 'medium',
+    legendColumns: 1,
+    chartToLegendRatio: '1.5:1',
+  },
+  large: {
+    width: '900px',
+    height: '600px',
+    chartSize: 'large',
+    legendColumns: 2,
+    chartToLegendRatio: '2:1',
+  },
+  fullscreen: {
+    width: '100vw',
+    height: '100vh',
+    chartSize: 'fullscreen',
+    legendColumns: 'auto',
+    chartToLegendRatio: '2.5:1',
+  },
+} as const;
+
+/**
+ * Chart size configurations for better space utilization
+ */
+export const DONUT_CHART_SIZES = {
+  small: {
+    container: { width: '250px', height: '220px' }, // ← Increased ApexCharts size for Small
+    donutHole: '45%',
+    legend: { minWidth: '160px', columns: 1 },
+  },
+  medium: {
+    container: { width: '280px', height: '280px' },
+    donutHole: '50%',
+    legend: { minWidth: '200px', columns: 1 },
+  },
+  large: {
+    container: { width: '500px', height: '500px' },
+    donutHole: '55%',
+    legend: { minWidth: '280px', columns: 2 },
+  },
+  fullscreen: {
+    container: { width: '600px', height: '600px' },
+    donutHole: '60%',
+    legend: { minWidth: '350px', columns: 'auto' },
+  },
+  auto: {
+    container: { width: '100%', height: '100%' },
+    donutHole: '50%',
+    legend: { minWidth: '200px', columns: 'responsive' },
+  },
 } as const;
 
 /**
@@ -70,20 +125,104 @@ export const DONUT_GRAPH_DEFAULTS = {
 export const DONUT_GRAPH_CHART_TYPE = 'donut' as const;
 
 /**
- * Responsive configuration for mobile devices
+ * Responsive configuration for different screen sizes
  */
 export const DONUT_GRAPH_RESPONSIVE_CONFIG = [
   {
-    breakpoint: DONUT_GRAPH_DEFAULTS.responsiveBreakpoint,
+    breakpoint: 1200,
     options: {
       chart: {
-        height: 300,
+        height: 500,
       },
       legend: {
         show: false, // Always disable built-in legend
       },
       dataLabels: {
         enabled: false, // Always disable data labels
+      },
+    },
+  },
+  {
+    breakpoint: 1024,
+    options: {
+      chart: {
+        height: 400,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+    },
+  },
+  {
+    breakpoint: 900,
+    options: {
+      chart: {
+        height: 350,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+    },
+  },
+  {
+    breakpoint: 768,
+    options: {
+      chart: {
+        height: 300,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+    },
+  },
+  {
+    breakpoint: 600,
+    options: {
+      chart: {
+        height: 250,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+    },
+  },
+  {
+    breakpoint: 480,
+    options: {
+      chart: {
+        height: 200,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+    },
+  },
+  {
+    breakpoint: 360,
+    options: {
+      chart: {
+        height: 150,
+      },
+      legend: {
+        show: false,
+      },
+      dataLabels: {
+        enabled: false,
       },
     },
   },
@@ -126,6 +265,32 @@ export const DONUT_GRAPH_SIZE_VARIANTS = [
   'custom',
   'auto',
 ] as const;
+
+/**
+ * Legend layout configurations
+ */
+export const DONUT_LEGEND_LAYOUTS = {
+  small: {
+    columns: 1,
+    maxHeight: '200px',
+    itemsPerColumn: 8,
+  },
+  medium: {
+    columns: 1,
+    maxHeight: '250px',
+    itemsPerColumn: 10,
+  },
+  large: {
+    columns: 2,
+    maxHeight: '400px',
+    itemsPerColumn: 12,
+  },
+  fullscreen: {
+    columns: 'auto',
+    maxHeight: '80vh',
+    itemsPerColumn: 15,
+  },
+} as const;
 
 /**
  * Unified demo data structure mimicking API response

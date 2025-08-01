@@ -1,1053 +1,205 @@
+/* Enhanced donut graph container with perfect centering */
 .donut-graph-container {
-  @apply flex flex-col bg-white rounded-[20px] overflow-hidden p-5;
+  @apply flex flex-col bg-white rounded-[20px] overflow-hidden overflow-x-hidden p-2.5 w-full h-full min-w-[200px] min-h-[120px] mx-auto relative z-[1];
   font-family: 'Nunito', sans-serif;
   box-shadow: 2px 2px 32px 0 rgba(208, 210, 218, 0.25);
-  overflow-x: hidden;
-  font-family: 'Nunito';
-  padding: 20px;
-  width: 100%;
-  height: 100%;
-  min-width: 300px;
-  min-height: 200px;
 }
 
 /* Disable scrollbars */
-.donut-graph-container::-webkit-scrollbar {
+.donut-graph-container::-webkit-scrollbar,
+.donut-graph-container *::-webkit-scrollbar {
   @apply hidden;
 }
-
-.donut-graph-container {
+.donut-graph-container,
+.donut-graph-container * {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
+/* Fullscreen layout */
 .donut-graph-fullscreen.donut-graph-container {
-  @apply rounded-none fixed top-0 left-0 z-[9999] p-0;
+  @apply rounded-none fixed top-0 left-0 z-[9999] p-0 w-screen h-screen;
   box-shadow: none;
-  height: 100vh;
-  width: 100vw;
   max-width: none;
   max-height: none;
 }
 
+/* Graph Header */
 .donut-graph-header {
-  @apply flex-row mb-0;
+  @apply flex items-center justify-between gap-2 min-h-[32px] px-3 py-1 relative z-30;
 }
 
+/* Title section */
 .donut-graph-title-section {
-  @apply flex items-center gap-3 flex-nowrap;
+  @apply flex items-center gap-2 flex-nowrap flex-1 min-w-0 overflow-hidden;
 }
-
-.donut-graph-icon {
-  @apply flex items-center justify-center w-8 h-8 rounded-lg text-white text-base;
-  background: #f0fdd6;
-  box-shadow: 0 2px 8px rgba(169, 218, 92, 0.3);
+.donut-graph-title {
+  @apply text-lg font-bold text-[#091635] leading-[1.2] flex-1 min-w-0 truncate;
+  font-size: clamp(10px, 2.5vw, 18px);
+  word-break: break-word;
+  hyphens: auto;
 }
-
-.donut-graph-icon div {
-  @apply flex items-center justify-center w-full h-full text-[#8dcb2c];
-}
-
-.donut-graph-icon svg {
-  @apply w-4 h-4 block;
-}
-
-.donut-graph-title-info {
-  @apply flex flex-col gap-1;
-}
-
 .donut-graph-total-count {
   @apply text-2xl font-extrabold text-[#1a1a1a] leading-[1.1] whitespace-nowrap;
   letter-spacing: -0.5px;
 }
 
-.donut-graph-title {
-  @apply text-xl font-bold text-[#091635] leading-[1.2] whitespace-nowrap;
+/* Donut icon */
+.donut-graph-icon {
+  @apply flex items-center justify-center w-6 h-6 rounded-lg text-white text-sm;
+  background: #f0fdd6;
+  box-shadow: 0 2px 8px rgba(169, 218, 92, 0.3);
+}
+.donut-graph-icon div {
+  @apply flex items-center justify-center w-full h-full text-[#8dcb2c];
+}
+.donut-graph-icon svg {
+  @apply w-4 h-4 block;
 }
 
+/* Content container */
 .donut-graph-content {
-  @apply p-0 flex items-center justify-center h-full w-full bg-white;
+  @apply flex items-center justify-center h-full w-full bg-white relative flex-1 mt-[2px];
 }
 
+/* Chart layout */
 .donut-chart-layout {
-  @apply flex items-center justify-start w-full h-full;
+  @apply flex items-center justify-center w-full h-full relative;
 }
-
-/* Legend position variants */
 .donut-chart-layout.legend-right {
-  @apply flex-row items-center justify-start;
+  @apply flex-row items-center justify-center gap-1;
 }
-
 .donut-chart-layout.legend-left {
-  @apply flex-row-reverse items-center justify-start;
+  @apply flex-row-reverse items-center justify-center gap-1;
 }
-
 .donut-chart-layout.legend-bottom {
-  @apply flex-col items-center justify-center;
+  @apply flex-col items-center justify-center gap-[3px];
 }
-
 .donut-chart-layout.legend-top {
-  @apply flex-col-reverse items-center justify-center;
+  @apply flex-col-reverse items-center justify-center gap-[3px];
 }
 
+/* Donut chart area */
 .donut-chart-area {
-  @apply flex items-center justify-center;
+  @apply flex items-center justify-center max-w-full max-h-full relative;
+  aspect-ratio: 1;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
 }
 
+/* Donut chart container */
 .donut-chart-container {
-  @apply relative flex items-center justify-center w-full h-full overflow-x-hidden;
+  @apply relative flex items-center justify-center w-full h-full max-w-full max-h-full overflow-hidden;
+  aspect-ratio: 1;
 }
-
-/* Disable scrollbars for chart container */
 .donut-chart-container::-webkit-scrollbar {
   @apply hidden;
 }
-
 .donut-chart-container {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
+/* Center content */
 .donut-center-content {
-  @apply absolute top-1/2 left-1/2 flex flex-col items-center justify-center z-10 w-full h-full pointer-events-none;
+  @apply absolute top-1/2 left-1/2 w-full h-full flex items-center justify-center pointer-events-none z-10;
   transform: translate(-50%, -50%);
 }
 
+/* Center total */
 .donut-center-total {
-  @apply text-2xl font-extrabold text-[#1a1a1a] text-center leading-[1.1] whitespace-nowrap select-none;
+  @apply absolute top-1/2 left-1/2 text-2xl font-extrabold text-[#1a1a1a] leading-[1.1] whitespace-nowrap select-none flex items-center justify-center text-center;
+  transform: translate(-50%, -50%);
   letter-spacing: -0.5px;
-  white-space: nowrap;
-  user-select: none;
-  word-break: break-word;
-  max-width: 100%;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
 }
 
-/* Size-specific chart area sizing */
-.donut-graph-small .donut-chart-area {
-  @apply min-w-[150px] max-w-[250px] min-h-[200px];
-}
-
-.donut-graph-medium .donut-chart-area {
-  @apply min-w-[200px] max-w-[350px] min-h-[300px];
-}
-
-.donut-graph-large .donut-chart-area {
-  @apply p-0 min-w-[350px] max-w-[450px] min-h-[400px];
-}
-
-.donut-graph-fullscreen .donut-chart-area {
-  @apply flex-none flex items-center justify-center min-w-[500px] max-w-[600px] min-h-[500px] h-[500px];
-}
-
+/* Legend */
 .donut-legend {
-  @apply flex flex-col bg-transparent rounded-none font-extrabold items-start flex-1 overflow-y-auto overflow-x-hidden min-w-[200px] max-w-[250px] max-h-full;
+  @apply flex flex-col items-start font-extrabold bg-transparent rounded-none overflow-y-auto overflow-x-hidden flex-shrink-0 min-w-[200px] max-h-full pb-4;
 }
-
-/* Hide scrollbar for Chrome, Safari and Opera */
 .donut-legend::-webkit-scrollbar {
   @apply hidden;
 }
-
-/* Hide scrollbar for IE, Edge and Firefox */
 .donut-legend {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Legend position specific styles */
-.legend-right .donut-legend {
-  @apply flex-col ml-5 min-w-[200px] max-w-[250px];
-}
-
-.legend-left .donut-legend {
-  @apply flex-col mr-5 min-w-[200px] max-w-[250px];
-}
-
-.legend-bottom .donut-legend {
-  @apply flex-row flex-wrap justify-center mt-5 gap-5 min-w-full max-w-none;
-}
-
-.legend-top .donut-legend {
-  @apply flex-row flex-wrap justify-center mb-5 gap-5 min-w-full max-w-none;
-}
-
+/* Legend item */
 .legend-item {
-  @apply flex items-center py-1 w-full;
+  @apply flex items-center py-1 w-full transition-all duration-300 ease-in-out rounded-md px-2 my-0.5 cursor-pointer;
 }
 
-/* Bottom and top legend items */
-.legend-bottom .legend-item,
-.legend-top .legend-item {
-  @apply w-auto px-2 py-1 min-w-[150px];
-}
-
+/* Legend marker */
 .legend-marker {
   @apply w-2 h-2 rounded-full flex-shrink-0 mr-2.5;
 }
-
-.legend-label-row {
-  @apply flex justify-between w-full items-center gap-10;
-}
-
-.legend-label {
-  @apply text-sm font-bold text-[#1a1a1a] whitespace-nowrap overflow-hidden text-ellipsis flex-1 leading-[1.2] min-w-0;
-}
-
-.legend-value {
-  @apply text-sm font-extrabold text-[#1a1a1a] whitespace-nowrap text-left flex-shrink-0;
-  min-width: fit-content;
-}
-
-/* Responsive adjustments for legend */
-@media (max-width: 1024px) {
-  .donut-legend {
-    min-width: 180px;
-    max-width: 220px;
-  }
-
-  .legend-label {
-    font-size: 13px;
-  }
-
-  .legend-value {
-    font-size: 13px;
-  }
-}
-
-/* Mobile-specific legend adjustments */
-@media (max-width: 768px) {
-  .donut-chart-layout {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .donut-legend {
-    min-width: 100%;
-    max-width: none;
-    max-height: 180px;
-  }
-
-  /* Override position classes on mobile for better responsiveness */
-  .legend-right,
-  .legend-left,
-  .legend-bottom,
-  .legend-top {
-    @apply flex-col;
-  }
-
-  .legend-right .donut-legend,
-  .legend-left .donut-legend,
-  .legend-bottom .donut-legend,
-  .legend-top .donut-legend {
-    flex-direction: column !important;
-    min-width: 100% !important;
-    max-width: none !important;
-    margin: 12px 0 0 0 !important;
-    gap: 6px !important;
-  }
-
-  .legend-bottom .legend-item,
-  .legend-top .legend-item {
-    @apply w-full;
-    min-width: auto !important;
-  }
-
-  .legend-label {
-    font-size: 11px;
-  }
-
-  .legend-value {
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 900px) {
-  .donut-legend {
-    min-width: 160px;
-    max-width: 200px;
-  }
-
-  .legend-label {
-    font-size: 12px;
-  }
-
-  .legend-value {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 600px) {
-  .donut-legend {
-    max-height: 160px;
-  }
-
-  .legend-label {
-    font-size: 10px;
-  }
-
-  .legend-value {
-    font-size: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .donut-legend {
-    max-height: 140px;
-  }
-
-  .legend-label {
-    font-size: 9px;
-  }
-
-  .legend-value {
-    font-size: 9px;
-  }
-}
-
-/* Size variants - all responsive */
-.donut-graph-small .donut-graph-content {
-  @apply min-h-[200px] max-h-[220px] h-[220px];
-}
-
-.donut-graph-small .donut-graph-total-count {
-  @apply text-xl;
-}
-
-.donut-graph-small .donut-graph-title {
-  @apply text-xl;
-}
-
-.donut-graph-small .donut-center-total {
-  @apply text-lg pt-2.5;
-}
-
-.donut-graph-small .donut-center-content {
-  @apply flex items-center justify-center;
-}
-
-/* Ensure small size has appropriate styling */
-.donut-graph-small .donut-graph-container {
-  @apply min-w-[350px] min-h-[200px];
-}
-
-.donut-graph-medium .donut-graph-content {
-  @apply min-h-[300px] max-h-[220px] h-[220px];
-}
-
-.donut-graph-medium .donut-graph-total-count {
-  @apply text-2xl;
-}
-
-.donut-graph-medium .donut-graph-title {
-  @apply text-xl;
-}
-
-.donut-graph-medium .donut-center-total {
-  @apply text-[22px] pt-2.5;
-}
-
-.donut-graph-medium .donut-center-content {
-  @apply flex items-center justify-center;
-}
-
-/* Ensure medium size has appropriate styling */
-.donut-graph-medium .donut-graph-container {
-  @apply min-w-[500px] min-h-[300px];
-}
-
-.donut-graph-large .donut-graph-content {
-  @apply min-h-[400px] max-h-[220px] h-[220px];
-}
-
-.donut-graph-large .donut-graph-total-count {
-  @apply text-[28px];
-}
-
-.donut-graph-large .donut-graph-title {
-  @apply text-xl;
-}
-
-.donut-graph-large .donut-center-total {
-  @apply text-[28px] pt-5;
-}
-
-.donut-graph-large .donut-center-content {
-  @apply flex items-center justify-center;
-}
-
-/* Ensure large size has more prominent styling */
-.donut-graph-large .donut-graph-container {
-  @apply min-w-[1000px] min-h-[300px];
-}
-
-/* Auto size styles - responsive to parent container */
-.donut-graph-auto {
-  /* Auto size container - fills parent container */
-  height: 100%;
-  width: 100%;
-  min-height: 300px;
-  min-width: 500px;
-  display: flex;
-  flex-direction: column;
-}
-
-.donut-graph-auto .donut-graph-content {
-  height: 100%;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-.donut-graph-auto .donut-chart-area {
-  min-width: 200px;
-  min-height: 250px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.donut-graph-auto .donut-legend {
-  /* Responsive legend that adapts to container */
-  max-height: none;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-width: 200px;
-  max-width: 300px;
-  flex: 0 0 auto;
-  padding-right: 8px;
-}
-
-/* Custom scrollbar for auto size legend */
-.donut-graph-auto .donut-legend::-webkit-scrollbar {
-  @apply w-0 hidden;
-}
-
-.donut-graph-auto .donut-legend::-webkit-scrollbar-track {
-  @apply hidden;
-}
-
-.donut-graph-auto .donut-legend::-webkit-scrollbar-thumb {
-  @apply hidden;
-}
-
-.donut-graph-auto .donut-legend::-webkit-scrollbar-thumb:hover {
-  @apply hidden;
-}
-
-/* Firefox scrollbar for auto size */
-.donut-graph-auto .donut-legend {
-  scrollbar-width: none;
-  scrollbar-color: transparent transparent;
-}
-
-/* Auto size legend layout adjustments */
-.donut-graph-auto .donut-chart-layout {
-  @apply gap-5 items-start justify-center;
-}
-
-.donut-graph-auto .legend-item {
-  @apply py-1.5 mb-0.5;
-}
-
-/* Auto size chart container adjustments */
-.donut-graph-auto .donut-chart-container {
-  min-height: 250px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.donut-graph-auto apx-chart {
-  width: 100%;
-  height: 100%;
-  min-height: 250px;
-  flex: 1;
-}
-
-.donut-graph-auto .donut-center-total {
-  @apply text-xl font-extrabold text-[#1a1a1a];
-}
-
-/* Auto size responsive adjustments */
-@media (max-width: 1200px) {
-  .donut-graph-auto .donut-graph-container {
-    min-width: 400px;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 180px;
-    min-height: 200px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .donut-graph-auto .donut-graph-container {
-    min-width: 350px;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 160px;
-    min-height: 180px;
-  }
-
-  .donut-graph-auto .donut-legend {
-    min-width: 180px;
-    max-width: 220px;
-  }
-}
-
-@media (max-width: 900px) {
-  .donut-graph-auto .donut-graph-container {
-    min-width: 300px;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 140px;
-    min-height: 160px;
-  }
-
-  .donut-graph-auto .donut-legend {
-    min-width: 160px;
-    max-width: 200px;
-  }
-}
-
-@media (max-width: 768px) {
-  .donut-graph-auto .donut-chart-layout {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .donut-graph-auto .donut-legend {
-    max-height: 180px;
-    min-width: 100%;
-    max-width: none;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 100%;
-    max-width: none;
-  }
-
-  .donut-graph-auto .donut-graph-container {
-    min-width: 280px;
-  }
-}
-
-@media (max-width: 600px) {
-  .donut-graph-auto .donut-graph-container {
-    min-width: 240px;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 120px;
-    min-height: 140px;
-  }
-
-  .donut-graph-auto .donut-legend {
-    max-height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .donut-graph-auto .donut-graph-container {
-    min-width: 200px;
-  }
-
-  .donut-graph-auto .donut-chart-area {
-    min-width: 100px;
-    min-height: 120px;
-  }
-
-  .donut-graph-auto .donut-legend {
-    max-height: 140px;
-  }
-}
-
-/* Hide any ApexCharts built-in legend elements */
-.donut-chart-container .apexcharts-legend {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-legend-text {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-legend-marker {
-  display: none !important;
-}
-
-/* Hide any data labels on chart segments */
-.donut-chart-container .apexcharts-datalabels {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-datalabel {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-datalabel-label {
-  display: none !important;
-}
-
-/* Hide any text elements that might appear on chart segments */
-.donut-chart-container .apexcharts-pie-label {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-pie-label-text {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-pie-label-line {
-  display: none !important;
-}
-
-/* Hide any additional label elements */
-.donut-chart-container .apexcharts-text {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-text-label {
-  display: none !important;
-}
-
-/* Hide any tooltip-like elements */
-.donut-chart-container .apexcharts-tooltip {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-tooltip-text {
-  display: none !important;
-}
-
-/* Aggressive hiding of any text elements on chart segments */
-.donut-chart-container .apexcharts-pie-area text {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-pie-area tspan {
-  display: none !important;
-}
-
-.donut-chart-container .apexcharts-pie-area .apexcharts-text {
-  display: none !important;
-}
-
-/* Hide any foreignObject elements that might contain text */
-.donut-chart-container .apexcharts-pie-area foreignObject {
-  display: none !important;
-}
-
-/* Hide any SVG text elements */
-.donut-chart-container svg text {
-  display: none !important;
-}
-
-.donut-chart-container svg tspan {
-  display: none !important;
-}
-
-/* Ensure ApexCharts component scales properly */
-.donut-graph-small apx-chart {
-  @apply w-full h-full p-0;
-  min-height: 200px;
-}
-
-.donut-graph-medium apx-chart {
-  @apply w-full h-full;
-  min-height: 300px;
-}
-
-.donut-graph-large apx-chart {
-  @apply w-full h-full;
-  min-height: 350px;
-}
-
-.donut-graph-fullscreen apx-chart {
-  @apply w-full h-full flex-1;
-  min-height: 100%;
-}
-
-.donut-graph-fullscreen .donut-graph-content {
-  @apply w-full flex flex-col p-0;
-  min-height: calc(100vh - 80px);
-  height: calc(100vh - 80px);
-}
-
-.donut-graph-fullscreen .donut-graph-total-count {
-  @apply text-[32px];
-}
-
-.donut-graph-fullscreen .donut-graph-title {
-  @apply text-xl;
-}
-
-.donut-graph-fullscreen .donut-center-total {
-  @apply text-[36px] font-extrabold text-[#1a1a1a];
-}
-
-.donut-graph-fullscreen .donut-center-content {
-  @apply flex items-center justify-center;
-}
-
-.donut-graph-fullscreen .donut-graph-header {
-  @apply bg-white text-left;
-  padding: 20px 20px 0 20px;
-}
-
-.donut-graph-fullscreen .donut-graph-title-section {
-  @apply gap-3 justify-start;
-}
-
-.donut-graph-fullscreen .donut-graph-icon {
-  @apply w-8 h-8 text-base;
-}
-
-.donut-graph-fullscreen .donut-graph-title {
-  @apply text-base font-bold text-[#091635];
-}
-
-.donut-graph-fullscreen .donut-chart-container {
-  @apply flex-1 h-full;
-  min-height: 100%;
-}
-
-.donut-graph-fullscreen .donut-chart-layout {
-  @apply flex-1 h-full flex items-center justify-center p-10;
-  min-height: 100%;
-  gap: 60px;
-}
-
-.donut-graph-fullscreen .donut-legend {
-  @apply text-base p-5 bg-transparent rounded-none;
-  min-width: 300px;
-  max-width: 400px;
-  box-shadow: none;
-}
-
-.donut-graph-fullscreen .legend-label {
-  @apply text-base font-bold text-[#1a1a1a] leading-[1.3];
-}
-
-.donut-graph-fullscreen .legend-value {
-  @apply text-base font-extrabold text-[#1a1a1a];
-}
-
-.donut-graph-fullscreen .legend-marker {
-  @apply w-2.5 h-2.5 mr-3;
-}
-
-.donut-graph-fullscreen .legend-item {
-  @apply py-1.5 mb-1.5;
-}
-
-.donut-graph-fullscreen .legend-label-row {
-  gap: 50px;
-}
-
-/* Hover effects for donut chart */
-.donut-chart-container apx-chart {
-  @apply transition-all duration-300 ease-in-out;
-}
-
-.donut-chart-container apx-chart:hover {
-  transform: scale(1.02);
-}
-
-/* Custom hover effects for chart segments */
-.donut-chart-container .apexcharts-pie-area {
-  @apply transition-all duration-300 ease-in-out cursor-pointer;
-}
-
-.donut-chart-container .apexcharts-pie-area:hover {
-  opacity: 1 !important;
-  filter: brightness(1.1) !important;
-}
-
-/* When hovering over a segment, dim other segments */
-.donut-chart-container:hover .apexcharts-pie-area:not(:hover) {
-  opacity: 0.3 !important;
-  filter: brightness(0.7) !important;
-}
-
-/* Legend hover effects */
-.legend-item {
-  @apply transition-all duration-300 ease-in-out rounded-md px-2 my-0.5 cursor-pointer;
-}
-
-/* Hovered legend item styling - matching donut behavior */
 .legend-item-hovered {
   @apply translate-x-1 rounded-md;
   opacity: 1 !important;
   filter: brightness(1.1) !important;
 }
-
 .legend-item-hovered .legend-label,
 .legend-item-hovered .legend-value {
   font-weight: 700 !important;
 }
-
 .legend-item-hovered .legend-marker {
   @apply transition-transform duration-300 ease-in-out;
   transform: scale(1.3) !important;
 }
 
-/* Legend dimming when chart or legend items are hovered */
-.donut-graph-container .donut-legend .legend-item {
-  @apply transition-all duration-300 ease-in-out;
+/* Legend label row */
+.legend-label-row {
+  @apply flex justify-between items-center gap-2 w-full flex-nowrap;
 }
 
-/* When chart is hovered, dim non-hovered legend items */
-.donut-chart-container.chart-hovered
-  .donut-legend
-  .legend-item:not(.legend-item-hovered) {
-  opacity: 0.2 !important;
-  filter: brightness(0.5) !important;
+/* Legend text */
+.legend-label {
+  @apply text-sm font-bold text-[#1a1a1a] whitespace-nowrap leading-[1.2] flex-1 min-w-0;
+}
+.legend-value {
+  @apply text-sm font-extrabold text-[#1a1a1a] whitespace-nowrap text-left flex-shrink-0;
+  min-width: fit-content;
+}
+.legend-percentage {
+  @apply text-sm font-extrabold text-[#1a1a1a] whitespace-nowrap;
 }
 
-/* When container is in hovered state, dim non-hovered legend items */
-.donut-graph-container.chart-hovered
-  .donut-legend
-  .legend-item:not(.legend-item-hovered) {
-  opacity: 0.2 !important;
-  filter: brightness(0.5) !important;
+/* Mobile Legend Dropdown Styles */
+.donut-legend-dropdown {
+  @apply relative w-full;
 }
-
-/* Dimmed legend items */
-.donut-graph-container .donut-legend .legend-item.legend-item-dimmed {
-  @apply transition-all duration-300 ease-in-out;
-  opacity: 0.2 !important;
-  filter: brightness(0.5) !important;
+.donut-legend-dropdown-header {
+  @apply relative z-40 flex-shrink-0;
 }
-
-/* Responsive design */
-/* Responsive breakpoints for donut-graph-container */
-@media (max-width: 1200px) {
-  .donut-graph-container {
-    padding: 18px;
-    border-radius: 16px;
-  }
-
-  .donut-graph-title {
-    font-size: 18px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 22px;
-  }
+.legend-dropdown-toggle {
+  @apply bg-white border border-gray-300 rounded-md px-2 py-1 text-xs font-medium text-gray-700 cursor-pointer transition-all duration-200 ease-in-out flex items-center justify-between min-h-[28px] min-w-[80px] relative z-50;
 }
-
-@media (max-width: 1024px) {
-  .donut-graph-container {
-    padding: 16px;
-    border-radius: 14px;
-    min-width: 280px;
-  }
-
-  .donut-graph-title {
-    font-size: 16px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 20px;
-  }
+.legend-dropdown-toggle:hover {
+  @apply bg-gray-50 border-gray-400;
 }
-
-@media (max-width: 900px) {
-  .donut-graph-container {
-    padding: 14px;
-    border-radius: 12px;
-    min-width: 260px;
-  }
-
-  .donut-graph-title {
-    font-size: 15px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 18px;
-  }
+.legend-dropdown-content-header {
+  @apply absolute top-full bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-48 overflow-y-auto;
+  margin-top: 2px;
+  width: fit-content;
+  min-width: 120px;
+  max-width: 300px;
+  right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-@media (max-width: 768px) {
-  .donut-graph-container {
-    border-radius: 8px;
-    padding: 12px;
-    min-width: 240px;
-    min-height: 180px;
-  }
-
-  .donut-graph-header {
-    padding: 12px 12px 0 12px;
-  }
-
-  .donut-graph-content {
-    padding: 12px;
-    min-height: 200px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 18px;
-  }
-
-  .donut-graph-title {
-    @apply text-sm;
-  }
-
-  .donut-graph-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-  }
-
-  .donut-graph-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-  }
+.legend-dropdown-content-header::-webkit-scrollbar {
+  @apply hidden;
 }
-
-@media (max-width: 600px) {
-  .donut-graph-container {
-    padding: 10px;
-    border-radius: 6px;
-    min-width: 220px;
-    min-height: 160px;
-  }
-
-  .donut-graph-title {
-    font-size: 13px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 16px;
-  }
-
-  .donut-graph-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
-  }
+.legend-dropdown-content-header .legend-dropdown-item {
+  @apply flex items-center px-3 py-2 cursor-pointer transition-all duration-200 ease-in-out border-b border-gray-100 whitespace-normal break-words;
 }
-
-@media (max-width: 600px) {
-  .donut-graph-container {
-    padding: 10px;
-    border-radius: 6px;
-    min-width: 220px;
-    min-height: 160px;
-  }
-
-  .donut-graph-title {
-    font-size: 13px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 16px;
-  }
-
-  .donut-graph-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .donut-graph-container {
-    padding: 8px;
-    border-radius: 4px;
-    min-width: 200px;
-    min-height: 140px;
-  }
-
-  .donut-graph-title-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .donut-graph-icon {
-    width: 22px;
-    height: 22px;
-    font-size: 11px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 14px;
-  }
-
-  .donut-graph-title {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 360px) {
-  .donut-graph-container {
-    padding: 6px;
-    border-radius: 3px;
-    min-width: 180px;
-    min-height: 120px;
-  }
-
-  .donut-graph-title {
-    font-size: 11px;
-  }
-
-  .donut-graph-total-count {
-    font-size: 12px;
-  }
-
-  .donut-graph-icon {
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
-  }
-
-  .donut-center-total {
-    font-size: 10px;
-  }
-}
-
-/* Responsive center content */
-@media (max-width: 1200px) {
-  .donut-center-total {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .donut-center-total {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 900px) {
-  .donut-center-total {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 768px) {
-  .donut-center-total {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 600px) {
-  .donut-center-total {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .donut-center-total {
-    font-size: 12px;
-  }
+.legend-dropdown-content-header .legend-dropdown-item:hover {
+  @apply bg-gray-50;
 }

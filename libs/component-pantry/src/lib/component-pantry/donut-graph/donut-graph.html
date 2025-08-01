@@ -7,6 +7,9 @@
     'donut-graph-fullscreen': isFullscreen(),
     'donut-graph-auto': isAuto()
   }"
+  [ngStyle]="containerStyles()"
+  [attr.data-count-range]="getCountRange()"
+  [attr.data-total-count]="totalCount()"
 >
   <!-- Header Section -->
   @if (title()) {
@@ -17,11 +20,56 @@
       </div>
       <div class="donut-graph-title">{{ title() }}</div>
     </div>
+    @if (shouldUseDropdownLegend()) {
+    <!-- Mobile Dropdown Legend in Header -->
+    <div class="donut-legend-dropdown-header">
+      <button
+        class="legend-dropdown-toggle"
+        [class.active]="isLegendDropdownOpen()"
+        (click)="toggleLegendDropdown()"
+        type="button"
+      >
+        <span class="dropdown-text">Legends ({{ data().length }})</span>
+        <span
+          class="dropdown-arrow"
+          [style.transform]="isLegendDropdownOpen() ? 'rotate(180deg)' : 'rotate(0deg)'"
+          >▼</span
+        >
+      </button>
+
+      @if (isLegendDropdownOpen()) {
+      <div class="legend-dropdown-content-header">
+        @for (item of data(); track item.label; let i = $index) {
+        <div
+          class="legend-dropdown-item"
+          [class.legend-item-hovered]="hoveredIndex() === i"
+          (mouseenter)="onLegendItemHover(i, true)"
+          (mouseleave)="onLegendItemHover(i, false)"
+        >
+          <span
+            class="legend-marker"
+            [style.background-color]="getColors(data(), config())[i]"
+          >
+          </span>
+          <div class="legend-label-row">
+            <span class="legend-label">{{ item.label }}</span>
+            <span class="legend-value">
+              <span class="legend-percentage">
+                {{ calculatePercentage(item.total) }}
+              </span>
+            </span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
   </div>
   }
 
   <!-- Chart Content -->
-  <div class="donut-graph-content" [ngStyle]="containerStyles()">
+  <div class="donut-graph-content">
     <div
       class="donut-chart-layout"
       [ngClass]="{
@@ -31,7 +79,7 @@
             'legend-top': legendPosition() === 'top'
           }"
     >
-      <div class="donut-chart-area">
+      <div class="donut-chart-area" [ngStyle]="chartAreaStyles()">
         <div class="donut-chart-container">
           <apx-chart
             #chart
@@ -52,14 +100,23 @@
 
           @if (displayValue()) {
           <div class="donut-center-content">
-            <div class="donut-center-total">{{ displayValue() }}</div>
+            <div
+              class="donut-center-total"
+              [class]="getCenterTextClass()"
+              [style.font-size]="getCenterTextFontSize()"
+              [attr.data-total]="displayValue()"
+              [attr.data-count-range]="getCountRange()"
+            >
+              {{ formattedDisplayValue() }}
+            </div>
           </div>
           }
         </div>
       </div>
 
       <!-- Custom Legend -->
-      @if (config().showLegend !== false) {
+      @if (config().showLegend !== false && !shouldUseDropdownLegend()) {
+      <!-- Desktop Legend -->
       <div class="donut-legend">
         @for (item of data(); track item.label; let i = $index) {
         <div
@@ -73,12 +130,16 @@
             [style.background-color]="getColors(data(), config())[i]"
           >
           </span>
-          <!-- Two-column layout -->
+          <!-- Two-column layout with enhanced value display -->
           <div class="legend-label-row">
-            <span class="legend-label">{{ item.label }}</span>
-            <span class="legend-value"
-              >{{ calculatePercentage(item.total) }}</span
+            <span class="legend-label" [title]="item.label"
+              >{{ item.label }}</span
             >
+            <span class="legend-value">
+              <span class="legend-percentage">
+                {{ calculatePercentage(item.total) }}
+              </span>
+            </span>
           </div>
         </div>
         }
