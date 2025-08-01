@@ -22,7 +22,7 @@ env:
 
 jobs:
   ci-checks:
-    name: 🔍 CI Build Test Lint
+    name: 🔍 CI - Build Lint Test
     runs-on: ubuntu-latest
     outputs:
       host_installation_changed: ${{ steps.setvars.outputs.host_installation_changed }}
@@ -71,7 +71,6 @@ jobs:
             echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
           fi
 
-
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
 
@@ -80,29 +79,6 @@ jobs:
 
       - name: 🏗️ Run build
         run: npx nx affected -t build --parallel=3
-
-      - name: 🏗️ Build host-installation
-        if: steps.setvars.outputs.host_installation_changed == 'true'
-        run: npx nx build host-installation
-
-      - name: 🏗️ Build component-pantry storybook
-        if: steps.setvars.outputs.component_pantry_changed == 'true'
-        run: npm run build:storybook:dev
-
-      
-      - name: ⬆️ Upload Host Installation Build
-        if: steps.setvars.outputs.host_installation_changed == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: host-installation-build
-          path: dist/apps/ntv-host-installation/host-installation/browser
-
-      - name: ⬆️ Upload Component Pantry Storybook
-        if: steps.setvars.outputs.component_pantry_changed == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: component-pantry-storybook
-          path: dist/storybook/component-pantry
 
       - name: 🎭 Get Playwright version
         id: playwright-version
@@ -124,6 +100,20 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
 
+      - name: ⬆️ Upload Host Installation Build
+        if: steps.setvars.outputs.host_installation_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: host-installation-build
+          path: dist/apps/ntv-host-installation/host-installation/browser
+
+      - name: ⬆️ Upload Component Pantry Storybook
+        if: steps.setvars.outputs.component_pantry_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: component-pantry-storybook
+          path: dist/storybook/component-pantry
+
   deploy-host-installation:
     name: 🚀 Deploy Host Installation
     needs: ci-checks
@@ -131,6 +121,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: ↓ Download Host Installation Build
+        uses: actions/download-artifact@v4
+        with:
+          name: host-installation-build
+          path: dist/apps/ntv-host-installation/host-installation/browser
 
       - name: Set deployment variables
         run: |
@@ -149,7 +145,6 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
-          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -157,13 +152,6 @@ jobs:
           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
-      - name: ⬇️ Download Host Installation Build
-        uses: actions/download-artifact@v4
-        with:
-          name: host-installation-build
-          path: dist/apps/ntv-host-installation/host-installation/browser
-
 
       - name: Deploy to S3 and Invalidate CloudFront
         run: |
@@ -177,6 +165,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: ↓ Download Component Pantry Storybook
+        uses: actions/download-artifact@v4
+        with:
+          name: component-pantry-storybook
+          path: dist/storybook/component-pantry
 
       - name: Set deployment variables
         run: |
@@ -195,7 +189,6 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
-          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -203,12 +196,6 @@ jobs:
           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
-      - name: ⬇️ Download Component Pantry Storybook
-        uses: actions/download-artifact@v4
-        with:
-          name: component-pantry-storybook
-          path: dist/storybook/component-pantry
 
       - name: Deploy Storybook to S3 and Invalidate CloudFront
         run: |
