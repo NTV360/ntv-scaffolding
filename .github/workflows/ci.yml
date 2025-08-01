@@ -60,11 +60,11 @@ jobs:
           echo "NX_BASE=$NX_BASE"
           echo "NX_HEAD=$NX_HEAD"
 
-          affected=$(npx nx show projects --affected --target=build --json)
-          echo "Raw affected: $affected"
+          echo "Affected projects:"
+          npx nx show projects --affected --target=build || echo "(none)"
 
-          host=$(echo "$affected" | jq -r '.[]' | grep '^host-installation$' || true)
-          component=$(echo "$affected" | jq -r '.[]' | grep '^component-pantry$' || true)
+          host=$(npx nx show projects --affected --target=build | grep -w host-installation || true)
+          component=$(npx nx show projects --affected --target=build | grep -w component-pantry || true)
 
           echo "host: [$host]"
           echo "component: [$component]"
@@ -80,7 +80,6 @@ jobs:
           else
             echo "component_pantry_changed=false" >> $GITHUB_OUTPUT
           fi
-
 
       - name: ☁️ Start Nx Cloud CI run
         run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
@@ -128,7 +127,7 @@ jobs:
   deploy-host-installation:
     name: 🚀 Deploy Host Installation
     needs: ci-checks
-    if: needs.ci-checks.outputs.host_installation_changed == 'true'
+    if: github.event_name == 'push' && needs.ci-checks.outputs.host_installation_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -156,7 +155,6 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_HOST_INSTALLATION_DEV }}" >> $GITHUB_ENV
-          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -173,7 +171,7 @@ jobs:
   deploy-component-pantry:
     name: 📘 Deploy Component Pantry Storybook
     needs: ci-checks
-    if: needs.ci-checks.outputs.component_pantry_changed == 'true'
+    if: github.event_name == 'push' && needs.ci-checks.outputs.component_pantry_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -201,7 +199,6 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}" >> $GITHUB_ENV
             echo "S3_BUCKET=${{ secrets.S3_BUCKET_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
             echo "CF_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_COMPONENT_PANTRY_STORYBOOK_DEV }}" >> $GITHUB_ENV
-          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
