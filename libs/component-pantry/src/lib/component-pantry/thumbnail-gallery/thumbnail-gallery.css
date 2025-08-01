@@ -11,7 +11,7 @@
 
 /* Grid Layout */
 .thumbnail-gallery--grid {
-  @apply grid mt-4;
+  @apply grid p-2 mt-2;
   gap: var(--gap, 1rem);
   grid-template-columns: repeat(var(--columns, 4), 1fr);
 }
